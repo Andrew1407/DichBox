@@ -22,13 +22,13 @@ create table boxes (
     references users (id) 
     on delete cascade
     on update cascade,
-  access_level varchar(6) not null,
+  access_level varchar(7) not null,
   description varchar(200) default '',
   reg_date timestamp default now()
 );
 
 -- privacy mode for box
-create table boxes_access (
+create table box_access (
   box_id int not null 
     references boxes (id) 
     on delete cascade
@@ -41,7 +41,7 @@ create table boxes_access (
 );
 
 -- stored files and diretories
-create table boxes_entries (
+create table box_entries (
   id serial primary key,
   box_id int not null 
     references boxes (id) 
@@ -50,5 +50,5 @@ create table boxes_entries (
   name varchar(350),
   type varchar(5),
   description varchar(200) default '',
-  file_entries text
+  file_entries text default ''
 );
