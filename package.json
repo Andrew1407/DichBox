@@ -1,23 +1,44 @@
 {
-  "name": "server",
+  "name": "dichbox",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node out/server-bundle.js",
-    "build": "webpack --mode development",
+    "server-start": "node ./out/server-bundle",
+    "server-build": "webpack --mode development",
+    "client-dev": "webpack-dev-server",
+    "client-start": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Andrew1407/DichBox.git"
+  },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
-    "ts-loader": "^7.0.5",
-    "typescript": "^3.9.5",
+    "@babel/core": "^7.10.3",
+    "@babel/preset-env": "^7.10.3",
+    "@babel/preset-react": "^7.10.1",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^3.6.0",
+    "style-loader": "^1.2.1",
     "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.5"
   },
   "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "@types/express": "^4.17.6",
     "@types/pg": "^7.14.3"
+  },
+  "babel": {
+    "presets": [
+      "@babel/env",
+      "@babel/react"
+    ]
   }
 }

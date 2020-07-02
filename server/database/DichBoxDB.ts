@@ -22,7 +22,49 @@ export default class DichBoxDB {
       for (let i = 1; i <= values.length; i++)
         valuesTemplate.push(`$${i}`);
       return [ keys, values, valuesTemplate ];
-    }
+  }
+
+  private async findValueById(
+    table: string,
+    id: number
+  ): Promise<any> {
+    const res: QueryResult = await this.poolClient.query(
+      `select * from ${table} where id = $1;`, [id]
+    );
+    return res.rows.length ? res.rows[0] : null;
+  }
+
+  private async updateValueById(
+    table: string,
+    id: number,
+    data: boxInput|userInput|entryInput
+  ): Promise<any> {
+    const [ keys, values, valuesTemplate ]: 
+      [string[], dataElement[], string[]] =
+      this.formatData(data);
+    const updated: string[] = [];
+    for (let i = 0; i < keys.length; i++)
+      updated.push(keys[i] + ' = ' + valuesTemplate[i]);
+    await this.poolClient.query(
+      `update ${table} set ${updated} where id = ${id};`,
+      values
+    );
+  }
+
+  private async insertValue(
+    table: string,
+    data: any
+  ): Promise<any> {
+    const [ keys, values, valuesTemplate ]: 
+    [string[], dataElement[], string[]] =
+    this.formatData(data);
+  const res: QueryResult = await this.poolClient.query(
+    `insert into ${table} (${keys}) values (${valuesTemplate}) returning *;`,
+    values
+  );
+  return res.rows[0];
+
+  }
 
   public async clientConnection(): Promise<void> {
     this.poolClient = await this.pool.connect();
@@ -31,33 +73,15 @@ export default class DichBoxDB {
   // users connetion
 
   public async insertUser(userData: userInput): Promise<userData> {
-    const [ keys, values, valuesTemplate ]: 
-      [string[], dataElement[], string[]] =
-      this.formatData(userData);
-    const res: QueryResult = await this.poolClient.query(
-      `insert into users (${keys}) values (${valuesTemplate}) returning *;`,
-      values
-    );
-    return res.rows[0];
+    return await this.insertValue('users', userData);
   }
 
   public async updateUser(id: number, userData: userInput): Promise<void> {
-    const [ keys, values, valuesTemplate ]: 
-      [string[], dataElement[], string[]] =
-      this.formatData(userData);
-    const updated: string[] = [];
-    for (let i = 0; i < keys.length; i++)
-      updated.push(keys[i] + ' = ' + valuesTemplate[i]);
-    await this.poolClient.query(
-      `update users set ${updated} where id = ${id};`, values
-    );
+    await this.updateValueById('users', id, userData);
   }
 
   public async findUser(userId: number): Promise<userData|null> {
-    const res: QueryResult = await this.poolClient.query(
-      'select * from users where id = $1;', [userId]
-    );
-    return res.rows.length ? res.rows[0] : null;
+    return await this.findValueById('users', userId);
   }
 
   public async findUserName(username: string): Promise<number> {
@@ -74,7 +98,6 @@ export default class DichBoxDB {
     return res.rows.length ? res.rows[0].id : -1;
   }
 
-
   public async removeUser(id: number): Promise<void> {
     await this.poolClient.query(
       'delete from users where id = $1;' +
@@ -87,16 +110,15 @@ export default class DichBoxDB {
   // description insertions
 
   public async setDescription(
-    database: string,
+    table: string,
     data: string,
     dataId: number
   ): Promise<void> {
       await this.poolClient.query(
-        `update ${database} set description = $1; where id = $2;`, 
+        `update ${table} set description = $1; where id = $2;`, 
         [data, dataId]
       );
   }
-
 
   // subscribrers: insert/remove
 
@@ -129,21 +151,11 @@ export default class DichBoxDB {
   // boxes connection
 
   public async insertBox(boxData: boxInput): Promise<boxData> {
-    const [ keys, values, valuesTemplate ]: 
-      [string[], dataElement[], string[]] =
-      this.formatData(boxData);
-    const res: QueryResult = await this.poolClient.query(
-      `insert into users (${keys}) values (${valuesTemplate}) returning *;`,
-      values
-    );
-    return res.rows[0];
+    return await this.insertValue('boxes', boxData);
   }
 
   public async findBox(boxId: number): Promise<boxData|null> {
-    const res: QueryResult = await this.poolClient.query(
-      'select * from boxes where id = $1;', [boxId]
-    );
-    return res.rows.length ? res.rows[0] : null;
+    return await this.findValueById('boxes', boxId);
   }
 
   public async removeBox(id: number): Promise<void> {
@@ -156,16 +168,7 @@ export default class DichBoxDB {
     id: number,
     boxData: boxInput
   ): Promise<void> {
-    const [ keys, values, valuesTemplate ]: 
-      [string[], dataElement[], string[]] =
-      this.formatData(boxData);
-    const updated: string[] = [];
-    for (let i = 0; i < keys.length; i++)
-      updated.push(keys[i] + ' = ' + valuesTemplate[i]);
-    await this.poolClient.query(
-      `update boxes set ${updated} where id = ${id};`,
-      values
-    );
+    await this.updateValueById('boxes', id, boxData);
   }
 
   // privacy setting up
@@ -213,36 +216,18 @@ export default class DichBoxDB {
   // files management
 
   public async insertEntry(entryData: entryInput): Promise<entryData> {
-    const [ keys, values, valuesTemplate ]: 
-      [string[], dataElement[], string[]] =
-      this.formatData(entryData);
-    const res: QueryResult = await this.poolClient.query(
-      `insert into box_entries (${keys}) values (${valuesTemplate}) returning *;`,
-      values
-    );
-    return res.rows[0];
+    return await this.insertValue('boxes', entryData);
   }
 
   public async findEntry(id: number): Promise<entryData|null> {
-    const res: QueryResult = await this.poolClient.query(
-      'select * from box_entries where id = $1;', [id]
-    );
-    return res.rows.length ? res.rows[0] : null;
+    return await this.findValueById('box_entries', id);
   }
 
   public async updateEntry(
     id: number,
     entryData: entryInput
   ): Promise<void> {
-    const [ keys, values, valuesTemplate ]: 
-      [string[], dataElement[], string[]] =
-      this.formatData(entryData);
-    const updated: string[] = [];
-    for (let i = 0; i < keys.length; i++)
-      updated.push(keys[i] + ' = ' + valuesTemplate[i]);
-    await this.poolClient.query(
-      `update box_entries set ${updated} where id = ${id};`, values
-    );
+    await this.updateValueById('box_entries', id, entryData)
   }
 
   public async removeEntry(id: number): Promise<void> {
@@ -250,5 +235,4 @@ export default class DichBoxDB {
       'delete from box_entries where id = $1;', [id]
     );
   }
-
 }
