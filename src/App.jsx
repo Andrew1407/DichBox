@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React from 'react';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Menu from './components/Menu';
+import MainContent from './components/MainContent';
+import './styles/main.css';
 
-const App = () => {
-  const [text, setText] = useState('dich-client');
-  const onClick = e => {
-    e.preventDefault();
-    axios
-      .get('http://192.168.0.223:7041')
-      .then(({ data }) => setText(data));
-  };
-  return (
-    <h1 onClick={onClick}>{text}</h1>
-  );
-};
+const App = () => (
+  <div id="main-page">
+    <Header />
+    <Menu />
+    <MainContent />
+    <Footer />
+  </div>
+);
+
 
 export default App;

@@ -1,0 +1,12 @@
+body {
+  background-color: black;
+}
+
+#main-page {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 10% 83% 7%;
+  min-width: 800px;
+  min-height: 1100px;
+  background-color: black;
+}

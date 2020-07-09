@@ -1,0 +1,66 @@
+body {
+  margin: 0;
+}
+
+#header {
+  grid-column: 1 / 5;
+  display: flex;
+  justify-content: space-between;
+  background-color: black;
+  font-family: "DynarShadowC";
+  border-bottom: 7px solid rgb(75, 73, 73);
+}
+
+#header-name {
+  font-size: 230%;
+  color: black;
+  background-color: rgb(50, 211, 240);
+  -webkit-transform: skewX(-25deg); 
+	-moz-transform: skewX(-25deg); 
+	-ms-transform: skewX(-25deg); 
+	-o-transform: skewX(-25deg); 
+  transform: skewX(-25deg);
+  margin-left: 2%;
+  padding-left: 2%;
+  padding-right: 3%;
+}
+
+#header-name > h1 {
+  margin-top: 5%;
+  -webkit-transform: skewX(25deg); 
+	-moz-transform: skewX(25deg); 
+	-ms-transform: skewX(25deg); 
+	-o-transform: skewX(25deg); 
+	transform: skewX(25deg); 
+}
+
+#header-search {
+  background-color: rgb(50, 211, 240);
+  margin-right: 2%; 
+  padding-left: 2%;
+  padding-right: 1.5%;
+  font-size: 200%;
+  -webkit-transform: skewX(-25deg); 
+	-moz-transform: skewX(-25deg); 
+	-ms-transform: skewX(-25deg); 
+	-o-transform: skewX(-25deg); 
+  transform: skewX(-25deg);
+}
+
+#header-search > input {
+  margin-top: 10%;
+  padding-left: 1%;
+  border: solid 4px;
+  font-size: 80%;
+  background-color: rgb(153, 237, 251);
+  -webkit-transform: skewX(25deg); 
+	-moz-transform: skewX(25deg); 
+	-ms-transform: skewX(25deg); 
+	-o-transform: skewX(25deg); 
+	transform: skewX(25deg); 
+}
+
+@font-face {
+  font-family: "DynarShadowC";
+  src: url("./fonts/15294.otf");
+}

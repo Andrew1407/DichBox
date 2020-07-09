@@ -28,9 +28,9 @@ module.exports = {
           { 
             loader: 'css-loader',
             options: {
-                modules: {
-                  localIdentName: "[name]__[local]___[hash:base64:5]",
-                },														
+                // modules: {
+                //   localIdentName: "[name]__[local]___[hash:base64:5]",
+                // },														
                 sourceMap: true
             }
           },
@@ -48,6 +48,13 @@ module.exports = {
       {
         test: /\.(png|jpe?g|gif)$/,
         loader: 'url-loader?limit=10000&name=img/[name].[ext]'
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2|otf)$/,
+        loader: 'file-loader',
+        options: {
+          name: './fonts/[name].[ext]',
+        },
       }
     ]
   },
