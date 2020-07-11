@@ -1,3 +1,7 @@
+* {
+  cursor: url("./imgs/cursor.png") 0 0, default;
+}
+
 body {
   background-color: black;
 }
@@ -6,7 +10,28 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: 10% 83% 7%;
-  min-width: 800px;
-  min-height: 1100px;
+  min-width: 1000px;
+  height: 1200px;
   background-color: black;
 }
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(50, 211, 240);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: orange;
+}
+

@@ -1,4 +1,6 @@
 #center {
   grid-column: 2 / 5;
+  padding: 1%;
   color: rgb(50, 211, 240);
+  height: 1000px;
 }

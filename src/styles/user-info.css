@@ -1,0 +1,96 @@
+.user-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 99%;
+  overflow-y: scroll;
+}
+
+.user-logo {
+  margin: 0 auto;
+  width: 60%;
+  margin-top: 35%;
+  margin-bottom: 16%;
+  padding: 4%;
+  border-radius: 50%;
+  border: 5px solid rgb(46, 182, 206);
+}
+
+.user-data {
+  margin-bottom: 15%;
+  font-size: 180%;
+}
+
+.show {
+  text-align: center;
+}
+
+.edit {
+  text-align: left;
+  padding-left: 2%;
+}
+
+.user-data b {
+  color: orange;
+}
+
+
+.img-radio {
+  text-align: left;
+}
+
+.user-img {
+  text-align: left;
+  margin-bottom: 20%;
+}
+  
+.inpt > input, .inpt > textarea {
+  margin-bottom: 10%;
+}
+
+#edit-desc {
+  resize: none;
+  margin-top: 6%;
+  color: rgb(46, 182, 206);
+  border: 3px solid rgb(46, 182, 206);
+  background-color: black;
+  outline: none;
+  font-size: 100%;
+  width: 90%;
+  padding: 3%;
+}
+
+.user-data > input {
+  margin-left: 1%;
+  margin-top: 3%;
+  font-size: 90%;
+  width: 90%;
+  padding: 3%;
+  color: rgb(46, 182, 206);
+  border: black;
+  border-bottom: 3px solid rgb(46, 182, 206);
+  background-color: black;
+  outline: none;
+}
+
+.logo-edit {
+  margin-top: 220%;
+}
+
+.edit-btn {
+  outline: none;
+  width: 40%;
+  margin: 0 auto;
+  margin-bottom: 10%;
+  font-style: italic;
+  color: rgb(46, 182, 206);
+  background: black;
+  border: 3px solid rgb(46, 182, 206);
+}
+
+.pswd-btn {
+  width: 70%;
+  margin-bottom: 20%;
+}
+
+

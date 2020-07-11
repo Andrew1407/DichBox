@@ -3,13 +3,19 @@ import '../styles/footer.css';
 
 const Footer = () => (
   <div id="footer">
-    <p id="version"><b>version: 0.0.1</b></p>
+    <p id="version">
+      <small>
+       <b>version: 0.0.1</b>
+      </small>
+      </p>
     <p>
       <b>Dich Connections</b>
     </p>  
     <p>
       <b>
-        <a id="repo-ref" href="https://github.com/Andrew1407/DichBox" target="_blank">git repo</a>
+        <small>
+          <a id="repo-ref" href="https://github.com/Andrew1407/DichBox" target="_blank">git repo</a>
+        </small>
       </b>
     </p>
   </div>
