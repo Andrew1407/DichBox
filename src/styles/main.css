@@ -1,18 +1,7 @@
 * {
+  background-color: black;
+  color: rgb(0, 217, 255);
   cursor: url("./imgs/cursor.png") 0 0, default;
-}
-
-body {
-  background-color: black;
-}
-
-#main-page {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: 10% 83% 7%;
-  min-width: 1000px;
-  height: 1200px;
-  background-color: black;
 }
 
 /* width */
@@ -34,4 +23,3 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: orange;
 }
-

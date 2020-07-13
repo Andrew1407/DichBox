@@ -1,7 +1,15 @@
 #menu {
-  grid-column: 1 / 2;
+  padding: 1%;
   border-right: 7px solid rgb(75, 73, 73);
-  color: rgb(50, 211, 240);
-  padding: 0.5%;
-  height: 100%;
+  width: 30%;
+  margin: 0;
+  max-height: 1000px;
+  overflow-y: scroll;
+}
+
+#hide-arrow {
+  height: 30px;
+  margin-left: 47%;
+  margin-top: 1%;
+  margin-bottom: 4%;
 }

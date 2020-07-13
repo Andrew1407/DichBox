@@ -1,70 +1,56 @@
-#sign-wrap {
-  margin-top: 6%;
-}
-
-#sign-switch{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
+#sign {
   margin-bottom: 10%;
 }
 
-#sign-switch > button {
-  color: rgb(46, 182, 206);
-  background-color: black;
+#sign {
+  overflow-y: scroll;
+}
+
+#sign-switch {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  margin-bottom: 5%;
+}
+
+#sign-switch > p {
+  font-size: 200%;
   outline: none;
-  font-size: 150%;
-  padding: 2% 3% 2% 3%;
-  border: 3px solid rgb(46, 182, 206);
-  border-radius: 46%;
-  width: 25%;
+  padding: 2% 4%;
+  border: 3px solid rgb(0, 217, 255);
+  border-radius: 50%;
 }
 
 .sign-form {
   display: flex;
   flex-direction: column;
-  padding: 5%;
-  margin: 5%;
-  /* background-color: rgb(46, 182, 206); */
-  border: 5px solid rgb(46, 182, 206);
+  font-size: 180%;
 }
 
 .sign-field {
-  text-align: center;
-  padding-bottom: 8%;
+  margin-bottom: 10%;
 }
 
 .sign-field > p {
-  text-align: left;
   color: orange;
-  font-size: 190%;
-  margin-top: 0;
-  margin-bottom: 5%;
-  font-weight: 600;
 }
 
 .sign-field > input {
+  font-size: 100%;
+  width: 90%;
+  margin-left: 3%;
   outline: none;
-  width: 97%;
-  font-size: 180%;
-  border: black;
-  border-bottom: 3px solid rgb(46, 182, 206);
-  background-color: black;
-  margin-bottom: 5%;
-  padding: 3%;
-  color: rgb(46, 182, 206);
+  border-color: black;
+  border-bottom: 3px solid rgb(0, 217, 255);
+  padding: 2%;
 }
 
 .form-submit {
-  text-align: center;
-}
-
-.form-submit > input {
-  padding: 1% 5% 1% 5%;
-  margin-top: 4%;
-  font-size: 160%;
-  background-color: black;
-  border: 3px solid rgb(46, 182, 206);
-  color: rgb(46, 182, 206);
+  margin: 0 auto;
+  border: 2px solid rgb(0, 217, 255);
+  font-size: 100%;
   font-style: italic;
+  padding: 2% 2%;
+  min-width: 60%;
+  margin-top: 20%;
 }

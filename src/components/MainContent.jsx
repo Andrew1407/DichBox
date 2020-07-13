@@ -1,15 +1,15 @@
-import React, { useContext } from 'react';
-import { MenuContext } from '../contexts/MenuContext';
+import React from 'react';
+import Menu from './Menu';
+import ShowContent from './ShowContent';
 import '../styles/main-content.css';
 
 const MainContent = () => {
-  const { menuIsHidden } = useContext(MenuContext);
-  const gridColumn = menuIsHidden ? '1 / 5': '2 / 5';
   return (
-  <div id="center" style={{ gridColumn }}>
-    <h2>nothing to do there</h2>
-  </div>
-  )
+    <div id="main-content">
+      <Menu />
+      <ShowContent />
+    </div>
+  );
 };
 
 export default MainContent;

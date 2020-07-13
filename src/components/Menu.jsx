@@ -1,23 +1,23 @@
 import React, { useContext } from 'react';
-import Sign from './SignForms/Sign';
-import UserInfo from './UserInfo/UserInfo';
-import { MenuContext } from '../contexts/MenuContext';
-import Navbar from './Navbar';
+import { MainContext } from '../contexts/MainContext';
+import SignForms from './SignForms/SignForms';
+import Personal from './Personal/Personal';
+import hideImg from '../styles/imgs/hide-arrow.png';
 import '../styles/menu.css';
 
 const Menu = () => {
-  const { menuIsHidden, userId } = useContext(MenuContext);
-  const styles = {
-    visible: { display: 'block', gridColumn: '1 / 2' },
-    hidden: { display: 'none', gridColumn: '1 / 1' }
+  const { isHidden, setMenuHidden, userId } = useContext(MainContext);
+  const handleArrowClick = e => {
+    e.preventDefault();
+    setMenuHidden(true)
   };
+
   return (
-  <div id="menu" style={menuIsHidden ? styles.hidden : styles.visible}>
-    <Navbar />
-    {/* { userId ? <UserInfo /> : < Sign />} */}
-    <UserInfo />
-  </div>
- );
+    !isHidden && <menu id="menu">
+      <img src={hideImg} id="hide-arrow" onClick={ handleArrowClick } />
+      { !userId ? <Personal /> : <SignForms />}
+    </menu>
+  );
 };
 
 export default Menu;
