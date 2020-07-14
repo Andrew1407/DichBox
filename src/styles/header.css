@@ -31,7 +31,7 @@ body {
 #header-name > h1 {
   color: black;
   background: rgb(50, 211, 240);
-  margin: 0.5% 2% 0.5% 2%;
+  margin: 0 auto;
   -webkit-transform: skewX(25deg); 
 	-moz-transform: skewX(25deg); 
 	-ms-transform: skewX(25deg); 

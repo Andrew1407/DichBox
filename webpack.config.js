@@ -8,7 +8,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
     chunkFilename: '[id].js',
-    publicPath: ''
+    publicPath: '/'
   },
   resolve: {
     extensions: ['.js', '.jsx']
@@ -67,6 +67,7 @@ module.exports = {
   ],
   devServer: {
     port: 7042,
-    host: '192.168.0.20'
+    host: '192.168.0.20',
+    historyApiFallback: true
   }
 }
