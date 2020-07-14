@@ -2,7 +2,7 @@ create database dich_box;
 -- enter the database
 \c dich_box 
 
--- users data
+-- users' data
 create table users (
   id serial primary key,
   name varchar(30),

@@ -1,5 +1,5 @@
 import { Pool, PoolClient, QueryResult } from 'pg';
-import { userData, userInput, boxData, boxInput, dataElement, entryData, entryInput } from './datatypes'
+import { userData, userInput, boxData, boxInput, dataElement, entryData, entryInput } from '../datatypes'
 
 export default class DichBoxDB {
   private pool: Pool;
@@ -84,11 +84,11 @@ export default class DichBoxDB {
     return await this.findValueById('users', userId);
   }
 
-  public async findUserName(username: string): Promise<number> {
+  public async findUserByName(username: string): Promise<userData|null> {
     const res: QueryResult = await this.poolClient.query(
       'select * from users where name = $1;', [username]
     );
-    return res.rows.length ? res.rows[0].id : -1;
+    return res.rows.length ? res.rows[0] : null;
   }
 
   public async findUserEmail(email: string): Promise<number> {
