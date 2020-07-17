@@ -4,32 +4,30 @@ import { MainContext } from '../contexts/MainContext';
 import SignForms from './SignForms/SignForms';
 import UserData from './UserData/UserData';
 import hideImg from '../styles/imgs/hide-arrow.png';
+import showImg from '../styles/imgs/show-arrow.png';
 import '../styles/menu.css';
-import SingForms from './SignForms/SignForms';
 
 const Menu = () => {
-  const { isHidden, setMenuHidden, userId, userData } = useContext(MainContext);
-  const handleArrowClick = e => {
+  const { menuVisible, setMenuVisible, userData } = useContext(MainContext);
+  const username = userData.name;
+  const handleArrowClick = modifier => e => {
     e.preventDefault();
-    setMenuHidden(true)
+    setMenuVisible(modifier)
   };
-  const signedUserPathRender = () => {
-    return (
-      userId ? <Redirect to={`/${userData.name}`} /> : <SignForms />
-    )
-  };
-  const userPathRender = ({ match }) => (
-    <UserData userData={userData} />
+  const signedUserCheckup = () => (
+    username ? <Redirect to={'/' + username} /> : <SignForms />
   );
 
   return (
-    !isHidden && <menu id="menu">
-      <img src={hideImg} id="hide-arrow" onClick={ handleArrowClick } />
+    menuVisible ? 
+    ( <menu id="menu">
+      <img src={hideImg} className="arrow" onClick={ handleArrowClick(false) } />
       <Switch>
-        <Route exact path="/" render={ signedUserPathRender } />
-        <Route path="/:username" component={ userPathRender }/>
+        <Route exact path="/" component={ signedUserCheckup } />
+        <Route path="/:username" component={ UserData }/>
       </Switch>
-    </menu>
+    </menu> ) :
+    <img src={showImg} className="arrow" id="show" onClick={ handleArrowClick(true) } />
   );
 };
 

@@ -16,9 +16,18 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.(js|jsx)?$/,
         loader: 'babel-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        options: {
+          presets: [
+              '@babel/preset-env',
+              '@babel/preset-react'
+          ],
+          plugins: [
+              '@babel/transform-runtime'
+          ]
+        } 
       },
       {
         test: /\.css$/,
@@ -63,7 +72,7 @@ module.exports = {
       template: __dirname + '/src/index.html',
       filename: 'index.html',
       inject: 'body'
-    })
+    }),
   ],
   devServer: {
     port: 7042,

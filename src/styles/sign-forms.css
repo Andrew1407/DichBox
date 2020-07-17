@@ -45,6 +45,10 @@
   padding: 2%;
 }
 
+.sign-field > input:focus {
+  border-bottom: 7px solid rgb(0, 217, 255);
+}
+
 .form-submit {
   margin: 0 auto;
   border: 2px solid rgb(0, 217, 255);
