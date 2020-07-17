@@ -10,9 +10,9 @@ type userData = {
 };
 
 type userInput = {
-  name: string,
-  email: string,
-  passwd: string,
+  name?: string,
+  email?: string,
+  passwd?: string,
   description?: string
 };
 

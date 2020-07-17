@@ -56,14 +56,12 @@ export default class DichBoxDB {
     data: any
   ): Promise<any> {
     const [ keys, values, valuesTemplate ]: 
-    [string[], dataElement[], string[]] =
-    this.formatData(data);
-  const res: QueryResult = await this.poolClient.query(
-    `insert into ${table} (${keys}) values (${valuesTemplate}) returning *;`,
-    values
-  );
-  return res.rows[0];
-
+      [string[], dataElement[], string[]] = this.formatData(data);
+    const res: QueryResult = await this.poolClient.query(
+      `insert into ${table} (${keys}) values (${valuesTemplate}) returning *;`,
+      values
+    );
+    return res.rows[0];
   }
 
   public async clientConnection(): Promise<void> {
@@ -84,18 +82,26 @@ export default class DichBoxDB {
     return await this.findValueById('users', userId);
   }
 
-  public async findUserByName(username: string): Promise<userData|null> {
+  public async findUserByEmail(
+    email: string,
+    passwd: string
+  ): Promise<userData|null> {
     const res: QueryResult = await this.poolClient.query(
-      'select * from users where name = $1;', [username]
+      'select * from users where email = $1 and passwd = $2;',
+      [email, passwd]
     );
     return res.rows.length ? res.rows[0] : null;
   }
 
-  public async findUserEmail(email: string): Promise<number> {
+  public async findUserColumnValue(
+    column: string,
+    value: string
+  ): Promise<undefined|string> {
     const res: QueryResult = await this.poolClient.query(
-      'select * from users where email = $1;', [email]
+      `select * from users where ${column} = $1;`,
+      [value]
     );
-    return res.rows.length ? res.rows[0].id : -1;
+    return res.rows.length ? res.rows[0][column] : undefined;
   }
 
   public async removeUser(id: number): Promise<void> {

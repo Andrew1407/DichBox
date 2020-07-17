@@ -7,7 +7,7 @@ create table users (
   id serial primary key,
   name varchar(30),
   email varchar(50) not null,
-  passwd varchar(10) not null,
+  passwd varchar(16) not null,
   followers int default 0,
   reg_date timestamp default now(),
   subscriptions int[] default '{}',

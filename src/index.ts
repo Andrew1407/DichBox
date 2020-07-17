@@ -10,6 +10,7 @@ app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({
   extended: true
 }));
-app.use('/', router);
+
+app.use('/users', router);
 
 app.listen(7041, '192.168.0.223')
