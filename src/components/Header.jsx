@@ -10,7 +10,7 @@ const Header = () => {
   const history = useHistory();
   const handleMenuClick = e => {
     const currentPath = history.location.pathname;
-    const isHomePath = new RegExp(id ? `^/${name}$` : '^/$');
+    const isHomePath = new RegExp(`^/(${name})?$`);
     if (isHomePath.test(currentPath)) {
       e.preventDefault()
       setMenuVisible(!menuVisible);
