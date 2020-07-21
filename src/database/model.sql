@@ -5,7 +5,7 @@ create database dich_box;
 -- users' data
 create table users (
   id serial primary key,
-  name varchar(30),
+  name varchar(20),
   email varchar(50) not null,
   passwd varchar(16) not null,
   followers int default 0,

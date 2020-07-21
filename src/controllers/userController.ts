@@ -6,7 +6,7 @@ type middlewareFn = (req: Request, res: Response) => Promise<void>;
 type userResponse = {
   name: string,
   description: string,
-  reg_date: Date,
+  reg_date: string,
   followers?: number,
   subscriptions?: number[]
   passwd?: string,
@@ -30,22 +30,22 @@ const formatUserFields = (
     email,
     id
   }: userData = userData;
+  const reg_dateFromated: string = new Date(reg_date).toDateString();
   return modifier ? 
-  { id, name, reg_date, description, email, followers, subscriptions } :
-  { name, reg_date, description, followers };
+  { id, name, reg_date: reg_dateFromated, description, email, followers, subscriptions } :
+  { id, name, reg_date: reg_dateFromated, description, followers };
 };
 
 const signUpUser: middlewareFn = async (req: Request, res: Response) => {
   const clientData: userInput = req.body;
   const signedUser: userData = await clientDB.insertUser(clientData);
-  const userRes: userResponse = formatUserFields(signedUser, true);
-  res.json(userRes).end();
+  res.json({ id: signedUser.id }).end();
 };
 
 const findUser: middlewareFn = async (req: Request, res: Response) => {
-  const id: number = req.body.id;
+  const name: string = req.body.name;
   const ownPage: boolean = req.body.ownPage;
-  const user: userData = await clientDB.findUser(id);
+  const user: userData = await clientDB.findUserByColumn('name', name);
   if (user) {
     const userRes: userResponse = formatUserFields(user, ownPage);
     res.json(userRes).end();
@@ -58,19 +58,24 @@ const signInUser: middlewareFn = async (req: Request, res: Response) => {
   const email: string = req.body.email;
   const passwd: string = req.body.passwd;
   const user: userData = await clientDB.findUserByEmail(email, passwd);
-  if (user) {
-    const userRes: userResponse = formatUserFields(user, true);
-    res.json(userRes).end();
-  } else {
-    res.json(null).end();
-  }
+  const id: number|null = user ? user.id : null;
+  res.json({ id }).end();
 };
 
 const verifyUserInput: middlewareFn = async (req: Request, res: Response) => {
   const inputValue: string = req.body.inputValue;
   const column: string = req.body.inputField;
-  const foundValue: string|undefined = await clientDB.findUserColumnValue(column, inputValue);
+  const foundUser: userData = await clientDB.findUserByColumn(column, inputValue);
+  const foundValue: string|number|null = foundUser ? 
+    foundUser[column] : null;
   res.json({ foundValue }).end();
+};
+
+const getUsername: middlewareFn = async (req: Request, res: Response) => {
+  const id: number = req.body.id;
+  const foundUser: userData = await clientDB.findUserByColumn('id', id);
+  const name: string = foundUser ? foundUser.name : null;
+  res.json({ name }).end();
 };
 
 
@@ -78,5 +83,6 @@ export {
   findUser,
   signUpUser,
   signInUser,
-  verifyUserInput
+  verifyUserInput,
+  getUsername
 };

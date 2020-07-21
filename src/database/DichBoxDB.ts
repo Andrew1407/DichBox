@@ -24,6 +24,17 @@ export default class DichBoxDB {
       return [ keys, values, valuesTemplate ];
   }
 
+  private async findValueByColumn(
+    table: string,
+    column: string,
+    value: any
+  ): Promise<any> {
+    const res: QueryResult = await this.poolClient.query(
+      `select * from ${table} where ${column} = $1;`, [value]
+    );
+    return res.rows.length ? res.rows[0] : null;
+  }
+
   private async findValueById(
     table: string,
     id: number
@@ -37,7 +48,8 @@ export default class DichBoxDB {
   private async updateValueById(
     table: string,
     id: number,
-    data: boxInput|userInput|entryInput
+    data: boxInput|
+    userInput|entryInput
   ): Promise<any> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] =
@@ -78,8 +90,11 @@ export default class DichBoxDB {
     await this.updateValueById('users', id, userData);
   }
 
-  public async findUser(userId: number): Promise<userData|null> {
-    return await this.findValueById('users', userId);
+  public async findUserByColumn(
+    column: string,
+    value: any
+  ): Promise<userData|null> {
+    return await this.findValueByColumn('users', column, value);
   }
 
   public async findUserByEmail(
@@ -91,17 +106,6 @@ export default class DichBoxDB {
       [email, passwd]
     );
     return res.rows.length ? res.rows[0] : null;
-  }
-
-  public async findUserColumnValue(
-    column: string,
-    value: string
-  ): Promise<undefined|string> {
-    const res: QueryResult = await this.poolClient.query(
-      `select * from users where ${column} = $1;`,
-      [value]
-    );
-    return res.rows.length ? res.rows[0][column] : undefined;
   }
 
   public async removeUser(id: number): Promise<void> {
@@ -144,8 +148,8 @@ export default class DichBoxDB {
         'update users set subscriptions = array_remove(subscriptions, $2) where id = $1;' +
         'update users set followers = (followers - 1) where id = $2;'
     };
-    const follower: userData|null = await this.findUser(followerId);
-    const user: userData|null = await this.findUser(userId)
+    const follower: userData|null = await this.findUserByColumn('id', followerId);
+    const user: userData|null = await this.findUserByColumn('id', followerId);
     if (!follower || !user) return false;
     await this.poolClient.query(
       query[queryType],
