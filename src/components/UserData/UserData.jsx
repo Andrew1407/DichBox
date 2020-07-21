@@ -1,16 +1,20 @@
-import React, { useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
+import { useHistory, Route } from 'react-router-dom';
 import { MainContext } from '../../contexts/MainContext';
+import Boxes from './Boxes';
 
 const UserData = () => {
-  const { username } = useParams();
   const { userData } = useContext(MainContext);
+  const history = useHistory();
+  const params = new URLSearchParams(history.location.search)
+  const menuCurrect = params.get('menu');
+
   return (
     <div>
-      <h1>{username}</h1>
-      <ul style={{fontSize: '200%'}}>
+      <h1>{ menuCurrect }</h1>
+      <ul>
         {Object.entries(userData)
-          .map(([key, value]) => 
+          .map(([ key, value ]) => 
             <li>{key}: {value}</li>
         )}
       </ul>

@@ -1,31 +1,44 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
 export const MainContext = createContext();
 
 const MainContextProvider = props => {
+  const history = useHistory();
   const [menuVisible, setMenuVisible] = useState(true);
-  const [userData, setUserDataState] = useState({
-    id: localStorage.getItem('id')
-  });
-  const setUserData = user => {
-    localStorage.setItem('id', user.id);
-    setUserDataState(user);
-  };
-  const getUserData = async () => {
-    const resBody = {
-      id: userData.id,
-      ownPage: true
-    };
-    const { data } = await axios.post('http://192.168.0.223:7041/users/find', resBody);
-    setUserDataState(data);
+  const [username, setUsername] = useState(null);
+  const [userData, setUserData] = useState({});
+  const [id, idState] = useState(localStorage.getItem('id'));
+  const setId = id => {
+    localStorage.setItem('id', id);
+    idState(id);
   };
   useEffect(() => {
-    if (userData.id) getUserData();
-  }, []);
-    
+    const fetchData = async () => {
+      let username = null;
+      if (id) {
+        const fetchName = await axios.post('http://192.168.0.223:7041/users/name', { id });
+        username = fetchName.data.name;
+      }
+      const pathName = history.location.pathname.split('/')[1];
+      if (pathName.length) {
+        const findBody = {
+          name: pathName,
+          ownPage: pathName === username
+        };
+        const { data } = await axios.post('http://192.168.0.223:7041/users/find', findBody);
+        setUserData(data)
+      }
+      setUsername(username);
+    };
+
+    fetchData();
+  }, [username])
+
+  
   return (
-    <MainContext.Provider value={{ menuVisible, setMenuVisible, userData, setUserData }}>
+    <MainContext.Provider value={{ menuVisible, setMenuVisible, id, setId, username, userData }}>
       {props.children}
     </MainContext.Provider>
   );

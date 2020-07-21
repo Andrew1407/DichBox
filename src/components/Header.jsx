@@ -5,14 +5,13 @@ import defaultLogo from '../styles/imgs/default-user-logo.png';
 import '../styles/header.css';
 
 const Header = () => {
-  const { menuVisible, setMenuVisible, userData } = useContext(MainContext);
-  const { id, name } = userData;
+  const { menuVisible, setMenuVisible, username, id } = useContext(MainContext);
   const history = useHistory();
   const handleMenuClick = e => {
+    e.preventDefault()
     const currentPath = history.location.pathname;
-    const isHomePath = new RegExp(`^/(${name})?$`);
-    if (isHomePath.test(currentPath)) {
-      e.preventDefault()
+    const pathName = new RegExp(username ? `^/${username}$` : '^/$');
+    if (pathName.test(currentPath)) {
       setMenuVisible(!menuVisible);
     }
     else {
@@ -25,7 +24,7 @@ const Header = () => {
   return (
     <div id="header">
       <div id="header-name">
-        <h1>DichBox</h1>
+        <h1 onClick={e => {e.preventDefault(); localStorage.setItem('username', 7890  )}} >DichBox</h1>
       </div>
       <div id="header-menu">
         <img src={defaultLogo}  onClick={ handleMenuClick } style={{ backgroundColor }} />

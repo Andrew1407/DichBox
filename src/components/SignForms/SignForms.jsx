@@ -1,5 +1,4 @@
 import React, { useState, useContext } from 'react';
-import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
@@ -7,13 +6,13 @@ import { MainContext } from '../../contexts/MainContext';
 import '../../styles/sign-forms.css';
 
 const SingForms = () => {
-  const history = useHistory();
+  const { setId } = useContext(MainContext);  
   const [userDataInput, setUserDataInput] = useState({});
   const [isSignUp, setSignModifier] = useState(true);
-  const { setUserData } = useContext(MainContext);
-
-  const handleSingForm = modifier => e => {
+  const handleSignForm = modifier => e => {
     e.preventDefault();
+    setCorrectState(getInputStateDefault(false));
+    setWarning(getInputStateDefault({}));
     setSignModifier(modifier);
   };
 
@@ -113,8 +112,7 @@ const SingForms = () => {
     const isCorrect = getBtnState(correctInput);
     if (!isCorrect) return;
     const { data } = await axios.post('http://192.168.0.223:7041/users/create', userDataInput);
-    setUserData(data);
-    history.push('/');
+    setId(data.id);
   };
 
   const submitSignIn = async e => {
@@ -122,9 +120,8 @@ const SingForms = () => {
     const isCorrect = getBtnState(correctInput);
     if (!isCorrect) return;
     const { data } = await axios.post('http://192.168.0.223:7041/users/enter', userDataInput );
-    if (data) {
-      setUserData(data);
-      history.push('/');
+    if (data.id) {
+      setId(data.id);
     } else {
       const passwd = {
         borderColor: 'crimson',
@@ -146,8 +143,8 @@ const SingForms = () => {
   return (
     <div id="sign">
       <div id="sign-switch">
-        <p onClick={ handleSingForm(true) } style={ setBtnStateStyle(isSignUp) }>sing up</p>
-        <p onClick={ handleSingForm(false) } style={ setBtnStateStyle(!isSignUp) }>sing in</p>
+        <p onClick={ handleSignForm(true) } style={ setBtnStateStyle(isSignUp) }>sing up</p>
+        <p onClick={ handleSignForm(false) } style={ setBtnStateStyle(!isSignUp) }>sing in</p>
       </div>
       { isSignUp ? 
         <SignUp {...{ submitSignUp, updateUserData, submitButton, warnings }} /> :
