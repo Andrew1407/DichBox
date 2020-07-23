@@ -1,25 +1,15 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useHistory, Route } from 'react-router-dom';
-import { MainContext } from '../../contexts/MainContext';
+import React, { useState } from 'react';
 import Boxes from './Boxes';
+import Default from './Default';
 
 const UserData = () => {
-  const { userData } = useContext(MainContext);
-  const history = useHistory();
-  const params = new URLSearchParams(history.location.search)
-  const menuCurrect = params.get('menu');
+  const [menuOption, setMenuOption] = useState('default');
+  const menuChioce = {
+    default: <Default {...{ menuOption, setMenuOption }} />,
+    boxes: <Boxes {...{ menuOption, setMenuOption }} />
+  };
 
-  return (
-    <div>
-      <h1>{ menuCurrect }</h1>
-      <ul>
-        {Object.entries(userData)
-          .map(([ key, value ]) => 
-            <li>{key}: {value}</li>
-        )}
-      </ul>
-    </div>
-  );
+  return menuChioce[menuOption];
 };
 
 export default UserData;

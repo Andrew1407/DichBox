@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import { MainContext } from '../contexts/MainContext';
-import axios from 'axios';
+import VerifiersContextProvider from '../contexts/VerifiersContext';
 import SignForms from './SignForms/SignForms';
 import UserData from './UserData/UserData';
 import hideImg from '../styles/imgs/hide-arrow.png';
@@ -17,16 +17,17 @@ const Menu = () => {
     e.preventDefault();
     setMenuVisible(modifier)
   };
-  
 
   return (
     menuVisible ? 
     ( <menu id="menu">
-      <img src={hideImg} className="arrow" onClick={ handleArrowClick(false) } />
-      <Switch>
-        <Route exact path="/" component={ signedUserCheckup } />
-        <Route path="/:username" component={ UserData } />
-      </Switch>
+      <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
+      <VerifiersContextProvider>
+        <Switch>
+          <Route exact path="/" component={ signedUserCheckup } />
+          <Route path="/:username" component={ UserData } />
+        </Switch>
+      </VerifiersContextProvider>
     </menu> ) :
     <img src={showImg} className="arrow" id="show" onClick={ handleArrowClick(true) } />
   );

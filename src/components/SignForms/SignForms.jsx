@@ -1,102 +1,59 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import axios from 'axios';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
 import { MainContext } from '../../contexts/MainContext';
+import { VerifiersContext } from '../../contexts/VerifiersContext';
 import '../../styles/sign-forms.css';
 
 const SingForms = () => {
-  const { setId } = useContext(MainContext);  
+  const { setId, id } = useContext(MainContext);  
+  const { useVerifiers, fetchInput,warnings, setWarning, correctInput, setCorrectState } 
+    = useContext(VerifiersContext);
   const [userDataInput, setUserDataInput] = useState({});
   const [isSignUp, setSignModifier] = useState(true);
-  const handleSignForm = modifier => e => {
-    e.preventDefault();
-    setCorrectState(getInputStateDefault(false));
-    setWarning(getInputStateDefault({}));
-    setSignModifier(modifier);
-  };
-
   const setBtnStateStyle = modifier => (
     modifier ? { backgroundColor: 'rgb(0, 217, 255)', color: 'black' } :
     { backgroundColor: 'black', color: 'rgb(0, 217, 255)' }
   );
 
-  // sign forms values (for verification)
-  const getInputStateDefault = value => ({
-    email: value,
-    name: value,
-    passwd: value
-  });
-
-  const getBtnState = ({ email, name, passwd }) => (
-    isSignUp ? email && name && passwd : email && passwd 
-  );
-
-  const [correctInput, setCorrectState] = useState(getInputStateDefault(false));
-  const [warnings, setWarning] = useState(getInputStateDefault({}));
-
-  const fetchInput = inputField => async inputValue => {
-    const verifyBody = { inputField, inputValue };
-    const { data } = await axios.post('http://192.168.0.223:7041/users/verify', verifyBody);
-    return data;
+  const signInVerParams = {
+    email: {
+      regExp: /^([a-z_\d\.-]+)@([a-z\d]+)\.([a-z]{2,8})(\.[a-z]{2,8})*$/,
+      warningRegExp: 'Incorrect email input form',
+      warningFetch: isSignUp ?
+        'This email is already taken' :
+        'This email is not registered',
+      fetchFn: fetchInput('email'),
+      fetchIsEqual: isSignUp ? false : true
+    },
+    passwd: {
+      regExp: /^[\S]{5,20}$/,
+      warningRegExp: 'Password length should be 5-16 symbols (no spaces)',
+    }
   };
-
-  const getVerifier = field => {
-    const checkupParams = {
-      email: {
-        regExp: /^([a-z_\d\.-]+)@([a-z\d]+)\.([a-z]{2,8})(\.[a-z]{2,8})*$/,
-        warningRegExp: 'Incorrect email input form',
-        warningFetch: isSignUp ?
-          'This email is already taken' :
-          'This email is not registered',
-        fetchFn: fetchInput('email')
-      },
-      name: {
-        regExp: /^[\S]{5,20}$/,
-        warningRegExp: 'Username length should be 5-16 symbols (no spaces)',
-        warningFetch: 'This username is already taken',
-        fetchFn: fetchInput('name')
-      },
-      passwd: {
-        regExp: /^[\S]{5,20}$/,
-        warningRegExp: 'Password length should be 5-16 symbols (no spaces)',
-      }
-    };
-
-    const verifierParams = checkupParams[field];
-    return async input => {
-      const fetchVefifier = verifierParams.fetchFn;
-      let warningStyle = {
-        borderColor: 'rgb(0, 255, 76)',
-        text: ''
-      };
-      let isCorrect = true;
-      const inputRegExp = verifierParams.regExp;
-      if (!inputRegExp.test(input)) {
-        warningStyle = {
-          borderColor: 'crimson',
-          text: verifierParams.warningRegExp
-        };
-        isCorrect = false;
-      } else if (fetchVefifier) {
-        const checkupModifier = bool => isSignUp ? bool : !bool;
-        const res = await fetchVefifier(input);
-        const checkup = checkupModifier(input === res.foundValue);
-        if (checkup) {
-          warningStyle = {
-            borderColor: 'crimson',
-            text: verifierParams.warningFetch
-          }
-          isCorrect = false;
-        }
-      }
-      setWarning({ ...warnings, [field]: warningStyle });
-      setCorrectState({ ...correctInput, [field]: isCorrect });
-    };
+  const signUpVerParams = {
+    ...signInVerParams,
+    name: {
+      regExp: /^[\S]{5,20}$/,
+      warningRegExp: 'Username length should be 5-16 symbols (no spaces)',
+      warningFetch: 'This username is already taken',
+      fetchFn: fetchInput('name'),
+      fetchIsEqual: false
+    }
+  };
+  const signForm = isSignUp ? signUpVerParams : signInVerParams;
+  const { getVerifiersState, getVerifier } =
+    useVerifiers(signForm);
+  const handleSignForm = modifier => e => {
+    e.preventDefault();
+    setWarning({});
+    setCorrectState({});
+    setSignModifier(modifier);
   };
 
   // input checkup
-  const updateUserData = field => {
+  const updateUserDataClb = field => {
     const inputVerifier = getVerifier(field);
     return e => {
       e.preventDefault();
@@ -105,22 +62,28 @@ const SingForms = () => {
       setUserDataInput({ ...userDataInput, [field]: input });
     };
   };
+  const updateUserData = useCallback(updateUserDataClb, [userDataInput, warnings, correctInput]);
 
   // submit handlers
-  const submitSignUp = async e => {
+  const submitSignUpClb = async e => {
     e.preventDefault();
-    const isCorrect = getBtnState(correctInput);
+    const isCorrect = getVerifiersState();
     if (!isCorrect) return;
     const { data } = await axios.post('http://192.168.0.223:7041/users/create', userDataInput);
+    setWarning({});
+    setCorrectState({});
     setId(data.id);
   };
+  const submitSignUp = useCallback(submitSignUpClb, [userDataInput, id]);
 
-  const submitSignIn = async e => {
+  const submitSignInClb = async e => {
     e.preventDefault();
-    const isCorrect = getBtnState(correctInput);
+    const isCorrect = getVerifiersState();
     if (!isCorrect) return;
     const { data } = await axios.post('http://192.168.0.223:7041/users/enter', userDataInput );
     if (data.id) {
+      setWarning({});
+      setCorrectState({});
       setId(data.id);
     } else {
       const passwd = {
@@ -131,11 +94,13 @@ const SingForms = () => {
       setCorrectState({ ...correctInput, passwd: false });
     }
   };
+  const submitSignIn = useCallback(submitSignInClb, [userDataInput, warnings, correctInput, id]);
 
   // submit buttom
+  const ableSubmit = getVerifiersState();
   const submitButton = {
-    disabled: !getBtnState(correctInput),
-    style: getBtnState(correctInput) ?
+    disabled: !ableSubmit,
+    style: ableSubmit ?
       { borderColor: 'rgb(0, 255, 76)', color: 'rgb(0, 255, 76)' } :
       { borderColor: 'rgb(0, 217, 255)', color: 'rgb(0, 217, 255)' }
   };
