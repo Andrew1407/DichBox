@@ -6,7 +6,9 @@ type userData = {
   followers: number,
   reg_date: Date,
   description: string,
-  subscriptions: number[]
+  subscriptions: number[],
+  name_color: string,
+  description_color: string
 };
 
 type userInput = {

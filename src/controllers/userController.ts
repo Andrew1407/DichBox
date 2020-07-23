@@ -11,7 +11,9 @@ type userResponse = {
   subscriptions?: number[]
   passwd?: string,
   email?: string
-  id?: number
+  id?: number,
+  name_color?: string,
+  description_color?: string
 };
 
 const clientDB: DichBoxDB = new DichBoxDB();
@@ -28,12 +30,22 @@ const formatUserFields = (
     followers,
     subscriptions,
     email,
+    name_color,
+    description_color,
     id
   }: userData = userData;
-  const reg_dateFromated: string = new Date(reg_date).toDateString();
-  return modifier ? 
-  { id, name, reg_date: reg_dateFromated, description, email, followers, subscriptions } :
-  { id, name, reg_date: reg_dateFromated, description, followers };
+  const dateFromated: string = new Date(reg_date).toLocaleDateString();
+  const regDate = dateFromated.replace(/\//g, '.');
+  const res: userResponse = {
+    name_color,
+    description_color,
+    id,
+    name,
+    reg_date: regDate,
+    description,
+    followers
+  };
+  return !modifier ? res : { ...res, email, subscriptions };
 };
 
 const signUpUser: middlewareFn = async (req: Request, res: Response) => {
@@ -44,14 +56,12 @@ const signUpUser: middlewareFn = async (req: Request, res: Response) => {
 
 const findUser: middlewareFn = async (req: Request, res: Response) => {
   const name: string = req.body.name;
-  const ownPage: boolean = req.body.ownPage;
+  const id: number = Number(req.body.id);
   const user: userData = await clientDB.findUserByColumn('name', name);
-  if (user) {
-    const userRes: userResponse = formatUserFields(user, ownPage);
-    res.json(userRes).end();
-  } else {
-    res.json(null).end();
-  }
+  const ownPage: boolean = id === user.id;
+  const userRes: userResponse|null = user ?
+    formatUserFields(user, ownPage) : null;
+  res.json({ ...userRes, ownPage }).end();
 };
 
 const signInUser: middlewareFn = async (req: Request, res: Response) => {

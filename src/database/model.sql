@@ -5,13 +5,15 @@ create database dich_box;
 -- users' data
 create table users (
   id serial primary key,
-  name varchar(20),
+  name varchar(20) not null,
+  name_color varchar(26) default 'rgb(0, 217, 255)',
   email varchar(50) not null,
   passwd varchar(16) not null,
   followers int default 0,
   reg_date timestamp default now(),
   subscriptions int[] default '{}',
-  description varchar(200) default ''
+  description varchar(200) default '',
+  description_name varchar(26) default 'orange'
 );
 
 -- storage units
