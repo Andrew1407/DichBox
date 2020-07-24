@@ -6,6 +6,7 @@ export const VerifiersContext = createContext();
 const VerifiersContextProvider = props => {
   const [warnings, setWarning] = useState({});
   const [correctInput, setCorrectState] = useState({});
+  const [userDataInput, setUserDataInput] = useState({});
   const fetchInput = inputField => async inputValue => {
     const verifyBody = { inputField, inputValue };
     const { data } = await axios.post('http://192.168.0.223:7041/users/verify', verifyBody);
@@ -47,12 +48,22 @@ const VerifiersContextProvider = props => {
       setWarning({ ...warnings, [field]: warningStyle });
       setCorrectState({ ...correctInput, [field]: isCorrect });
     };
-    return { getVerifiersState, getVerifier };
+    const updateUserDataClb = field => {
+      const inputVerifier = getVerifier(field);
+      return e => {
+        e.preventDefault();
+        const input = e.target.value;
+        inputVerifier(input);
+        setUserDataInput({ ...userDataInput, [field]: input });
+      };
+    };
+    const getOnChangeVerifier = useCallback(updateUserDataClb, [userDataInput, warnings, correctInput]);
+    return { getVerifiersState, getOnChangeVerifier };
   };
   const useVerifiers = useCallback(useVerifiersClb, [warnings, correctInput]);
 
   return (
-    <VerifiersContext.Provider value={{ useVerifiers, fetchInput, warnings, setWarning, correctInput, setCorrectState }}>
+    <VerifiersContext.Provider value={{ useVerifiers, fetchInput, warnings, setWarning, correctInput, setCorrectState, userDataInput }}>
       {props.children}
     </VerifiersContext.Provider>
   );

@@ -1,0 +1,51 @@
+#edit-profile, .edit-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.edit-field {
+  padding-bottom: 20%;
+  border-bottom: 3px solid rgb(0, 217, 255);
+}
+
+
+#edit-logo {
+  background-color: rgb(0, 217, 255);
+  border: 3px solid rgb(0, 217, 255);
+  border-radius: 50%;
+  padding: 1%;
+  display: block;
+  margin: 0 auto;
+  width: 55%;
+}
+
+.edit-logo-input {
+  margin-top: 6%;
+}
+
+.edit-logo-input > p {
+  font-size: 220%;
+  display: inline-block;
+  color: orange;
+}
+
+.edit-logo-input > input[type="radio"] {
+  display: inline-block;
+  margin-right: 3%;
+}
+
+.edit-logo-input > input[type="file"] {
+  font-size: 120%;
+}
+
+.edit-logo-input > input[type="text"] {
+  font-size: 180%;
+  width: 90%;
+  margin-left: 3%;
+  outline: none;
+  border-color: black;
+  border-bottom: 3px solid rgb(0, 217, 255);
+  padding: 2%;
+  margin-bottom: 4%;
+}

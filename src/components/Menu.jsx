@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { MainContext } from '../contexts/MainContext';
 import VerifiersContextProvider from '../contexts/VerifiersContext';
@@ -6,26 +6,37 @@ import SignForms from './SignForms/SignForms';
 import UserData from './UserData/UserData';
 import hideImg from '../styles/imgs/hide-arrow.png';
 import showImg from '../styles/imgs/show-arrow.png';
+import homeLogo from '../styles/imgs/home-icon.png';
 import '../styles/menu.css';
 
 const Menu = () => {
-  const { menuVisible, setMenuVisible, username } = useContext(MainContext);
-  const signedUserCheckup = () => (
-    username ? <Redirect to={'/' + username} /> : <SignForms />
-  );
+  const { menuVisible, setMenuVisible, username, id } = useContext(MainContext);
+  const [menuOption, setMenuOption] = useState('editProfile');
   const handleArrowClick = modifier => e => {
     e.preventDefault();
     setMenuVisible(modifier)
   };
+  const handleHomeClickClb = e => {
+    e.preventDefault();
+    setMenuOption('default')
+  };
+  const handleHomeClick = useCallback(handleHomeClickClb, []);
+
 
   return (
     menuVisible ? 
     ( <menu id="menu">
       <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
+      { (menuOption !== 'default') && id && <img src={homeLogo} id="home-logo" onClick={ handleHomeClick } /> }
       <VerifiersContextProvider>
         <Switch>
-          <Route exact path="/" component={ signedUserCheckup } />
-          <Route path="/:username" component={ UserData } />
+          <Route exact path="/">
+            {username ? <Redirect to={'/' + username} /> : <SignForms />}
+          </Route>
+
+          <Route path="/:username">
+            <UserData {...{ menuOption, setMenuOption }} />
+          </Route>
         </Switch>
       </VerifiersContextProvider>
     </menu> ) :

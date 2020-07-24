@@ -21,15 +21,15 @@ const MainContextProvider = props => {
 
   useEffect(() => {
     const fetchUsername = async () => {
-    if (id) {
-      const { data } = await axios.post('http://192.168.0.223:7041/users/name', { id });
-      setUsername(data.name);
-    }
-  };
+      if (id) {
+        const { data } = await axios.post('http://192.168.0.223:7041/users/name', { id });
+        setUsername(data.name);
+      }
+    };
     
-  fetchUsername();
+    fetchUsername();
   }, [id]);
-
+  
   useEffect(() => {
     const fetchUserData = async () => {
       if (pathName.length) {
@@ -44,7 +44,7 @@ const MainContextProvider = props => {
 
   
   return (
-    <MainContext.Provider value={{ menuVisible, setMenuVisible, id, setId, username, setUsername, userData, setPathName }}>
+    <MainContext.Provider value={{ menuVisible, setMenuVisible, id, setId, username, setUsername, userData, pathName, setPathName }}>
       {props.children}
     </MainContext.Provider>
   );

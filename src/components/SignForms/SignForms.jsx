@@ -8,9 +8,8 @@ import '../../styles/sign-forms.css';
 
 const SingForms = () => {
   const { setId, id } = useContext(MainContext);  
-  const { useVerifiers, fetchInput,warnings, setWarning, correctInput, setCorrectState } 
+  const { useVerifiers, fetchInput,warnings, setWarning, correctInput, setCorrectState, userDataInput } 
     = useContext(VerifiersContext);
-  const [userDataInput, setUserDataInput] = useState({});
   const [isSignUp, setSignModifier] = useState(true);
   const setBtnStateStyle = modifier => (
     modifier ? { backgroundColor: 'rgb(0, 217, 255)', color: 'black' } :
@@ -35,15 +34,15 @@ const SingForms = () => {
   const signUpVerParams = {
     ...signInVerParams,
     name: {
-      regExp: /^[\S]{5,20}$/,
-      warningRegExp: 'Username length should be 5-16 symbols (no spaces)',
+      regExp: /^(?!search$)[\S]{5,40}$/,
+      warningRegExp: 'Username length should be unique, 5-16 symbols (no spaces)',
       warningFetch: 'This username is already taken',
       fetchFn: fetchInput('name'),
       fetchIsEqual: false
     }
   };
   const signForm = isSignUp ? signUpVerParams : signInVerParams;
-  const { getVerifiersState, getVerifier } =
+  const { getVerifiersState, getOnChangeVerifier } =
     useVerifiers(signForm);
   const handleSignForm = modifier => e => {
     e.preventDefault();
@@ -52,17 +51,7 @@ const SingForms = () => {
     setSignModifier(modifier);
   };
 
-  // input checkup
-  const updateUserDataClb = field => {
-    const inputVerifier = getVerifier(field);
-    return e => {
-      e.preventDefault();
-      const input = e.target.value;
-      inputVerifier(input);
-      setUserDataInput({ ...userDataInput, [field]: input });
-    };
-  };
-  const updateUserData = useCallback(updateUserDataClb, [userDataInput, warnings, correctInput]);
+  
 
   // submit handlers
   const submitSignUpClb = async e => {
@@ -81,6 +70,7 @@ const SingForms = () => {
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
     const { data } = await axios.post('http://192.168.0.223:7041/users/enter', userDataInput );
+    console.log(data)
     if (data.id) {
       setWarning({});
       setCorrectState({});
@@ -112,8 +102,8 @@ const SingForms = () => {
         <p onClick={ handleSignForm(false) } style={ setBtnStateStyle(!isSignUp) }>sing in</p>
       </div>
       { isSignUp ? 
-        <SignUp {...{ submitSignUp, updateUserData, submitButton, warnings }} /> :
-        <SignIn {...{ submitSignIn, updateUserData, submitButton, warnings }} /> 
+        <SignUp {...{ submitSignUp, getOnChangeVerifier, submitButton, warnings }} /> :
+        <SignIn {...{ submitSignIn, getOnChangeVerifier, submitButton, warnings }} /> 
       }
     </div>
   );
