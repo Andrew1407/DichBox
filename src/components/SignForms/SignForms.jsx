@@ -8,7 +8,7 @@ import '../../styles/sign-forms.css';
 
 const SingForms = () => {
   const { setId, id } = useContext(MainContext);  
-  const { useVerifiers, fetchInput,warnings, setWarning, correctInput, setCorrectState, userDataInput } 
+  const { useVerifiers, fetchInput, warnings, setWarning, correctInput, setCorrectState, userDataInput } 
     = useContext(VerifiersContext);
   const [isSignUp, setSignModifier] = useState(true);
   const setBtnStateStyle = modifier => (
@@ -23,8 +23,10 @@ const SingForms = () => {
       warningFetch: isSignUp ?
         'This email is already taken' :
         'This email is not registered',
-      fetchFn: fetchInput('email'),
-      fetchIsEqual: isSignUp ? false : true
+      fetchVerifier: async input => {
+        const { foundValue } = await fetchInput('email', input);
+        return isSignUp ? foundValue === input : foundValue !== input;
+      }
     },
     passwd: {
       regExp: /^[\S]{5,20}$/,
@@ -35,23 +37,22 @@ const SingForms = () => {
     ...signInVerParams,
     name: {
       regExp: /^(?!search$)[\S]{5,40}$/,
-      warningRegExp: 'Username length should be unique, 5-16 symbols (no spaces)',
+      warningRegExp: 'Username length should be unique, 5-40 symbols (no spaces)',
       warningFetch: 'This username is already taken',
-      fetchFn: fetchInput('name'),
-      fetchIsEqual: false
+      fetchVerifier: async input => {
+        const { foundValue } = await fetchInput('name', input);
+        return foundValue === input;
+      }
     }
   };
-  const signForm = isSignUp ? signUpVerParams : signInVerParams;
   const { getVerifiersState, getOnChangeVerifier } =
-    useVerifiers(signForm);
+    useVerifiers(isSignUp ? signUpVerParams : signInVerParams);
   const handleSignForm = modifier => e => {
     e.preventDefault();
     setWarning({});
     setCorrectState({});
     setSignModifier(modifier);
   };
-
-  
 
   // submit handlers
   const submitSignUpClb = async e => {
@@ -70,7 +71,6 @@ const SingForms = () => {
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
     const { data } = await axios.post('http://192.168.0.223:7041/users/enter', userDataInput );
-    console.log(data)
     if (data.id) {
       setWarning({});
       setCorrectState({});

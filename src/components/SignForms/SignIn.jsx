@@ -7,12 +7,12 @@ const SignIn = ({ submitSignIn, getOnChangeVerifier, submitButton, warnings }) =
     <form className="sign-form" onSubmit={ submitSignIn } >
       <div className="sign-field">
         <p>email:</p>
-        <input type="email" onChange={ getOnChangeVerifier('email') } style={email ? { borderBottomColor: email.borderColor } : null} />
+        <input type="email" onChange={ getOnChangeVerifier('email') } style={{ borderBottomColor: email && email.borderColor }} />
         <i className="warning">{email ? email.text : null}</i>
       </div>
       <div className="sign-field">
         <p>password:</p>
-        <input type="password" onChange={ getOnChangeVerifier('passwd') } style={passwd ? { borderBottomColor: passwd.borderColor } : null} />
+        <input type="password" onChange={ getOnChangeVerifier('passwd') } style={{ borderBottomColor: passwd && passwd.borderColor }} />
         <i className="warning">{passwd ? passwd.text : null}</i>
       </div>
       <input className="form-submit" type="submit" value="sign in" disabled={ submitButton.disabled } style={ submitButton.style } />

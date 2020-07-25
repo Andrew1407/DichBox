@@ -2,11 +2,12 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin: 0
 }
 
 .edit-field {
-  padding-bottom: 20%;
-  border-bottom: 3px solid rgb(0, 217, 255);
+  padding-bottom: 15%;
+  border-bottom: 7px dashed grey;
 }
 
 
@@ -24,10 +25,14 @@
   margin-top: 6%;
 }
 
-.edit-logo-input > p {
-  font-size: 220%;
-  display: inline-block;
+.edit-field p {
+  font-size: 180%;
+  display: block;
   color: orange;
+}
+
+.edit-logo-input > p {
+  display: inline-block;
 }
 
 .edit-logo-input > input[type="radio"] {
@@ -37,15 +42,43 @@
 
 .edit-logo-input > input[type="file"] {
   font-size: 120%;
+  display: block;
 }
 
-.edit-logo-input > input[type="text"] {
+.edit-input {
   font-size: 180%;
-  width: 90%;
+  width: 85%;
+  display: block;
   margin-left: 3%;
   outline: none;
   border-color: black;
   border-bottom: 3px solid rgb(0, 217, 255);
   padding: 2%;
   margin-bottom: 4%;
+}
+
+.edit-input:focus {
+  border-bottom: 7px solid rgb(0, 217, 255);
+}
+
+#edit-uname {
+  margin-top: 5%;
+}
+
+#edit-desc-area {
+  border: 2px solid rgb(0, 217, 255);
+  font-size: 180%;
+  outline: none;
+  padding: 2%;
+  width: 90%;
+  resize: none;
+}
+
+#edit-email {
+  padding-bottom: 10%
+}
+
+.edit-warning {
+  font-size: 190%;
+  color: crimson;
 }
