@@ -12,10 +12,13 @@ type userData = {
 };
 
 type userInput = {
+  id?: number,
   name?: string,
   email?: string,
   passwd?: string,
   description?: string
+  description_color?: string,
+  name_color?: string
 };
 
 type boxData = {

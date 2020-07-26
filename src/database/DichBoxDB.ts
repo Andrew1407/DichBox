@@ -24,13 +24,18 @@ export default class DichBoxDB {
       return [ keys, values, valuesTemplate ];
   }
 
-  private async findValueByColumn(
+  private async findValueByColumns(
     table: string,
-    column: string,
-    value: any
+    data: boxInput|userInput|entryInput
   ): Promise<any> {
+    const [ keys, values, valuesTemplate ]: 
+      [string[], dataElement[], string[]] = this.formatData(data);
+    const selectSearch: string[] = [];
+    for (let i = 0; i < keys.length; i++)
+      selectSearch.push(keys[i] + ' = ' + valuesTemplate[i]);
     const res: QueryResult = await this.poolClient.query(
-      `select * from ${table} where ${column} = $1;`, [value]
+      `select * from ${table} where ${selectSearch.join(' and ')}`,
+      values
     );
     return res.rows.length ? res.rows[0] : null;
   }
@@ -48,24 +53,23 @@ export default class DichBoxDB {
   private async updateValueById(
     table: string,
     id: number,
-    data: boxInput|
-    userInput|entryInput
+    data: boxInput|userInput|entryInput
   ): Promise<any> {
     const [ keys, values, valuesTemplate ]: 
-      [string[], dataElement[], string[]] =
-      this.formatData(data);
+      [string[], dataElement[], string[]] = this.formatData(data);
     const updated: string[] = [];
     for (let i = 0; i < keys.length; i++)
       updated.push(keys[i] + ' = ' + valuesTemplate[i]);
-    await this.poolClient.query(
-      `update ${table} set ${updated} where id = ${id};`,
+    const res: QueryResult = await this.poolClient.query(
+      `update ${table} set ${updated} where id = ${id} returning *;`,
       values
     );
+    return res.rows.length ? res.rows[0] : null;
   }
 
   private async insertValue(
     table: string,
-    data: any
+    data: boxInput|userInput|entryInput
   ): Promise<any> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(data);
@@ -86,26 +90,23 @@ export default class DichBoxDB {
     return await this.insertValue('users', userData);
   }
 
-  public async updateUser(id: number, userData: userInput): Promise<void> {
-    await this.updateValueById('users', id, userData);
+  public async updateUser(
+    id: number,
+    userData: userInput
+  ): Promise<userData|null> {
+    return await this.updateValueById('users', id, userData);
   }
 
-  public async findUserByColumn(
-    column: string,
-    value: any
+  public async findUserByColumns(
+    values: userInput
   ): Promise<userData|null> {
-    return await this.findValueByColumn('users', column, value);
+    return await this.findValueByColumns('users', values);
   }
 
-  public async findUserByEmail(
-    email: string,
-    passwd: string
+  public async findUserById(
+    id: number
   ): Promise<userData|null> {
-    const res: QueryResult = await this.poolClient.query(
-      'select * from users where email = $1 and passwd = $2;',
-      [email, passwd]
-    );
-    return res.rows.length ? res.rows[0] : null;
+    return await this.findValueById('users', id);
   }
 
   public async removeUser(id: number): Promise<void> {
@@ -148,8 +149,8 @@ export default class DichBoxDB {
         'update users set subscriptions = array_remove(subscriptions, $2) where id = $1;' +
         'update users set followers = (followers - 1) where id = $2;'
     };
-    const follower: userData|null = await this.findUserByColumn('id', followerId);
-    const user: userData|null = await this.findUserByColumn('id', followerId);
+    const follower: userData|null = await this.findUserById(followerId);
+    const user: userData|null = await this.findUserById(userId);
     if (!follower || !user) return false;
     await this.poolClient.query(
       query[queryType],

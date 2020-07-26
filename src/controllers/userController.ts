@@ -57,7 +57,7 @@ const signUpUser: middlewareFn = async (req: Request, res: Response) => {
 const findUser: middlewareFn = async (req: Request, res: Response) => {
   const name: string = req.body.name;
   const id: number = Number(req.body.id);
-  const user: userData = await clientDB.findUserByColumn('name', name);
+  const user: userData = await clientDB.findUserByColumns({ name });
   const ownPage: boolean = id === user.id;
   const userRes: userResponse|null = user ?
     formatUserFields(user, ownPage) : null;
@@ -67,7 +67,7 @@ const findUser: middlewareFn = async (req: Request, res: Response) => {
 const signInUser: middlewareFn = async (req: Request, res: Response) => {
   const email: string = req.body.email;
   const passwd: string = req.body.passwd;
-  const user: userData = await clientDB.findUserByEmail(email, passwd);
+  const user: userData = await clientDB.findUserByColumns({ email, passwd });
   const id: number|null = user ? user.id : null;
   res.json({ id }).end();
 };
@@ -75,24 +75,44 @@ const signInUser: middlewareFn = async (req: Request, res: Response) => {
 const verifyUserInput: middlewareFn = async (req: Request, res: Response) => {
   const inputValue: string = req.body.inputValue;
   const column: string = req.body.inputField;
-  const foundUser: userData = await clientDB.findUserByColumn(column, inputValue);
-  const foundValue: string|number|null = foundUser ? 
-    foundUser[column] : null;
+  const foundUser: userData = await clientDB.findUserByColumns({ [column]: inputValue });
+  const foundValue: string|number|null = foundUser ? foundUser[column] : null;
+  res.json({ foundValue }).end();
+};
+
+const verifyUserPassword: middlewareFn = async (req: Request, res: Response) => {
+  const id: number = req.body.id;
+  const passwd: string = req.body.passwd;
+  const foundUser: userData = await clientDB.findUserByColumns({ id, passwd });
+  const foundValue: string = foundUser ? foundUser.passwd : null;
   res.json({ foundValue }).end();
 };
 
 const getUsername: middlewareFn = async (req: Request, res: Response) => {
   const id: number = req.body.id;
-  const foundUser: userData = await clientDB.findUserByColumn('id', id);
+  const foundUser: userData = await clientDB.findUserById(id);
   const name: string = foundUser ? foundUser.name : null;
   res.json({ name }).end();
 };
 
+const editUser: middlewareFn = async (req: Request, res: Response) => {
+  const id: number = req.body.id;
+  const editedData: userInput = req.body.edited;
+  const editedUser = await clientDB.updateUser(id, editedData);
+  const editedResponse: userInput = {};
+  for (const field in editedData) {
+    if (field === 'passwd') continue;
+    editedResponse[field] = editedData[field];
+  }
+  res.json({ editedResponse }).end();
+};
 
 export {
   findUser,
   signUpUser,
   signInUser,
   verifyUserInput,
-  getUsername
+  getUsername,
+  verifyUserPassword,
+  editUser
 };
