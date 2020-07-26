@@ -8,8 +8,15 @@ import '../../styles/sign-forms.css';
 
 const SingForms = () => {
   const { setId, id } = useContext(MainContext);  
-  const { useVerifiers, fetchInput, warnings, setWarning, correctInput, setCorrectState, userDataInput } 
-    = useContext(VerifiersContext);
+  const {
+    useVerifiers,
+    fetchInput,
+    warnings,
+    setWarning, 
+    correctInput,
+    setCorrectState,
+    userDataInput
+  } = useContext(VerifiersContext);
   const [isSignUp, setSignModifier] = useState(true);
   const setBtnStateStyle = modifier => (
     modifier ? { backgroundColor: 'rgb(0, 217, 255)', color: 'black' } :

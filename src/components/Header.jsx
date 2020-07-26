@@ -10,7 +10,7 @@ const Header = () => {
   const handleMenuClickClb = e => {
     e.preventDefault()
     const currentPath = history.location.pathname;
-    const pathName = new RegExp(username ? `^/${username}$` : '^/$');
+    const pathName = new RegExp(username ? `^/${username}` : '^/$');
     if (pathName.test(currentPath)) {
       setMenuVisible(!menuVisible);
     }

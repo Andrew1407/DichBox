@@ -12,6 +12,11 @@ const VerifiersContextProvider = props => {
     const { data } = await axios.post('http://192.168.0.223:7041/users/verify', verifyBody);
     return data;
   };
+  const fetchPasswdVer = async (id, passwd) => {
+    const passwdBody = { id, passwd };
+    const { data } = await axios.post('http://192.168.0.223:7041/users/passwd_verify', passwdBody);
+    return data;
+  }
   const useVerifiersClb = verParams => {
     const verFields = Object.keys(verParams);
     const getVerifiersState = (arr = verFields) => arr.reduce(
@@ -65,7 +70,7 @@ const VerifiersContextProvider = props => {
   const useVerifiers = useCallback(useVerifiersClb, [warnings, correctInput]);
 
   return (
-    <VerifiersContext.Provider value={{ useVerifiers, fetchInput, warnings, setWarning, correctInput, setCorrectState, userDataInput, setUserDataInput }}>
+    <VerifiersContext.Provider value={{ useVerifiers, fetchInput, warnings, setWarning, correctInput, setCorrectState, userDataInput, setUserDataInput, fetchPasswdVer }}>
       {props.children}
     </VerifiersContext.Provider>
   );

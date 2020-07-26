@@ -1,5 +1,5 @@
 import React, { useContext, useState, useCallback } from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
 import { MainContext } from '../contexts/MainContext';
 import VerifiersContextProvider from '../contexts/VerifiersContext';
 import SignForms from './SignForms/SignForms';
@@ -8,20 +8,26 @@ import hideImg from '../styles/imgs/hide-arrow.png';
 import showImg from '../styles/imgs/show-arrow.png';
 import homeLogo from '../styles/imgs/home-icon.png';
 import '../styles/menu.css';
+import Boxes from './UserData/Boxes';
 
 const Menu = () => {
-  const { menuVisible, setMenuVisible, username, id } = useContext(MainContext);
+  const { menuVisible, setMenuVisible, username, id, userData } = useContext(MainContext);
   const [menuOption, setMenuOption] = useState('editProfile');
+  const history = useHistory();
   const handleArrowClick = modifier => e => {
     e.preventDefault();
     setMenuVisible(modifier)
   };
   const handleHomeClickClb = e => {
     e.preventDefault();
+    const currentPath = history.location.pathname;
+    const isUserMain = new RegExp(`/^/${username}$/`);
+    console.log(!isUserMain.test(currentPath))
+    if (!isUserMain.test(currentPath))
+      history.push('/')
     setMenuOption('default')
   };
   const handleHomeClick = useCallback(handleHomeClickClb, []);
-
 
   return (
     menuVisible ? 
@@ -31,12 +37,11 @@ const Menu = () => {
       <VerifiersContextProvider>
         <Switch>
           <Route exact path="/">
-            {username ? <Redirect to={'/' + username} /> : <SignForms />}
+            {username && userData ? <Redirect to={'/' + username} /> : <SignForms />}
           </Route>
-
           <Route path="/:username">
             <UserData {...{ menuOption, setMenuOption }} />
-          </Route>
+          </Route>       
         </Switch>
       </VerifiersContextProvider>
     </menu> ) :

@@ -1,14 +1,38 @@
 import React, { useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
 import { MainContext } from '../../contexts/MainContext';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import '../../styles/edit-profile.css';
 
-const EditProfile = () => {
+const EditProfile = ({ setMenuOption }) => {
+  const { userData, setUserData, id } = useContext(MainContext);
+  const { 
+    useVerifiers,
+    fetchInput,
+    setCorrectState,
+    fetchPasswdVer,
+    warnings,
+    setWarning,
+    correctInput,
+    userDataInput,
+    setUserDataInput 
+  } = useContext(VerifiersContext);
+  const [editFields, setEditFields] = useState([]);
   const [checkedRadio, setCheckedRadio] = useState(true);
-  const { userData } = useContext(MainContext);
-  const { useVerifiers, fetchInput, warnings, setWarning, correctInput, setCorrectState, userDataInput, setUserDataInput } 
-    = useContext(VerifiersContext);
+  const [passwdFormHidden, setPasswdForm] = useState(true);
+  const handleRadioChange = state => () => setCheckedRadio(state);
+  const handlePasswdFormClick = e => {
+    e.preventDefault();
+    if (!passwdFormHidden) {
+      const filteredFields = editFields.filter(x => 
+        /^(?!(newP|p)asswd$)/.test(x)
+      );
+      setWarning({ ...warnings, passwd: {}, newPasswd: {} })
+      setEditFields(filteredFields);
+    }
+    setPasswdForm(!passwdFormHidden);
+  };
   const signVerParams = {
     email: {
       regExp: /^([a-z_\d\.-]+)@([a-z\d]+)\.([a-z]{2,8})(\.[a-z]{2,8})*$/,
@@ -16,7 +40,7 @@ const EditProfile = () => {
       warningFetch: 'This email is already taken',
       fetchVerifier: async input => {
         const { foundValue } = await fetchInput('email', input);
-        return foundValue === input && foundValue !== userData.name;
+        return foundValue === input && foundValue !== userData.email;
       }
     },
     name: {
@@ -25,7 +49,7 @@ const EditProfile = () => {
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
         const { foundValue } = await fetchInput('name', input);
-        return foundValue === input;
+        return foundValue === input && foundValue !== userData.name;
       }
     },
     description: {},
@@ -34,17 +58,60 @@ const EditProfile = () => {
     passwd: {
       regExp: /^[\S]{5,20}$/,
       warningRegExp: 'Password length should be 5-16 symbols (no spaces)',
+      warningFetch: 'Wrong password',
+      fetchVerifier: async input => {
+        const { foundValue } = await fetchPasswdVer(userData.id, input);
+        return foundValue !== input;
+      }
+    },
+    newPasswd: {
+      regExp: {
+        test: input => /^[\S]{5,20}$/.test(input) && input !== userDataInput.passwd
+      },
+      warningRegExp: 'Password length should be 5-16 symbols (no spaces, unequal to previous one)',
     }
   };
 
   const { getVerifiersState, getOnChangeVerifier } = useVerifiers(signVerParams);
-  const handleRadioChange = state => () => setCheckedRadio(state);
+  const handleInputChange = field => {
+    const fieldVerifier = getOnChangeVerifier(field);
+    return e => {
+      fieldVerifier(e)
+      if (!editFields.includes(field)) {
+        const newFields = field === 'passwd' ?
+          [ field, 'newPasswd' ] : [ field ]
+        setEditFields([ ...editFields, ...newFields ]);
+      }
+    };
+  };
+  const ableSubmit = editFields.length ? 
+    getVerifiersState(editFields) : getVerifiersState();
+  const submitButton = {
+    disabled: !ableSubmit,
+    style: ableSubmit ?
+      { borderColor: 'rgb(0, 255, 76)', color: 'rgb(0, 255, 76)' } :
+      { borderColor: 'rgb(0, 217, 255)', color: 'rgb(0, 217, 255)' }
+  };
+  const submitEditedFields = async e => {
+    e.preventDefault();
+    const edited = editFields.reduce((body, field) => {
+      if (field === 'passwd') return body;
+      if (field === 'newPasswd') 
+        return { ...body, passwd: userDataInput[field] };
+      return { ...body, [field]: userDataInput[field] }; 
+    }, {});
+    const { data } =  await axios.post('http://192.168.0.223:7041/users/edit_user', { id, edited });
+    setWarning({});
+    setCorrectState({});
+    setUserData({ ...userData, ...data.editedResponse})
+    setMenuOption('default');
+  };
   useEffect(()=> {
     setUserDataInput({ ...userData, ...userDataInput })
   }, [userData, warnings]);
  
   return (
-    <form id="edit-profile">
+    <form id="edit-profile" onSubmit={ submitEditedFields } >
       <div className="edit-field">
         <img id="edit-logo" src={ logoDefault } />
         <div className="edit-logo-input">
@@ -62,35 +129,54 @@ const EditProfile = () => {
       <div className="edit-field" id="edit-uname">
         <div className="edit-name">
           <p>username:</p>
-          <input type="text"  onChange={ getOnChangeVerifier('name') } className="edit-input" value={ userDataInput.name ? userDataInput.name : '' } style={{ color: userDataInput.name_color ? userDataInput.name_color : '#00d9ff', borderBottomColor: warnings.name && warnings.name.borderColor }}/>
+          <input type="text"  onChange={ handleInputChange('name') } className="edit-input" value={ userDataInput.name ? userDataInput.name : '' } style={{ color: userDataInput.name_color ? userDataInput.name_color : '#00d9ff', borderBottomColor: warnings.name && warnings.name.borderColor }}/>
           <i className="edit-warning">{warnings.name ? warnings.name.text : null}</i>
         </div>
         <div className="edit-name">
           <p>username color:</p>
-          <input type="color" onChange={ getOnChangeVerifier('name_color') } className="edit-input" value={userDataInput.name_color ? userDataInput.name_color : '#00d9ff'}/>
+          <input type="color" onChange={ handleInputChange('name_color') } className="edit-input" value={userDataInput.name_color ? userDataInput.name_color : '#00d9ff'}/>
         </div>
       </div>
 
       <div className="edit-field">
-      <div className="edit-name">
+        <div className="edit-name">
           <p>description:</p>
-          <textarea  onChange={ getOnChangeVerifier('description') } maxLength="100" id="edit-desc-area" rows="8" value={userDataInput.description ? userDataInput.description : '' } style={{ color: userDataInput.description_color ? userDataInput.description_color : '#00d9ff' }}>
+          <textarea  onChange={ handleInputChange('description') } maxLength="100" id="edit-desc-area" rows="8" value={userDataInput.description ? userDataInput.description : '' } style={{ color: userDataInput.description_color ? userDataInput.description_color : '#00d9ff' }}>
           </textarea>
         </div>
         <div className="edit-name">
           <p>description color:</p>
-          <input type="color" onChange={ getOnChangeVerifier('description_color') } className="edit-input" value={userDataInput.description_color ? userDataInput.description_color : '#00d9ff'}/>
+          <input type="color" onChange={ handleInputChange('description_color') } className="edit-input" value={userDataInput.description_color ? userDataInput.description_color : '#00d9ff'}/>
         </div>
       </div>
 
       <div className="edit-field" id="edit-email">
         <div className="edit-name">
           <p>email:</p>
-          <input type="email"  onChange={ getOnChangeVerifier('email') } className="edit-input" value={ userDataInput.email ? userDataInput.email : '' } style={{ borderBottomColor: warnings.email && warnings.email.borderColor }} />
+          <input type="email" onChange={ handleInputChange('email') } className="edit-input" value={ userDataInput.email ? userDataInput.email : '' } style={{ borderBottomColor: warnings.email && warnings.email.borderColor }} />
           <i className="edit-warning">{warnings.email ? warnings.email.text : null}</i>
         </div>
       </div>
-      <input type="submit" value="edit"/>
+
+      <div className="edit-field">
+        { !passwdFormHidden &&
+        <div>
+          <div>
+            <p>current password:</p>
+            <input type="password" className="edit-input" onChange={ handleInputChange('passwd') } style={{ borderBottomColor: warnings.passwd && warnings.passwd.borderColor }} />
+            <i className="edit-warning">{warnings.passwd ? warnings.passwd.text : null}</i>
+          </div>
+          <div className="edit-name">
+            <p>new password:</p>
+            <input type="password" onChange={ handleInputChange('newPasswd') } disabled={ !correctInput.passwd } className="edit-input" style={{ borderBottomColor: warnings.newPasswd && warnings.newPasswd.borderColor }} />
+            <i className="edit-warning">{warnings.newPasswd ? warnings.newPasswd.text : null}</i>
+          </div>
+        </div>
+        }
+        <input className="edit-btn" type="button" onClick={ handlePasswdFormClick } value={ passwdFormHidden ? 'change password' : 'cancel' }/>
+      </div>
+
+      <input className="edit-btn" id="edit-submit" type="submit" value="edit profile" disabled={ submitButton.disabled } style={ submitButton.style } />
     </form>
   );
 };

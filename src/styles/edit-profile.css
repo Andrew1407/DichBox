@@ -7,6 +7,7 @@
 
 .edit-field {
   padding-bottom: 15%;
+  margin-bottom: 7%;
   border-bottom: 7px dashed grey;
 }
 
@@ -81,4 +82,15 @@
 .edit-warning {
   font-size: 190%;
   color: crimson;
+}
+
+.edit-btn {
+  outline: none;
+  margin: 0 auto;
+  border: 2px solid rgb(0, 217, 255);
+  font-size: 180%;
+  font-style: italic;
+  padding: 2% 3%;
+  min-width: 60%;
+  margin-top: 10%;
 }

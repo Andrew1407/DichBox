@@ -44,7 +44,7 @@ const MainContextProvider = props => {
 
   
   return (
-    <MainContext.Provider value={{ menuVisible, setMenuVisible, id, setId, username, setUsername, userData, pathName, setPathName }}>
+    <MainContext.Provider value={{ menuVisible, setMenuVisible, id, setId, username, setUsername, setUserData, userData, pathName, setPathName }}>
       {props.children}
     </MainContext.Provider>
   );
