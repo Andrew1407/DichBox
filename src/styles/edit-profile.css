@@ -11,7 +11,6 @@
   border-bottom: 7px dashed grey;
 }
 
-
 #edit-logo {
   background-color: rgb(0, 217, 255);
   border: 3px solid rgb(0, 217, 255);
@@ -19,8 +18,9 @@
   padding: 1%;
   display: block;
   margin: 0 auto;
-  width: 55%;
+  width: 55%  
 }
+
 
 .edit-logo-input {
   margin-top: 6%;
@@ -93,4 +93,8 @@
   padding: 2% 3%;
   min-width: 60%;
   margin-top: 10%;
+}
+
+#edit-submit {
+  margin-bottom: 6%;
 }
