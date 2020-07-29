@@ -1,6 +1,7 @@
 import DichBoxDB from '../database/DichBoxDB';
 import { Request, Response } from 'express';
 import { userInput, userData } from '../datatypes';
+import * as fs from 'fs';
 
 type middlewareFn = (req: Request, res: Response) => Promise<void>;
 type userResponse = {
@@ -75,7 +76,8 @@ const signInUser: middlewareFn = async (req: Request, res: Response) => {
 const verifyUserInput: middlewareFn = async (req: Request, res: Response) => {
   const inputValue: string = req.body.inputValue;
   const column: string = req.body.inputField;
-  const foundUser: userData = await clientDB.findUserByColumns({ [column]: inputValue });
+  const verifyField: userInput = { [column]: inputValue };
+  const foundUser: userData = await clientDB.findUserByColumns(verifyField);
   const foundValue: string|number|null = foundUser ? foundUser[column] : null;
   res.json({ foundValue }).end();
 };
@@ -97,14 +99,23 @@ const getUsername: middlewareFn = async (req: Request, res: Response) => {
 
 const editUser: middlewareFn = async (req: Request, res: Response) => {
   const id: number = req.body.id;
-  const editedData: userInput = req.body.edited;
-  const editedUser = await clientDB.updateUser(id, editedData);
-  const editedResponse: userInput = {};
-  for (const field in editedData) {
-    if (field === 'passwd') continue;
-    editedResponse[field] = editedData[field];
-  }
-  res.json({ editedResponse }).end();
+  const editedData: userInput|null = req.body.edited;
+  const editedLogo: {
+    name: string,
+    src: string
+  } = req.body.logo;
+  // if (editedData) {
+  //   const editedUser = await clientDB.updateUser(id, editedData);
+  //   const editedResponse: userInput = {};
+  //   for (const field in editedData) {
+  //     if (field === 'passwd') continue;
+  //     editedResponse[field] = editedUser[field];
+  //   }
+  //   res.json({ editedResponse }).end();
+  // }
+  const base64Data = editedLogo.src
+    .replace(/^data:image\/png;base64,/, '');
+  fs.writeFileSync(editedLogo.name, base64Data, 'base64');
 };
 
 export {

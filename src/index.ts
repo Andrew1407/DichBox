@@ -6,8 +6,9 @@ import router from './routes/clientRoutes';
 
 const app: Application = express();
 app.use(cors());
-app.use(bodyparser.json())
+app.use(bodyparser.json({ limit: '50mb' }))
 app.use(bodyparser.urlencoded({
+  limit: '50mb',
   extended: true
 }));
 

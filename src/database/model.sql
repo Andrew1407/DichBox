@@ -7,6 +7,7 @@ create table users (
   id serial primary key,
   name varchar(40) not null,
   name_color varchar(26) default '#00d9ff',
+  logo_path varchar(150) default null,
   email varchar(50) not null,
   passwd varchar(16) not null,
   followers int default 0,

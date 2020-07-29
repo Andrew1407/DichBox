@@ -33,10 +33,10 @@ export default class DichBoxDB {
     const selectSearch: string[] = [];
     for (let i = 0; i < keys.length; i++)
       selectSearch.push(keys[i] + ' = ' + valuesTemplate[i]);
-    const res: QueryResult = await this.poolClient.query(
-      `select * from ${table} where ${selectSearch.join(' and ')}`,
-      values
-    );
+      const res: QueryResult = await this.poolClient.query(
+        `select * from ${table} where ${selectSearch.join(' and ')};`,
+        values
+      );
     return res.rows.length ? res.rows[0] : null;
   }
 
