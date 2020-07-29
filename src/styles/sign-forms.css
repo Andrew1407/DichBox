@@ -44,6 +44,8 @@
   border-bottom: 3px solid rgb(0, 217, 255);
   padding: 2%;
   margin-bottom: 4%;
+  background-color: black;
+  color: rgb(0, 217, 255);
 }
 
 .sign-field > input:focus {
@@ -58,6 +60,8 @@
   padding: 2% 2%;
   min-width: 60%;
   margin-top: 20%;
+  background-color: black;
+  color: rgb(0, 217, 255);
 }
 
 .warning {

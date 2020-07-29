@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
 import { MainContext } from '../../contexts/MainContext';
+import CropImage from '../../modals/CropImage';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import '../../styles/edit-profile.css';
 
@@ -18,50 +19,24 @@ const EditProfile = ({ setMenuOption }) => {
     userDataInput,
     setUserDataInput 
   } = useContext(VerifiersContext);
-  const [editFields, setEditFields] = useState([]);
-  const [uploadedLogo, setLogo] = useState({});
-  const [showLogo, setShowLogo] = useState(logoDefault);
-  const [checkedRadio, setCheckedRadio] = useState(true);
+  const [editedFields, setEditedFields] = useState([]);
+  const [logoEdited, setLogoEdited] = useState(null);
   const [passwdFormHidden, setPasswdForm] = useState(true);
-  const handleRadioChange = state => () => setCheckedRadio(state);
-  const handleLogoChange = inputType => {
-    const logo = { type: inputType };
-    const uploaders = {
-      url (e) {
-        e.preventDefault();
-        logo.src = e.target.value;
-        setLogo(logo);
-        setShowLogo(logo.src);
-      },
-      file (e) {
-        e.preventDefault();
-        logo.src = e.target.files[0];
-        setLogo(logo);
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (reader.readyState === 2)
-          setShowLogo(reader.result)
-        };
-        reader.readAsDataURL(logo.src);
-      }
-    };
-    const uploader = uploaders[inputType];
-    return e => uploader(e);
-  };
+  const [cropModalHidden, setCropModalHidden] = useState(true);
   const handlePasswdFormClickClb = e => {
     e.preventDefault();
     if (!passwdFormHidden) {
-      const filteredFields = editFields.filter(x => 
-        /^(?!(newP|p)asswd$)/.test(x)
+      const filteredFields = editedFields.filter(x => 
+        /^(newP|p)asswd$/.test(x)
       );
       setWarning({ ...warnings, passwd: {}, newPasswd: {} })
-      setEditFields(filteredFields);
+      setEditedFields(filteredFields);
     }
     setPasswdForm(!passwdFormHidden);
   };
   const handlePasswdFormClick = useCallback(
     handlePasswdFormClickClb,
-    [warnings, editFields, passwdFormHidden]
+    [warnings, editedFields, passwdFormHidden]
   );
   const signVerParams = {
     email: {
@@ -106,19 +81,20 @@ const EditProfile = ({ setMenuOption }) => {
     const fieldVerifier = getOnChangeVerifier(field);
     return e => {
       fieldVerifier(e)
-      if (!editFields.includes(field)) {
+      if (!editedFields.includes(field)) {
         const newFields = field === 'passwd' ?
           [ field, 'newPasswd' ] : [ field ]
-        setEditFields([ ...editFields, ...newFields ]);
+        setEditedFields([ ...editedFields, ...newFields ]);
       }
     };
   };
   const handleInputChange = useCallback(
     handleInputChangeClb,
-    [editFields, warnings, correctInput]
+    [editedFields, warnings, correctInput]
   );
-  const ableSubmit = editFields.length ? 
-    getVerifiersState(editFields) : getVerifiersState();
+  const ableSubmit = (editedFields.length ? 
+    getVerifiersState(editedFields) : getVerifiersState())
+    || logoEdited;
   const submitButton = {
     disabled: !ableSubmit,
     style: ableSubmit ?
@@ -127,23 +103,29 @@ const EditProfile = ({ setMenuOption }) => {
   };
   const submitEditedFieldsClb = async e => {
     e.preventDefault();
-    const edited = editFields.reduce((body, field) => {
+    const isCorrect = getVerifiersState(editedFields);
+    const allowSubmit = isCorrect || logoEdited;
+    if (!allowSubmit) return;
+    const edited = editedFields.reduce((body, field) => {
       if (field === 'passwd') return body;
       if (field === 'newPasswd') 
         return { ...body, passwd: userDataInput[field] };
       return { ...body, [field]: userDataInput[field] }; 
     }, {});
-    const { data } =  await axios.post('http://192.168.0.223:7041/users/edit_user', { id, edited });
-    setWarning({});
-    setCorrectState({});
-    setUserData({ ...userData, ...data.editedResponse})
-    setMenuOption('default');
+    const editedBody = { id, edited };
+    if (logoEdited) {
+      editedBody.logo = logoEdited;
+    }
+    const { data } =  await axios.post('http://192.168.0.223:7041/users/edit_user', editedBody);
+    // setWarning({});
+    // setCorrectState({});
+    // setUserData({ ...userData, ...data.editedResponse})
+    // setMenuOption('default');
   };
   const submitEditedFields = useCallback(
     submitEditedFieldsClb,
-    [userData, id, editFields]
+    [userData, id, editedFields, logoEdited]
   );
-
   useEffect(()=> {
     setUserDataInput({ ...userData, ...userDataInput })
   }, [userData, warnings]);
@@ -151,17 +133,10 @@ const EditProfile = ({ setMenuOption }) => {
   return (
     <form id="edit-profile" onSubmit={ submitEditedFields } >
       <div className="edit-field">
-        <img id="edit-logo" src={ showLogo } />
-        <div className="edit-logo-input">
-          <input type="radio" checked={ checkedRadio } onChange={ handleRadioChange(true) } />
-          <p>url:</p>
-          <input type="text" onChange={ handleLogoChange('url') } disabled={ !checkedRadio } className="edit-input" />
-        </div>
-        <div className="edit-logo-input">
-          <input type="radio" checked={ !checkedRadio } onChange={ handleRadioChange(false) } />
-          <p>file:</p>
-          <input type="file" onChange={ handleLogoChange('file') } accept="image/*" className="edit-input" disabled={ checkedRadio } />
-        </div>
+          <img id="edit-logo" src={ logoEdited ? logoEdited.src : logoDefault } />
+          <CropImage  isOpen={ !cropModalHidden } {...{ cropModalHidden, setCropModalHidden, setLogoEdited }} />
+          <input type="button" value="change logo" className="edit-btn" onClick={ () => setCropModalHidden(false) } />
+          { logoEdited && <input type="button" value="cancel" value="cancel" className="edit-btn" onClick={ () => setLogoEdited(null) } /> }
       </div>
 
       <div className="edit-field" id="edit-uname">

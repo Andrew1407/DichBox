@@ -4,9 +4,10 @@ import Footer from './components/Footer';
 import MainContent from './components/MainContent';
 import MainContextProvider from './contexts/MainContext';
 import { BrowserRouter } from 'react-router-dom';
+import ReactModal from 'react-modal';
 import './styles/main.css';
 
-
+ReactModal.setAppElement('#root')
 const App = () => (
   <BrowserRouter>
     <div id="main">

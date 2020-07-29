@@ -8,6 +8,8 @@
   padding-left: 1%;
   padding-right: 2%;
   border-top: 7px solid rgb(75, 73, 73);
+  background-color: black;
+  color: rgb(0, 217, 255);
 }
 
 #repo-ref{

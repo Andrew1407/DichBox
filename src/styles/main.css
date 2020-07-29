@@ -1,7 +1,10 @@
 * {
+  cursor: url("./imgs/cursor.png") 0 0, default;
+}
+
+body {
   background-color: black;
   color: rgb(0, 217, 255);
-  cursor: url("./imgs/cursor.png") 0 0, default;
 }
 
 /* width */

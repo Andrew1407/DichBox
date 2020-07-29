@@ -18,12 +18,15 @@
   padding: 1%;
   display: block;
   margin: 0 auto;
-  width: 55%  
+  width: 55%  ;
+  margin-bottom: 10%;
 }
 
 
 .edit-logo-input {
   margin-top: 6%;
+  background-color: black;
+  color: rgb(0, 217, 255);
 }
 
 .edit-field p {
@@ -36,14 +39,11 @@
   display: inline-block;
 }
 
-.edit-logo-input > input[type="radio"] {
-  display: inline-block;
-  margin-right: 3%;
-}
-
 .edit-logo-input > input[type="file"] {
   font-size: 120%;
   display: block;
+  background-color: black;
+  color: rgb(0, 217, 255);
 }
 
 .edit-input {
@@ -56,6 +56,8 @@
   border-bottom: 3px solid rgb(0, 217, 255);
   padding: 2%;
   margin-bottom: 4%;
+  background-color: black;
+  color: rgb(0, 217, 255);
 }
 
 .edit-input:focus {
@@ -73,6 +75,8 @@
   padding: 2%;
   width: 90%;
   resize: none;
+  background-color: black;
+  color: rgb(0, 217, 255);
 }
 
 #edit-email {
@@ -93,6 +97,8 @@
   padding: 2% 3%;
   min-width: 60%;
   margin-top: 10%;
+  background-color: black;
+  color: rgb(0, 217, 255);
 }
 
 #edit-submit {
