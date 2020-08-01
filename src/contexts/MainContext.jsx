@@ -6,9 +6,10 @@ export const MainContext = createContext();
 
 const MainContextProvider = props => {
   const history = useHistory();
-  const getPathName = () => history.location.pathname
-    .split('/')
-    .slice(1, 2)[0];
+  const getPathName = () => history
+    .location
+    .pathname
+    .split('/')[1];
   const [pathName, setPathName] = useState(getPathName());
   const [menuVisible, setMenuVisible] = useState(true);
   const [username, setUsername] = useState(null);
@@ -41,7 +42,6 @@ const MainContextProvider = props => {
     
     fetchUserData();
   }, [pathName]);
-
   
   return (
     <MainContext.Provider value={{ menuVisible, setMenuVisible, id, setId, username, setUsername, setUserData, userData, pathName, setPathName }}>

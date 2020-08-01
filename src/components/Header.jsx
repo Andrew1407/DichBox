@@ -5,13 +5,11 @@ import defaultLogo from '../styles/imgs/default-user-logo.png';
 import '../styles/header.css';
 
 const Header = () => {
-  const { menuVisible, setMenuVisible, username, id, setPathName } = useContext(MainContext);
+  const { menuVisible, setMenuVisible, username, id, setPathName, pathName } = useContext(MainContext);
   const history = useHistory();
   const handleMenuClickClb = e => {
     e.preventDefault()
-    const currentPath = history.location.pathname;
-    const pathName = new RegExp(username ? `^/${username}` : '^/$');
-    if (pathName.test(currentPath)) {
+    if (pathName === username) {
       setMenuVisible(!menuVisible);
     }
     else {

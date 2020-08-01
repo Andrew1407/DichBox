@@ -19,6 +19,7 @@ const EditProfile = ({ setMenuOption }) => {
     userDataInput,
     setUserDataInput 
   } = useContext(VerifiersContext);
+  const logo = userData.logo ? userData.logo : logoDefault;
   const [editedFields, setEditedFields] = useState([]);
   const [logoEdited, setLogoEdited] = useState(null);
   const [passwdFormHidden, setPasswdForm] = useState(true);
@@ -116,24 +117,34 @@ const EditProfile = ({ setMenuOption }) => {
     if (logoEdited) {
       editedBody.logo = logoEdited;
     }
-    const { data } =  await axios.post('http://192.168.0.223:7041/users/edit_user', editedBody);
-    // setWarning({});
-    // setCorrectState({});
-    // setUserData({ ...userData, ...data.editedResponse})
-    // setMenuOption('default');
+    const { data } =  await axios.post('http://192.168.0.223:7041/users/edit', editedBody);
+    setWarning({});
+    setCorrectState({});
+    setUserData({ ...userData, ...data.editedResponse });
+    setMenuOption('default');
   };
   const submitEditedFields = useCallback(
     submitEditedFieldsClb,
-    [userData, id, editedFields, logoEdited]
+    [userDataInput, id, editedFields, logoEdited]
   );
   useEffect(()=> {
-    setUserDataInput({ ...userData, ...userDataInput })
+    const userDataIsFetched = Object.keys(userData).length;
+    if (userDataIsFetched) {
+      const editDefaultFields = {
+        name: userData.name,
+        email: userData.email,
+        description: userData.description,
+        name_color: userData.name_color,
+        description_color: userData.description_color
+      };
+      setUserDataInput({ ...editDefaultFields, ...userDataInput })
+    }
   }, [userData, warnings]);
- 
+  
   return (
     <form id="edit-profile" onSubmit={ submitEditedFields } >
       <div className="edit-field">
-          <img id="edit-logo" src={ logoEdited ? logoEdited.src : logoDefault } />
+          <img id="edit-logo" src={ logoEdited ? logoEdited : logo } />
           <CropImage  isOpen={ !cropModalHidden } {...{ cropModalHidden, setCropModalHidden, setLogoEdited }} />
           <input type="button" value="change logo" className="edit-btn" onClick={ () => setCropModalHidden(false) } />
           { logoEdited && <input type="button" value="cancel" value="cancel" className="edit-btn" onClick={ () => setLogoEdited(null) } /> }

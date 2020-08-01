@@ -43,12 +43,14 @@ const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited }) => {
       crop.height,
     );
     const base64Image = canvas.toDataURL('image/png');
-    setLogoEdited({ name: imgName, src: base64Image});
+    setLogoEdited(base64Image);
   };
   
   return (
     <ReactModal isOpen={ !cropModalHidden } className="crop-modal" >
-      <ReactCrop {...{ src: img, crop, onChange: setCrop, onImageLoaded: setImgCropped }} />
+      <div id="crop-area">
+        <ReactCrop {...{ src: img, crop, onChange: setCrop, onImageLoaded: setImgCropped }} />
+      </div>
         <div className="crop-input-field">
           <p>file:</p>
           <input type="file" accept="image/*"  onChange={ handleInputImage} />
