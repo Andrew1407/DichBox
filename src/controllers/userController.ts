@@ -1,22 +1,17 @@
-import DichBoxDB from '../database/DichBoxDB';
 import { Request, Response } from 'express';
 import { userInput, userData } from '../datatypes';
-import * as fs from 'fs';
+import DichBoxDB from '../database/DichBoxDB';
+import LogoManager from '../storageManagers/LogoManager';
 
 type middlewareFn = (req: Request, res: Response) => Promise<void>;
-type userResponse = {
-  name: string,
-  description: string,
+type userResponse = userInput & {
   reg_date: string,
-  followers?: number,
-  subscriptions?: number[]
-  passwd?: string,
-  email?: string
-  id?: number,
-  name_color?: string,
-  description_color?: string
+  followers: number,
+  subscriptions: number[],
+  logo?: string
 };
 
+const userLogo: LogoManager = new LogoManager();
 const clientDB: DichBoxDB = new DichBoxDB();
 clientDB.clientConnection();
 
@@ -44,9 +39,10 @@ const formatUserFields = (
     name,
     reg_date: regDate,
     description,
-    followers
+    followers,
+    subscriptions 
   };
-  return !modifier ? res : { ...res, email, subscriptions };
+  return !modifier ? res : { ...res, email };
 };
 
 const signUpUser: middlewareFn = async (req: Request, res: Response) => {
@@ -60,8 +56,14 @@ const findUser: middlewareFn = async (req: Request, res: Response) => {
   const id: number = Number(req.body.id);
   const user: userData = await clientDB.findUserByColumns({ name });
   const ownPage: boolean = id === user.id;
-  const userRes: userResponse|null = user ?
-    formatUserFields(user, ownPage) : null;
+  let userRes: userResponse|null;
+  if (user) {
+    const dataFields: userResponse = formatUserFields(user, ownPage);
+    const logo: string = await userLogo.getLogo(id);
+    userRes = { ...dataFields, logo };
+  } else {
+    userRes = null;
+  }
   res.json({ ...userRes, ownPage }).end();
 };
 
@@ -100,22 +102,20 @@ const getUsername: middlewareFn = async (req: Request, res: Response) => {
 const editUser: middlewareFn = async (req: Request, res: Response) => {
   const id: number = req.body.id;
   const editedData: userInput|null = req.body.edited;
-  const editedLogo: {
-    name: string,
-    src: string
-  } = req.body.logo;
-  // if (editedData) {
-  //   const editedUser = await clientDB.updateUser(id, editedData);
-  //   const editedResponse: userInput = {};
-  //   for (const field in editedData) {
-  //     if (field === 'passwd') continue;
-  //     editedResponse[field] = editedUser[field];
-  //   }
-  //   res.json({ editedResponse }).end();
-  // }
-  const base64Data = editedLogo.src
-    .replace(/^data:image\/png;base64,/, '');
-  fs.writeFileSync(editedLogo.name, base64Data, 'base64');
+  const editedLogo: string = req.body.logo;
+  const editedResponse: userInput & { logo?: string } = {};
+  if (Object.keys(editedData).length) {
+    const editedUser = await clientDB.updateUser(id, editedData);
+    for (const field in editedData) {
+      if (field === 'passwd') continue;
+      editedResponse[field] = editedUser[field];
+    }
+  }
+  if (editedLogo) {
+    const savedLogo: string = await userLogo.saveLogo(editedLogo, id);
+    editedResponse.logo = savedLogo;
+  }
+  res.json({ editedResponse }).end();
 };
 
 export {

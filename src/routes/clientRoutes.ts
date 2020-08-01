@@ -9,14 +9,14 @@ import {
   editUser
 } from '../controllers/userController';
 
-const router: expres.Router = expres.Router();
+const usersRouter: expres.Router = expres.Router();
 
-router.post('/create', signUpUser);
-router.post('/find', findUser);
-router.post('/enter', signInUser);
-router.post('/verify', verifyUserInput);
-router.post('/name', getUsername)
-router.post('/passwd_verify', verifyUserPassword)
-router.post('/edit_user', editUser)
+usersRouter.post('/create', signUpUser);
+usersRouter.post('/find', findUser);
+usersRouter.post('/enter', signInUser);
+usersRouter.post('/verify', verifyUserInput);
+usersRouter.post('/name', getUsername)
+usersRouter.post('/passwd_verify', verifyUserPassword)
+usersRouter.post('/edit', editUser)
 
-export default router;
+export default usersRouter;
