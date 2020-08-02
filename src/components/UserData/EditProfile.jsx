@@ -1,13 +1,16 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
 import { MainContext } from '../../contexts/MainContext';
 import CropImage from '../../modals/CropImage';
+import EditField from './EditField';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import '../../styles/edit-profile.css';
 
 const EditProfile = ({ setMenuOption }) => {
-  const { userData, setUserData, id } = useContext(MainContext);
+  const history = useHistory();
+  const { userData, setUserData, id, setUsername } = useContext(MainContext);
   const { 
     useVerifiers,
     fetchInput,
@@ -28,7 +31,7 @@ const EditProfile = ({ setMenuOption }) => {
     e.preventDefault();
     if (!passwdFormHidden) {
       const filteredFields = editedFields.filter(x => 
-        /^(newP|p)asswd$/.test(x)
+        /^(?!(newP|p)asswd$)/.test(x)
       );
       setWarning({ ...warnings, passwd: {}, newPasswd: {} })
       setEditedFields(filteredFields);
@@ -120,12 +123,16 @@ const EditProfile = ({ setMenuOption }) => {
     const { data } =  await axios.post('http://192.168.0.223:7041/users/edit', editedBody);
     setWarning({});
     setCorrectState({});
-    setUserData({ ...userData, ...data.editedResponse });
+    setUserData({ ...userData, ...data });
+    if (data.name) {
+      setUsername(data.name);
+      history.push('/' + data.name);
+    }
     setMenuOption('default');
   };
   const submitEditedFields = useCallback(
     submitEditedFieldsClb,
-    [userDataInput, id, editedFields, logoEdited]
+    [userDataInput, id, editedFields, logoEdited, userData]
   );
   useEffect(()=> {
     const userDataIsFetched = Object.keys(userData).length;
@@ -151,50 +158,24 @@ const EditProfile = ({ setMenuOption }) => {
       </div>
 
       <div className="edit-field" id="edit-uname">
-        <div className="edit-name">
-          <p>username:</p>
-          <input type="text"  onChange={ handleInputChange('name') } className="edit-input" value={ userDataInput.name ? userDataInput.name : '' } style={{ color: userDataInput.name_color ? userDataInput.name_color : '#00d9ff', borderBottomColor: warnings.name && warnings.name.borderColor }}/>
-          <i className="edit-warning">{warnings.name ? warnings.name.text : null}</i>
-        </div>
-        <div className="edit-name">
-          <p>username color:</p>
-          <input type="color" onChange={ handleInputChange('name_color') } className="edit-input" value={userDataInput.name_color ? userDataInput.name_color : '#00d9ff'}/>
-        </div>
+        <EditField {...{ label: 'username', type: 'text', inputValue: userDataInput.name, inputColor: userDataInput.name_color, warning: warnings.name, handleOnChange: handleInputChange('name') }} />
+        <EditField {...{ label: 'username color', type: 'color', inputValue: userDataInput.name_color, handleOnChange: handleInputChange('name_color') }} />
       </div>
 
       <div className="edit-field">
-        <div className="edit-name">
-          <p>description:</p>
-          <textarea  onChange={ handleInputChange('description') } maxLength="150" id="edit-desc-area" rows="8" value={userDataInput.description ? userDataInput.description : '' } style={{ color: userDataInput.description_color ? userDataInput.description_color : '#00d9ff' }}>
-          </textarea>
-        </div>
-        <div className="edit-name">
-          <p>description color:</p>
-          <input type="color" onChange={ handleInputChange('description_color') } className="edit-input" value={userDataInput.description_color ? userDataInput.description_color : '#00d9ff'}/>
-        </div>
+        <EditField {...{ label: 'descriprion', textarea: true, inputValue: userDataInput.description, inputColor: userDataInput.description_color, handleOnChange: handleInputChange('description') }} />
+        <EditField {...{ label: 'description color:', type: 'color', inputValue: userDataInput.description_color, handleOnChange: handleInputChange('description_color') }} />
       </div>
 
       <div className="edit-field" id="edit-email">
-        <div className="edit-name">
-          <p>email:</p>
-          <input type="email" onChange={ handleInputChange('email') } className="edit-input" value={ userDataInput.email ? userDataInput.email : '' } style={{ borderBottomColor: warnings.email && warnings.email.borderColor }} />
-          <i className="edit-warning">{warnings.email ? warnings.email.text : null}</i>
-        </div>
+        <EditField {...{ label: 'email', type: 'email', inputValue: userDataInput.email, warning: warnings.email, handleOnChange: handleInputChange('email') }} />
       </div>
 
       <div className="edit-field">
         { !passwdFormHidden &&
         <div>
-          <div>
-            <p>current password:</p>
-            <input type="password" className="edit-input" onChange={ handleInputChange('passwd') } style={{ borderBottomColor: warnings.passwd && warnings.passwd.borderColor }} />
-            <i className="edit-warning">{warnings.passwd ? warnings.passwd.text : null}</i>
-          </div>
-          <div className="edit-name">
-            <p>new password:</p>
-            <input type="password" onChange={ handleInputChange('newPasswd') } disabled={ !correctInput.passwd } className="edit-input" style={{ borderBottomColor: warnings.newPasswd && warnings.newPasswd.borderColor }} />
-            <i className="edit-warning">{warnings.newPasswd ? warnings.newPasswd.text : null}</i>
-          </div>
+          <EditField {...{ label: 'current password', type: 'password', inputValue: userDataInput.passwd, warning: warnings.passwd, handleOnChange: handleInputChange('passwd') }} />
+          <EditField {...{ label: 'new password', type: 'password', inputValue: userDataInput.newPasswd, warning: warnings.newPasswd, handleOnChange: handleInputChange('newPasswd') }} />
         </div>
         }
         <input className="edit-btn" type="button" onClick={ handlePasswdFormClick } value={ passwdFormHidden ? 'change password' : 'cancel' }/>

@@ -1,11 +1,13 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { MainContext } from '../../contexts/MainContext';
+import ConfirmModal from '../../modals/ConfirmModal';
 import '../../styles/menu-default.css';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 
 
 const Default = ({ setMenuOption }) => {
   const { userData, id } = useContext(MainContext);
+  const [modalOpen, setModalOpen] = useState(false);
   const logo = userData.logo ? userData.logo : logoDefault;
   const handeMenuChoice = choice => e => {
     e.preventDefault();
@@ -46,7 +48,8 @@ const Default = ({ setMenuOption }) => {
       { userData.ownPage && <div id="sign-options">
         <p>remove account</p>
         <p>sign out</p>
-      </div>}
+        <ConfirmModal modalOpen={ modalOpen } />
+      </div> }
     </div>
   );
 };

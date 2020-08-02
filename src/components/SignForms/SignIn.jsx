@@ -1,23 +1,12 @@
 import React from 'react';
+import SignField from './SignField';
 
-const SignIn = ({ submitSignIn, getOnChangeVerifier, submitButton, warnings }) => {
-  const { email, passwd } = warnings;
-
-  return (
-    <form className="sign-form" onSubmit={ submitSignIn } >
-      <div className="sign-field">
-        <p>email:</p>
-        <input type="email" onChange={ getOnChangeVerifier('email') } style={{ borderBottomColor: email && email.borderColor }} />
-        <i className="warning">{email ? email.text : null}</i>
-      </div>
-      <div className="sign-field">
-        <p>password:</p>
-        <input type="password" onChange={ getOnChangeVerifier('passwd') } style={{ borderBottomColor: passwd && passwd.borderColor }} />
-        <i className="warning">{passwd ? passwd.text : null}</i>
-      </div>
-      <input className="form-submit" type="submit" value="sign in" disabled={ submitButton.disabled } style={ submitButton.style } />
-    </form>
-  )
-};
+const SignIn = ({ submitSignIn, getOnChangeVerifier, submitButton, warnings }) => (
+  <form className="sign-form" onSubmit={ submitSignIn } >
+    <SignField {...{ warning: warnings.email, label: 'email', type: 'email', handleOnChange: getOnChangeVerifier('email') }} />
+    <SignField {...{ warning: warnings.passwd, label: 'password', type: 'password', handleOnChange: getOnChangeVerifier('passwd') }} />
+    <input className="form-submit" type="submit" value="sign in" disabled={ submitButton.disabled } style={ submitButton.style } />
+  </form>
+);
 
 export default SignIn;

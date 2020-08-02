@@ -7,12 +7,10 @@ import '../styles/crop-image.css';
 const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited }) => {
   const [img, setImg] = useState(null);
   const [imgCropped, setImgCropped] = useState(null);
-  const [imgName, setImgName] = useState(null)
   const [crop, setCrop] = useState({ aspect: 1 / 1 });
   const handleInputImage = e => {
-    const file = e.target.files[0];
-    const fileName = file.name
-    setImgName(fileName);
+    e.preventDefault();
+    const [ file ] = e.target.files;
     setImg(URL.createObjectURL(file));
   };
   const handleCancel = () => {
@@ -53,7 +51,7 @@ const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited }) => {
       </div>
         <div className="crop-input-field">
           <p>file:</p>
-          <input type="file" accept="image/*"  onChange={ handleInputImage} />
+          <input type="file" accept="image/*" onChange={ handleInputImage } />
         </div>
 
       <div id="crop-apply-btns">
