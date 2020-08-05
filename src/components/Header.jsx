@@ -1,11 +1,11 @@
 import React, { useContext, useCallback } from 'react';
-import { MainContext } from '../contexts/MainContext';
+import { UserContext } from '../contexts/UserContext';
 import { useHistory } from 'react-router-dom';
 import defaultLogo from '../styles/imgs/default-user-logo.png';
 import '../styles/header.css';
 
 const Header = () => {
-  const { menuVisible, setMenuVisible, username, id, setPathName, pathName } = useContext(MainContext);
+  const { menuVisible, setMenuVisible, username, id, setPathName, pathName } = useContext(UserContext);
   const history = useHistory();
   const handleMenuClickClb = e => {
     e.preventDefault();

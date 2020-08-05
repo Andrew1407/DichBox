@@ -2,25 +2,25 @@ import React, { useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
-import { MainContext } from '../../contexts/MainContext';
+import { UserContext } from '../../contexts/UserContext';
 import CropImage from '../../modals/CropImage';
-import EditField from './EditField';
+import EditField from '../inputFields/EditField';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import '../../styles/edit-profile.css';
 
 const EditProfile = ({ setMenuOption }) => {
   const history = useHistory();
-  const { userData, setUserData, id, setUsername } = useContext(MainContext);
+  const { userData, dispatchUserData, id, setUsername } = useContext(UserContext);
   const { 
     useVerifiers,
     fetchInput,
-    setCorrectState,
     fetchPasswdVer,
     warnings,
-    setWarning,
     correctInput,
-    userDataInput,
-    setUserDataInput 
+    dataInput,
+    dispatchDataInput,
+    cleanWarnings,
+    setWarningsOnHandle
   } = useContext(VerifiersContext);
   const logo = userData.logo ? userData.logo : logoDefault;
   const [editedFields, setEditedFields] = useState([]);
@@ -33,8 +33,14 @@ const EditProfile = ({ setMenuOption }) => {
       const filteredFields = editedFields.filter(x => 
         /^(?!(newP|p)asswd$)/.test(x)
       );
-      setWarning({ ...warnings, passwd: {}, newPasswd: {} })
+      setWarningsOnHandle({ passwd: {}, newPasswd: {} })
       setEditedFields(filteredFields);
+      setWarningsOnHandle(null, { passwd: false, newPasswd: false });
+      const dataReducerAction = {
+        type: 'PUSH_DATA',
+        data: { passwd: '', newPasswd: '' }
+      };
+      dispatchDataInput(dataReducerAction);
     }
     setPasswdForm(!passwdFormHidden);
   };
@@ -57,7 +63,8 @@ const EditProfile = ({ setMenuOption }) => {
       warningRegExp: 'Username length should be unique, 5-40 symbols (no spaces)',
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
-        const { foundValue } = await fetchInput('name', input);
+        const fetchData = fetchInput('users');
+        const { foundValue } = await fetchData('name', input);
         return foundValue === input && foundValue !== userData.name;
       }
     },
@@ -75,7 +82,7 @@ const EditProfile = ({ setMenuOption }) => {
     },
     newPasswd: {
       regExp: {
-        test: input => /^[\S]{5,20}$/.test(input) && input !== userDataInput.passwd
+        test: input => /^[\S]{5,20}$/.test(input) && input !== dataInput.passwd
       },
       warningRegExp: 'Password length should be 5-16 symbols (no spaces, unequal to previous one)',
     }
@@ -113,26 +120,26 @@ const EditProfile = ({ setMenuOption }) => {
     const edited = editedFields.reduce((body, field) => {
       if (field === 'passwd') return body;
       if (field === 'newPasswd') 
-        return { ...body, passwd: userDataInput[field] };
-      return { ...body, [field]: userDataInput[field] }; 
+        return { ...body, passwd: dataInput[field] };
+      return { ...body, [field]: dataInput[field] }; 
     }, {});
     const editedBody = { id, edited };
     if (logoEdited) {
       editedBody.logo = logoEdited;
     }
     const { data } =  await axios.post('http://192.168.0.223:7041/users/edit', editedBody);
-    setWarning({});
-    setCorrectState({});
-    setUserData({ ...userData, ...data });
+    dispatchUserData({ type: 'REFRESH_DATA', data });
     if (data.name) {
       setUsername(data.name);
       history.push('/' + data.name);
     }
+    cleanWarnings();
+    dispatchDataInput({ type: 'CLEAN_DATA' });
     setMenuOption('default');
   };
   const submitEditedFields = useCallback(
     submitEditedFieldsClb,
-    [userDataInput, id, editedFields, logoEdited, userData]
+    [dataInput, id, editedFields, logoEdited, userData]
   );
   useEffect(()=> {
     const userDataIsFetched = Object.keys(userData).length;
@@ -144,7 +151,11 @@ const EditProfile = ({ setMenuOption }) => {
         name_color: userData.name_color,
         description_color: userData.description_color
       };
-      setUserDataInput({ ...editDefaultFields, ...userDataInput })
+      const dataReducerAction = {
+        type: 'APPEND_DATA',
+        data: editDefaultFields
+      };
+      dispatchDataInput(dataReducerAction);
     }
   }, [userData, warnings]);
   
@@ -158,24 +169,24 @@ const EditProfile = ({ setMenuOption }) => {
       </div>
 
       <div className="edit-field" id="edit-uname">
-        <EditField {...{ label: 'username', type: 'text', inputValue: userDataInput.name, inputColor: userDataInput.name_color, warning: warnings.name, handleOnChange: handleInputChange('name') }} />
-        <EditField {...{ label: 'username color', type: 'color', inputValue: userDataInput.name_color, handleOnChange: handleInputChange('name_color') }} />
+        <EditField {...{ label: 'username', type: 'text', inputValue: dataInput.name, inputColor: dataInput.name_color, warning: warnings.name, handleOnChange: handleInputChange('name') }} />
+        <EditField {...{ label: 'username color', type: 'color', inputValue: dataInput.name_color, handleOnChange: handleInputChange('name_color') }} />
       </div>
 
       <div className="edit-field">
-        <EditField {...{ label: 'descriprion', textarea: true, inputValue: userDataInput.description, inputColor: userDataInput.description_color, handleOnChange: handleInputChange('description') }} />
-        <EditField {...{ label: 'description color:', type: 'color', inputValue: userDataInput.description_color, handleOnChange: handleInputChange('description_color') }} />
+        <EditField {...{ label: 'descriprion', textarea: true, inputValue: dataInput.description, inputColor: dataInput.description_color, handleOnChange: handleInputChange('description') }} />
+        <EditField {...{ label: 'description color', type: 'color', inputValue: dataInput.description_color, handleOnChange: handleInputChange('description_color') }} />
       </div>
 
       <div className="edit-field" id="edit-email">
-        <EditField {...{ label: 'email', type: 'email', inputValue: userDataInput.email, warning: warnings.email, handleOnChange: handleInputChange('email') }} />
+        <EditField {...{ label: 'email', type: 'email', inputValue: dataInput.email, warning: warnings.email, handleOnChange: handleInputChange('email') }} />
       </div>
 
       <div className="edit-field">
         { !passwdFormHidden &&
         <div>
-          <EditField {...{ label: 'current password', type: 'password', inputValue: userDataInput.passwd, warning: warnings.passwd, handleOnChange: handleInputChange('passwd') }} />
-          <EditField {...{ label: 'new password', type: 'password', inputValue: userDataInput.newPasswd, warning: warnings.newPasswd, handleOnChange: handleInputChange('newPasswd') }} />
+          <EditField {...{ label: 'current password', type: 'password', inputValue: dataInput.passwd, warning: warnings.passwd, handleOnChange: handleInputChange('passwd') }} />
+          <EditField {...{ disabled: !correctInput.passwd, label: 'new password', type: 'password', inputValue: dataInput.newPasswd, warning: warnings.newPasswd, handleOnChange: handleInputChange('newPasswd') }} />
         </div>
         }
         <input className="edit-btn" type="button" onClick={ handlePasswdFormClick } value={ passwdFormHidden ? 'change password' : 'cancel' }/>

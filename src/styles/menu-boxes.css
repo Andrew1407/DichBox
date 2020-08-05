@@ -1,0 +1,75 @@
+#menu-boxes, #boxes-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#boxes-header {
+  border-bottom: 5px solid grey;
+  padding-bottom: 8%;
+}
+
+#boxes-title {
+  text-align: center;
+  font-size: 400%;
+}
+
+#boxes-search {
+  border-top: 5px solid grey;
+  padding-top: 7%;
+  margin-top: 7%;
+}
+
+#boxes-search > * {
+  display: inline-block;
+}
+
+#boxes-search > label {
+  font-size: 165%;
+  font-style: italic;
+}
+
+#boxes-search > input {
+  max-width: 95%;
+  font-size: 155%;
+  outline: none;
+  color: rgb(0, 217, 255);
+  border-color: black;
+  background-color: black;
+  border-bottom: 2px solid rgb(0, 217, 255);
+  padding: 2%;
+}
+
+#boxes-search > input:focus {
+  border-bottom: 5px solid rgb(0, 217, 255);
+}
+
+#boxes-select {
+  margin-top: 2%;
+  font-size: 110%;
+  padding: 2% 0;
+  background-color: black;
+  color: rgb(0, 217, 255);
+  border-color: rgb(0, 217, 255);
+  outline: none;
+}
+
+#boxes-header-btn {
+  margin: 0 auto;
+  margin-top: 8%;
+  outline: none;
+  padding: 3% 6%;
+  font-size: 120%;
+  font-weight: bold;
+  background-color: black;
+  color: rgb(0, 217, 255);
+  border-color: rgb(0, 217, 255);
+}
+
+#boxes-list {
+  padding-top: 5%;
+}
+
+#boxes-list-empty {
+  text-align: center;
+}

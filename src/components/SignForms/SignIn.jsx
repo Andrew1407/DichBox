@@ -1,5 +1,5 @@
 import React from 'react';
-import SignField from './SignField';
+import SignField from '../inputFields/SignField';
 
 const SignIn = ({ submitSignIn, getOnChangeVerifier, submitButton, warnings }) => (
   <form className="sign-form" onSubmit={ submitSignIn } >

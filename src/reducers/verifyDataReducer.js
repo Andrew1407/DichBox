@@ -1,0 +1,12 @@
+const verifyDataReducer = (state, action) => {
+  const actions = {
+    SET_DATA: { ...action.data },
+    APPEND_DATA: { ...action.data, ...state },
+    PUSH_DATA: { ...state, ...action.data },
+    CLEAN_DATA: {}
+  };
+  const actionType = actions[action.type];
+  return actionType ? actionType : state;
+};
+
+export default verifyDataReducer;

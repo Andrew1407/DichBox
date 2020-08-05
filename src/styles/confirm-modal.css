@@ -1,0 +1,37 @@
+.confirm-modal {
+  position: absolute;
+  top: 18%;
+  left: 25%;
+  right: 25%;
+  bottom: 38%;
+  background-color: black;
+  border: 7px solid rgb(204, 0, 255);
+  padding: 1%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+#confirm-btns {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#confirm-btns > input {
+  outline: none;
+  background-color: black;
+  color: rgb(204, 0, 255);
+  margin: 0 auto;
+  border: 2px solid rgb(204, 0, 255);
+  font-size: 200%;
+  font-style: italic;
+  padding: 0.5% 2%;
+  width: 20%;
+}
+
+#confirm-message {
+  color: rgb(204, 0, 255);
+  text-align: center;
+  font-size: 270%;
+}

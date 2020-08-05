@@ -2,20 +2,21 @@ import React, { useState, useContext, useCallback } from 'react';
 import axios from 'axios';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
-import { MainContext } from '../../contexts/MainContext';
+import { UserContext } from '../../contexts/UserContext';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
 import '../../styles/sign-forms.css';
 
 const SingForms = () => {
-  const { setId, id } = useContext(MainContext);  
+  const { dispatchId, id } = useContext(UserContext);  
   const {
     useVerifiers,
     fetchInput,
     warnings,
-    setWarning, 
     correctInput,
-    setCorrectState,
-    userDataInput
+    dataInput,
+    dispatchDataInput,
+    cleanWarnings,
+    setWarningsOnHandle
   } = useContext(VerifiersContext);
   const [isSignUp, setSignModifier] = useState(true);
   const setBtnStateStyle = modifier => (
@@ -31,7 +32,8 @@ const SingForms = () => {
         'This email is already taken' :
         'This email is not registered',
       fetchVerifier: async input => {
-        const { foundValue } = await fetchInput('email', input);
+        const fetchData = fetchInput('users');
+        const { foundValue } = await fetchData('email', input);
         return isSignUp ? foundValue === input : foundValue !== input;
       }
     },
@@ -47,7 +49,8 @@ const SingForms = () => {
       warningRegExp: 'Username length should be unique, 5-40 symbols (no spaces)',
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
-        const { foundValue } = await fetchInput('name', input);
+        const fetchData = fetchInput('users');
+        const { foundValue } = await fetchData('name', input);
         return foundValue === input;
       }
     }
@@ -56,8 +59,7 @@ const SingForms = () => {
     useVerifiers(isSignUp ? signUpVerParams : signInVerParams);
   const handleSignForm = modifier => e => {
     e.preventDefault();
-    setWarning({});
-    setCorrectState({});
+    cleanWarnings();
     setSignModifier(modifier);
   };
 
@@ -66,32 +68,31 @@ const SingForms = () => {
     e.preventDefault();
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
-    const { data } = await axios.post('http://192.168.0.223:7041/users/create', userDataInput);
-    setWarning({});
-    setCorrectState({});
-    setId(data.id);
+    const { data } = await axios.post('http://192.168.0.223:7041/users/create', dataInput);
+    cleanWarnings();
+    dispatchDataInput({ type: 'CLEAN_DATA' });
+    dispatchId({ type: 'SET_ID', id: data.id });
   };
-  const submitSignUp = useCallback(submitSignUpClb, [userDataInput, id]);
+  const submitSignUp = useCallback(submitSignUpClb, [dataInput, id]);
 
   const submitSignInClb = async e => {
     e.preventDefault();
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
-    const { data } = await axios.post('http://192.168.0.223:7041/users/enter', userDataInput );
+    const { data } = await axios.post('http://192.168.0.223:7041/users/enter', dataInput );
     if (data.id) {
-      setWarning({});
-      setCorrectState({});
-      setId(data.id);
+      cleanWarnings();
+      dispatchId({ type: 'SET_ID', id: data.id });
+      dispatchDataInput({ type: 'CLEAN_DATA' });
     } else {
       const passwd = {
         borderColor: 'crimson',
         text: 'Wrong password'
       };
-      setWarning({ ...warnings, passwd });
-      setCorrectState({ ...correctInput, passwd: false });
+      setWarningsOnHandle({ passwd }, { passwd: false });
     }
   };
-  const submitSignIn = useCallback(submitSignInClb, [userDataInput, warnings, correctInput, id]);
+  const submitSignIn = useCallback(submitSignInClb, [dataInput, warnings, correctInput, id]);
 
   // submit buttom
   const ableSubmit = getVerifiersState();

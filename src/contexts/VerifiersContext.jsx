@@ -1,15 +1,28 @@
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useReducer } from 'react';
 import axios from 'axios';
+import verifyDataReducer from '../reducers/verifyDataReducer';
 
 export const VerifiersContext = createContext();
 
 const VerifiersContextProvider = props => {
   const [warnings, setWarning] = useState({});
   const [correctInput, setCorrectState] = useState({});
-  const [userDataInput, setUserDataInput] = useState({});
-  const fetchInput = async (inputField, inputValue) => {
+  const [dataInput, dispatchDataInput] = useReducer(verifyDataReducer, {});
+  const cleanWarningsClb = () => {
+    setCorrectState({});
+    setWarning({})
+  };
+  const cleanWarnings = useCallback(cleanWarningsClb, []);
+  const setWarningsOnHandleClb = (wrngs, correctState) => {
+    if (wrngs)
+      setWarning({ ...warnings, ...wrngs });
+    if (correctState)
+      setCorrectState({ ...correctInput, ...correctState });
+  };
+  const setWarningsOnHandle = useCallback(setWarningsOnHandleClb, [warnings, correctInput]);
+  const fetchInput = fetchType => async (inputField, inputValue) => {
     const verifyBody = { inputField, inputValue };
-    const { data } = await axios.post('http://192.168.0.223:7041/users/verify', verifyBody);
+    const { data } = await axios.post(`http://192.168.0.223:7041/${fetchType}/verify`, verifyBody);
     return data;
   };
   const fetchPasswdVer = async (id, passwd) => {
@@ -50,8 +63,10 @@ const VerifiersContextProvider = props => {
             isCorrect = false;
           }
         }
-        setWarning({ ...warnings, [field]: warningStyle });
-        setCorrectState({ ...correctInput, [field]: isCorrect });
+        setWarningsOnHandle(
+          { [field]: warningStyle },
+          { [field]: isCorrect }
+        );
       };
     };
     const updateUserDataClb = field => {
@@ -61,16 +76,20 @@ const VerifiersContextProvider = props => {
         const input = e.target.value;
         if (inputVerifier)
           inputVerifier(input);
-        setUserDataInput({ ...userDataInput, [field]: input });
+        const dataReducerAction = {
+          type: 'PUSH_DATA',
+          data: { [field]: input }
+        };
+        dispatchDataInput(dataReducerAction);
       };
     };
-    const getOnChangeVerifier = useCallback(updateUserDataClb, [userDataInput, warnings, correctInput]);
+    const getOnChangeVerifier = useCallback(updateUserDataClb, [dataInput, warnings, correctInput]);
     return { getVerifiersState, getOnChangeVerifier };
   };
   const useVerifiers = useCallback(useVerifiersClb, [warnings, correctInput]);
 
   return (
-    <VerifiersContext.Provider value={{ useVerifiers, fetchInput, warnings, setWarning, correctInput, setCorrectState, userDataInput, setUserDataInput, fetchPasswdVer }}>
+    <VerifiersContext.Provider value={{ useVerifiers, fetchInput, warnings, correctInput, dataInput, dispatchDataInput, fetchPasswdVer, cleanWarnings, setWarningsOnHandle }}>
       {props.children}
     </VerifiersContext.Provider>
   );

@@ -1,12 +1,13 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { MainContext } from '../../contexts/MainContext';
+import React, { useContext, useEffect } from 'react';
+import { UserContext } from '../../contexts/UserContext';
 import { useParams, Route, Switch } from 'react-router-dom';
 import Boxes from './Boxes';
 import Default from './Default';
 import EditProfile from './EditProfile';
+import CreateBox from './CreateBox';
 
 const UserData = ({ menuOption, setMenuOption }) => {
-  const { setPathName, pathName } = useContext(MainContext);
+  const { setPathName, pathName } = useContext(UserContext);
   const { username } = useParams();
   useEffect(() => {
     if (username !== pathName)
@@ -15,7 +16,8 @@ const UserData = ({ menuOption, setMenuOption }) => {
   const menuChioces = {
     default: <Default {...{ setMenuOption }} />,
     boxes: <Boxes {...{ menuOption, setMenuOption }} />,
-    editProfile: <EditProfile {...{ setMenuOption }} />
+    editProfile: <EditProfile {...{ setMenuOption }} />,
+    createBox: <CreateBox />
   };
 
   return (
