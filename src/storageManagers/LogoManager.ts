@@ -1,11 +1,17 @@
 import * as fs  from 'fs';
 import * as path from 'path';
 
-class LogoManager {
-  private logosPath: string = path.join('..', 'DichStorage/logos');
+export default class LogoManager {
+  private logosPath: string;
+
+  constructor(logosType: string) {
+    this.logosPath  = path.join('..', 'DichStorage/logos', logosType);
+  }
+
   private generateLogoPath(userId: number): string {
     return path.join(this.logosPath, userId + '.png');
   }
+
   private appendBase64Header(image: string): string {
     return 'data:image/png;base64,' + image;
   }
@@ -39,5 +45,3 @@ class LogoManager {
       await fs.promises.unlink(logoPath);
   }
 }
-
-export default LogoManager;

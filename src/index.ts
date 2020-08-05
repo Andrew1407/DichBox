@@ -2,7 +2,8 @@ import * as express from 'express';
 import { Application } from 'express';
 import * as cors from 'cors';
 import * as bodyparser from 'body-parser';
-import usersRouter from './routes/clientRoutes';
+import usersRouter from './routes/userRoutes';
+import boxesRoutes from './routes/boxesRoutes';
 
 const app: Application = express();
 app.use(cors());
@@ -13,5 +14,6 @@ app.use(bodyparser.urlencoded({
 }));
 
 app.use('/users', usersRouter);
+app.use('/boxes', boxesRoutes);
 
 app.listen(7041, '192.168.0.223')

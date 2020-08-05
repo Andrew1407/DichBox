@@ -6,7 +6,6 @@ type userData = {
   followers: number,
   reg_date: Date,
   description: string,
-  subscriptions: number[],
   name_color: string,
   description_color: string
 };
@@ -24,34 +23,26 @@ type userInput = {
 type boxData = {
   id: number,
   name: string,
+  name_color: string,
   reg_date: Date,
   description: string,
+  description_color: string,
   owner_id: number,
-  access_level: 'read'|'write'
+  access_level: 'public'|'private'|'limited'|'invetee'
 };
 
 type boxInput = {
-  name: string,
-  owner_id: number,
-  access_level: 'read'|'write',
-  description?: string
-};
-
-type entryData = {
-  id: number,
-  box_id: number,
-  name: string,
-  type: 'text'|'dir'|'media',
-  description: string,
-  file_entries: string
-};
-
-type entryInput = {
-  box_id: number,
-  name: string,
-  type: 'text'|'dir'|'media',
+  name?: string,
+  owner_id?: number,
+  name_color?: string,
+  access_level?: 'public'|'private'|'limited'|'invetee'|'followers',
   description?: string,
-  file_entries?: string
+  description_color?: string
+};
+
+type subscribersData = {
+  person_id: number,
+  subscription: number
 };
 
 type dataElement = string|number|Date|number[];
@@ -62,6 +53,5 @@ export {
   boxData,
   boxInput,
   dataElement,
-  entryData,
-  entryInput
+  subscribersData
 };

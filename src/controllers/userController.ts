@@ -1,18 +1,19 @@
 import { Request, Response } from 'express';
 import { userInput, userData } from '../datatypes';
-import DichBoxDB from '../database/DichBoxDB';
+import UserClientDichBoxDB from '../database/UserClientDichBoxDB';
 import LogoManager from '../storageManagers/LogoManager';
 
 type middlewareFn = (req: Request, res: Response) => Promise<void>;
 type userResponse = userInput & {
   reg_date: string,
   followers: number,
-  subscriptions: number[],
+  follower?: boolean,
   logo?: string
 };
 
-const userLogo: LogoManager = new LogoManager();
-const clientDB: DichBoxDB = new DichBoxDB();
+const userLogo: LogoManager = new LogoManager('users');
+
+const clientDB: UserClientDichBoxDB = new UserClientDichBoxDB();
 clientDB.clientConnection();
 
 const formatUserFields = (
@@ -24,7 +25,6 @@ const formatUserFields = (
     description,
     reg_date,
     followers,
-    subscriptions,
     email,
     name_color,
     description_color,
@@ -39,8 +39,7 @@ const formatUserFields = (
     name,
     reg_date: regDate,
     description,
-    followers,
-    subscriptions 
+    followers
   };
   return !modifier ? res : { ...res, email };
 };
@@ -56,13 +55,15 @@ const findUser: middlewareFn = async (req: Request, res: Response) => {
   const id: number = Number(req.body.id);
   const user: userData = await clientDB.findUserByColumns({ name });
   const ownPage: boolean = id === user.id;
-  let userRes: userResponse|null;
+  let userRes: userResponse|null = null;
   if (user) {
     const dataFields: userResponse = formatUserFields(user, ownPage);
-    const logo: string = await userLogo.getLogo(id);
+    const logo: string = await userLogo.getLogo(user.id);
     userRes = { ...dataFields, logo };
-  } else {
-    userRes = null;
+    if (!ownPage) {
+      const follower: boolean = await clientDB.checkSubscription(user.id, id);
+      userRes = { ...userRes, follower };
+    }
   }
   res.json({ ...userRes, ownPage }).end();
 };
@@ -105,17 +106,28 @@ const editUser: middlewareFn = async (req: Request, res: Response) => {
   const editedLogo: string = req.body.logo;
   const editedResponse: userInput & { logo?: string } = {};
   if (Object.keys(editedData).length) {
-    const editedUser = await clientDB.updateUser(id, editedData);
+    await clientDB.updateUser(id, editedData);
     for (const field in editedData) {
       if (field === 'passwd') continue;
-      editedResponse[field] = editedUser[field];
+      editedResponse[field] = editedData[field];
     }
   }
   if (editedLogo) {
     const savedLogo: string = await userLogo.saveLogo(editedLogo, id);
     editedResponse.logo = savedLogo;
   }
-  res.json({ editedResponse }).end();
+  res.json({ ...editedResponse }).end();
+};
+
+const removeUser: middlewareFn = async (req: Request, res: Response) => {
+  const id: number = req.body.id;
+  if (req.body.confirmation !==  'permitted') {
+    res.json({ removed: false }).end();
+  } else {
+    userLogo.removeLogoIfExists(id);
+    clientDB.removeUser(id);
+    res.json({ removed: true }).end();
+  }
 };
 
 export {
@@ -125,5 +137,6 @@ export {
   verifyUserInput,
   getUsername,
   verifyUserPassword,
-  editUser
+  editUser,
+  removeUser
 };
