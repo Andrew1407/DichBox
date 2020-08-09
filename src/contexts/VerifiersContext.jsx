@@ -10,7 +10,7 @@ const VerifiersContextProvider = props => {
   const [dataInput, dispatchDataInput] = useReducer(verifyDataReducer, {});
   const cleanWarningsClb = () => {
     setCorrectState({});
-    setWarning({})
+    setWarning({});
   };
   const cleanWarnings = useCallback(cleanWarningsClb, []);
   const setWarningsOnHandleClb = (wrngs, correctState) => {
@@ -20,9 +20,14 @@ const VerifiersContextProvider = props => {
       setCorrectState({ ...correctInput, ...correctState });
   };
   const setWarningsOnHandle = useCallback(setWarningsOnHandleClb, [warnings, correctInput]);
-  const fetchInput = fetchType => async (inputField, inputValue) => {
+  const fetchBoxInput = async (id, boxName) => {
+    const verifyBody = { id, boxName };
+    const { data } = await axios.post('http://192.168.0.223:7041/boxes/verify', verifyBody);
+    return data;
+  };
+  const fetchUserInput = async (inputField, inputValue) => {
     const verifyBody = { inputField, inputValue };
-    const { data } = await axios.post(`http://192.168.0.223:7041/${fetchType}/verify`, verifyBody);
+    const { data } = await axios.post('http://192.168.0.223:7041/users/verify', verifyBody);
     return data;
   };
   const fetchPasswdVer = async (id, passwd) => {
@@ -33,7 +38,7 @@ const VerifiersContextProvider = props => {
   const useVerifiersClb = verParams => {
     const verFields = Object.keys(verParams);
     const getVerifiersState = (arr = verFields) => arr.reduce(
-      (isCorrectAll, isCorrectField) => 
+      (isCorrectAll, isCorrectField) =>
         isCorrectAll && correctInput[isCorrectField], true
     );
     const getVerifier = field => {
@@ -86,10 +91,10 @@ const VerifiersContextProvider = props => {
     const getOnChangeVerifier = useCallback(updateUserDataClb, [dataInput, warnings, correctInput]);
     return { getVerifiersState, getOnChangeVerifier };
   };
-  const useVerifiers = useCallback(useVerifiersClb, [warnings, correctInput]);
+  const useVerifiers = useCallback(useVerifiersClb, [warnings, correctInput, dataInput]);
 
   return (
-    <VerifiersContext.Provider value={{ useVerifiers, fetchInput, warnings, correctInput, dataInput, dispatchDataInput, fetchPasswdVer, cleanWarnings, setWarningsOnHandle }}>
+    <VerifiersContext.Provider value={{ useVerifiers, fetchUserInput, warnings, correctInput, dataInput, dispatchDataInput, fetchPasswdVer, cleanWarnings, setWarningsOnHandle, fetchBoxInput }}>
       {props.children}
     </VerifiersContext.Provider>
   );

@@ -9,7 +9,7 @@ import logoDefault from '../../styles/imgs/default-user-logo.png';
 
 const Default = ({ setMenuOption }) => {
   const history = useHistory();
-  const { userData, id, dispatchId, dispatchUserData, setUsername } = useContext(UserContext);
+  const { userData, id, dispatchId, dispatchUserData, setUsername, setPathName } = useContext(UserContext);
   const [modalOptions, setModalOptions] = useState(null);
   const logo = userData.logo ? userData.logo : logoDefault;
   const handeMenuChoice = choice => e => {
@@ -24,10 +24,11 @@ const Default = ({ setMenuOption }) => {
   });
   const signOutOkClb = () => {
     dispatchId({ type: 'REMOVE_ID' });
-    dispatchUserData({ type: 'CLEAN_DATA' });
     setUsername('');
     setModalOptions(null);
-    history.push('/')
+    dispatchUserData({ type: 'CLEAN_DATA' });
+    setPathName('');
+    history.push('/');
   };
 
   const removeOkClb = async () => {

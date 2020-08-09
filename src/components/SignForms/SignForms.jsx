@@ -10,7 +10,7 @@ const SingForms = () => {
   const { dispatchId, id } = useContext(UserContext);  
   const {
     useVerifiers,
-    fetchInput,
+    fetchUserInput,
     warnings,
     correctInput,
     dataInput,
@@ -32,7 +32,7 @@ const SingForms = () => {
         'This email is already taken' :
         'This email is not registered',
       fetchVerifier: async input => {
-        const fetchData = fetchInput('users');
+        const fetchData = fetchUserInput;
         const { foundValue } = await fetchData('email', input);
         return isSignUp ? foundValue === input : foundValue !== input;
       }
@@ -49,7 +49,7 @@ const SingForms = () => {
       warningRegExp: 'Username length should be unique, 5-40 symbols (no spaces)',
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
-        const fetchData = fetchInput('users');
+        const fetchData = fetchUserInput;
         const { foundValue } = await fetchData('name', input);
         return foundValue === input;
       }
@@ -59,6 +59,7 @@ const SingForms = () => {
     useVerifiers(isSignUp ? signUpVerParams : signInVerParams);
   const handleSignForm = modifier => e => {
     e.preventDefault();
+    dispatchDataInput({ type: 'CLEAN_DATA' });
     cleanWarnings();
     setSignModifier(modifier);
   };
@@ -74,7 +75,7 @@ const SingForms = () => {
     dispatchId({ type: 'SET_ID', id: data.id });
   };
   const submitSignUp = useCallback(submitSignUpClb, [dataInput, id]);
-
+  
   const submitSignInClb = async e => {
     e.preventDefault();
     const isCorrect = getVerifiersState();
@@ -92,7 +93,10 @@ const SingForms = () => {
       setWarningsOnHandle({ passwd }, { passwd: false });
     }
   };
-  const submitSignIn = useCallback(submitSignInClb, [dataInput, warnings, correctInput, id]);
+  const submitSignIn = useCallback(
+    submitSignInClb, 
+    [dataInput, warnings, correctInput, id]
+  );
 
   // submit buttom
   const ableSubmit = getVerifiersState();

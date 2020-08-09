@@ -26,3 +26,86 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: orange;
 }
+
+.edit-input {
+  font-size: 180%;
+  width: 85%;
+  display: block;
+  margin-left: 3%;
+  outline: none;
+  border-color: black;
+  border-bottom: 3px solid rgb(0, 217, 255);
+  padding: 2%;
+  margin-bottom: 4%;
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+.edit-input:focus {
+  border-bottom: 7px solid rgb(0, 217, 255);
+}
+
+.edit-desc-area {
+  border: 2px solid rgb(0, 217, 255);
+  font-size: 180%;
+  outline: none;
+  padding: 2%;
+  width: 90%;
+  resize: none;
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+.edit-warning {
+  font-size: 160%;
+  color: crimson;
+}
+.sign-field {
+  margin-bottom: 10%;
+}
+
+.sign-field > p {
+  color: orange;
+}
+
+.sign-field > input {
+  font-size: 100%;
+  width: 90%;
+  margin-left: 3%;
+  outline: none;
+  border-color: black;
+  border-bottom: 3px solid rgb(0, 217, 255);
+  padding: 2%;
+  margin-bottom: 4%;
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+.sign-field > input:focus {
+  border-bottom: 7px solid rgb(0, 217, 255);
+}
+
+.warning {
+  font-size: 90%;
+  color: crimson;
+}
+
+.edit-field {
+  padding-bottom: 15%;
+  margin-bottom: 7%;
+  border-bottom: 7px dashed grey;
+}
+
+.edit-btn {
+  outline: none;
+  margin: 0 auto;
+  border: 2px solid rgb(0, 217, 255);
+  font-size: 180%;
+  font-style: italic;
+  padding: 2% 3%;
+  min-width: 60%;
+  margin-top: 10%;
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+

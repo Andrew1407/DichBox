@@ -11,7 +11,6 @@ const Boxes = ({ menuOption, setMenuOption }) => {
       setMenuOption('boxes');
     const fetchBoxesList = async () => {
       if (!boxesList && userData.id) {
-        console.log(userData.id, id)
         const boxesBody = {
           id,
           ownPage: id === userData.id,

@@ -13,13 +13,16 @@
 }
 
 #crop-area {
-  padding-left: 17%;
+  /* padding-left: 17%; */
+  margin: 0 auto;
 }
 
 img.ReactCrop__image{
   background-color: rgb(0, 217, 255);
-  max-width: 80%;
-  max-height: 60%;
+  max-width: 800px;
+  max-height: 400px;
+  /* max-width: 80%; */
+  /* max-height: 40%; */
 }
 
 #crop-apply-btns {

@@ -21,5 +21,10 @@
 
 #home-logo {
   height: 50px;
-  float: right;
+}
+
+#menu-nav-btns {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }

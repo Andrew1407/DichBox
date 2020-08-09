@@ -40,7 +40,7 @@ const UserContextProvider = props => {
     
     fetchUserData();
   }, [pathName]);
-  
+
   return (
     <UserContext.Provider value={{ menuVisible, setMenuVisible, id, dispatchId, username, setUsername, dispatchUserData, userData, pathName, setPathName }}>
       {props.children}

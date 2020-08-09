@@ -5,6 +5,7 @@ import Boxes from './Boxes';
 import Default from './Default';
 import EditProfile from './EditProfile';
 import CreateBox from './CreateBox';
+import BoxEntries from './BoxEntries';
 
 const UserData = ({ menuOption, setMenuOption }) => {
   const { setPathName, pathName } = useContext(UserContext);
@@ -16,14 +17,15 @@ const UserData = ({ menuOption, setMenuOption }) => {
   const menuChioces = {
     default: <Default {...{ setMenuOption }} />,
     boxes: <Boxes {...{ menuOption, setMenuOption }} />,
-    editProfile: <EditProfile {...{ setMenuOption }} />,
-    createBox: <CreateBox />
+    editProfile: <EditProfile {...{ menuOption, setMenuOption }} />,
+    createBox: <CreateBox {...{ setMenuOption }} />,
+    boxEntries: <BoxEntries />
   };
 
   return (
     <Switch>
       <Route path="/:username/:box">
-        { menuChioces['boxes'] }
+        { menuChioces.boxEntries }
       </Route>
       <Route expact path="/:username">
         { menuChioces[menuOption] }

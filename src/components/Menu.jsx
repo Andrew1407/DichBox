@@ -11,12 +11,14 @@ import '../styles/menu.css';
 
 const Menu = () => {
   const { menuVisible, setMenuVisible, username, id, userData, pathName } = useContext(UserContext);
-  const { dispatchDataInput } = useContext(VerifiersContext);
-  const [menuOption, setMenuOption] = useState('boxes');
+  const { dispatchDataInput, cleanWarnings } = useContext(VerifiersContext);
+  const [menuOption, setMenuOption] = useState('createBox');
   const history = useHistory();
   const handleArrowClick = modifier => e => {
     e.preventDefault();
-    setMenuVisible(modifier)
+    setMenuVisible(modifier);
+    dispatchDataInput({ type: 'CLEAN_DATA' });
+    cleanWarnings();
   };
   const handleHomeClickClb = e => {
     e.preventDefault();
@@ -25,37 +27,23 @@ const Menu = () => {
     if (!isMainPage.test(currentPath))
       history.push('/' + pathName)
     setMenuOption('default')
+    dispatchDataInput({ type: 'CLEAN_DATA' });
+    cleanWarnings();
   };
   const handleHomeClick = useCallback(handleHomeClickClb, [userData, id, pathName]);
-  
-  useEffect(() => {
-    const userDataIsFetched = Object.keys(userData).length;
-    if (userDataIsFetched && menuOption === 'editProfile') {
-      const editDefaultFields = {
-        name: userData.name,
-        email: userData.email,
-        description: userData.description,
-        name_color: userData.name_color,
-        description_color: userData.description_color
-      };
-      const dataReducerAction = {
-        type: 'SET_DATA',
-        data: editDefaultFields
-      };
-      dispatchDataInput(dataReducerAction);
-    }
-  }, [menuOption]);
 
-  useEffect(() => {
-    if (menuOption !== 'default')
-      setMenuOption('default');
-  }, [pathName])
+  // useEffect(() => {
+  //   if (menuOption !== 'default')
+  //     setMenuOption('default');
+  // }, [pathName])
 
   return (
     menuVisible ? 
     ( <menu id="menu">
-      <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
-      { (menuOption !== 'default') && id && <img src={homeLogo} id="home-logo" onClick={ handleHomeClick } /> }
+      <div id="menu-nav-btns">
+        <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
+        <img src={ homeLogo } id="home-logo" onClick={ handleHomeClick } style={{ display: (menuOption !== 'default') && id ? 'block' : 'none' }} />
+      </div>
         <Switch>
           <Route exact path="/">
             { username && userData ? <Redirect to={'/' + username} /> : <SignForms /> }

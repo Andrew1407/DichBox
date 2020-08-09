@@ -1,19 +1,19 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
-import { VerifiersContext } from '../../contexts/VerifiersContext';
 import { UserContext } from '../../contexts/UserContext';
+import { VerifiersContext } from '../../contexts/VerifiersContext';
 import CropImage from '../../modals/CropImage';
 import EditField from '../inputFields/EditField';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import '../../styles/edit-profile.css';
 
-const EditProfile = ({ setMenuOption }) => {
+const EditProfile = ({ menuOption, setMenuOption }) => {
   const history = useHistory();
   const { userData, dispatchUserData, id, setUsername } = useContext(UserContext);
   const { 
     useVerifiers,
-    fetchInput,
+    fetchUserInput,
     fetchPasswdVer,
     warnings,
     correctInput,
@@ -33,9 +33,11 @@ const EditProfile = ({ setMenuOption }) => {
       const filteredFields = editedFields.filter(x => 
         /^(?!(newP|p)asswd$)/.test(x)
       );
-      setWarningsOnHandle({ passwd: {}, newPasswd: {} })
       setEditedFields(filteredFields);
-      setWarningsOnHandle(null, { passwd: false, newPasswd: false });
+      setWarningsOnHandle(
+        { passwd: {}, newPasswd: {} },
+        { passwd: false, newPasswd: false }
+      );
       const dataReducerAction = {
         type: 'PUSH_DATA',
         data: { passwd: '', newPasswd: '' }
@@ -54,17 +56,16 @@ const EditProfile = ({ setMenuOption }) => {
       warningRegExp: 'Incorrect email input form',
       warningFetch: 'This email is already taken',
       fetchVerifier: async input => {
-        const { foundValue } = await fetchInput('email', input);
+        const { foundValue } = await fetchUserInput('email', input);
         return foundValue === input && foundValue !== userData.email;
       }
     },
     name: {
       regExp: /^(?!search$)[\S]{5,40}$/,
-      warningRegExp: 'Username length should be unique, 5-40 symbols (no spaces)',
+      warningRegExp: 'Username length should be 5-40 symbols (unique, no spaces)',
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
-        const fetchData = fetchInput('users');
-        const { foundValue } = await fetchData('name', input);
+        const { foundValue } = await fetchUserInput('name', input);
         return foundValue === input && foundValue !== userData.name;
       }
     },
@@ -124,9 +125,8 @@ const EditProfile = ({ setMenuOption }) => {
       return { ...body, [field]: dataInput[field] }; 
     }, {});
     const editedBody = { id, edited };
-    if (logoEdited) {
+    if (logoEdited)
       editedBody.logo = logoEdited;
-    }
     const { data } =  await axios.post('http://192.168.0.223:7041/users/edit', editedBody);
     dispatchUserData({ type: 'REFRESH_DATA', data });
     if (data.name) {
@@ -141,9 +141,9 @@ const EditProfile = ({ setMenuOption }) => {
     submitEditedFieldsClb,
     [dataInput, id, editedFields, logoEdited, userData]
   );
-  useEffect(()=> {
+  useEffect(() => {
     const userDataIsFetched = Object.keys(userData).length;
-    if (userDataIsFetched) {
+    if (userDataIsFetched && menuOption === 'editProfile' && id) {
       const editDefaultFields = {
         name: userData.name,
         email: userData.email,
@@ -152,18 +152,18 @@ const EditProfile = ({ setMenuOption }) => {
         description_color: userData.description_color
       };
       const dataReducerAction = {
-        type: 'APPEND_DATA',
+        type: 'SET_DATA',
         data: editDefaultFields
       };
       dispatchDataInput(dataReducerAction);
     }
-  }, [userData, warnings]);
-  
+  }, []);
+
   return (
     <form id="edit-profile" onSubmit={ submitEditedFields } >
       <div className="edit-field">
           <img id="edit-logo" src={ logoEdited ? logoEdited : logo } />
-          <CropImage  isOpen={ !cropModalHidden } {...{ cropModalHidden, setCropModalHidden, setLogoEdited }} />
+          <CropImage {...{ cropModalHidden, setCropModalHidden, setLogoEdited }} />
           <input type="button" value="change logo" className="edit-btn" onClick={ () => setCropModalHidden(false) } />
           { logoEdited && <input type="button" value="cancel" value="cancel" className="edit-btn" onClick={ () => setLogoEdited(null) } /> }
       </div>
