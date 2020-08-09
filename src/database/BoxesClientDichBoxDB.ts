@@ -1,18 +1,20 @@
 import { QueryResult } from 'pg';
 import ClientDichBoxDB from './ClientDichBoxDB';
-import { boxData, boxInput } from '../datatypes';
-
+import { boxData, privacyList } from '../datatypes';
 
 export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
   public async getBoxesList(
     userId: number,
     ownPage: boolean,
     follower: boolean = false
-  ): Promise<boxInput[]|null> {
-    let boxesList: boxInput[]|null;
+  ): Promise<boxData[]|null> {
+    let boxesList: boxData[]|null;
     if (ownPage) {
-      const userBoxes: boxInput[]|null = await this.getUserOwnBoxes(userId);
-      const inveteeBoxes: boxInput[]|null = await this.getUserInveteeBoxes(userId);
+      const [userBoxes, inveteeBoxes]: (boxData[]|null)[] =
+        await Promise.all([
+          this.getUserOwnBoxes(userId),
+          this.getUserInveteeBoxes(userId)
+        ]);
       boxesList = (userBoxes || inveteeBoxes) ? 
         [ ...userBoxes, ...inveteeBoxes ] : null;
     } else {
@@ -21,20 +23,20 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
     return boxesList;
   }
 
-  private async getUserOwnBoxes(id: number): Promise<boxInput[]|null> {
-    const res: QueryResult = await this.poolClient.query(
-      'select name, name_color, access_level from boxes where owner_id = $1;',
-      [id]
-    );
-    const userBoxes: boxInput[]|null = res.rowCount ?
-      res.rows : null;
+  private async getUserOwnBoxes(owner_id: number): Promise<boxData[]|null> {
+    const args: [string, { owner_id: number }, string[]] = [
+      'boxes',
+      { owner_id },
+      ['name', 'name_color', 'access_level']
+    ];
+    const userBoxes: boxData[]|null = await this.selectValues(...args);
     return userBoxes;
   }
 
   private async getVisitorBoxes(
     id: number,
     follower: boolean
-  ): Promise<boxInput[]|null> {
+  ): Promise<boxData[]|null> {
     const boxesAccess = follower ?
       '(access_level = \'public\' or access_level = \'followers\');' :
       'access_level = \'public\';';
@@ -42,81 +44,81 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       'select name, name_color, access_level from boxes where owner_id = $1 and ' + boxesAccess,
       [id]
     );
-    const visitorBoxes: boxInput[]|null = res.rowCount ?
+    const visitorBoxes: boxData[]|null = res.rowCount ?
       res.rows : null;
     return visitorBoxes;
   }
 
-  private async getUserInveteeBoxes(id: number): Promise<boxInput[]|null> {
+  private async getUserInveteeBoxes(id: number): Promise<boxData[]|null> {
     const res: QueryResult = await this.poolClient.query(
       'select name, name_color, $1 as access_level from boxes b left join box_access ba on b.id = ba.box_id where ba.person_id = $2;',
       ['invetee', id]
     );
-    const inveteeBoxes: boxInput[]|null = res.rowCount ?
+    const inveteeBoxes: boxData[]|null = res.rowCount ?
       res.rows : null;
     return inveteeBoxes
   }
 
-  public async insertBox(boxData: boxInput): Promise<boxData> {
-    return await this.insertValue('boxes', boxData);
+  private async getUsersIds(usernames: string[]): Promise<number[]> {
+    const namesList: string = usernames
+      .map(x => `'${x}'`)
+      .join(', ');
+    const res: QueryResult = await this.poolClient.query(
+      `select id from users where name in (${namesList});`
+    );
+    const ids: number[] = res.rows
+      .map(x => x.id);
+    return ids;
   }
 
-  public async findBox(boxId: number): Promise<boxData|null> {
-    return await this.findValueById('boxes', boxId);
+  private async insertLimitedUsers(
+    box_id: number,
+    privacyList: privacyList
+  ): Promise<void> {
+    const usernames: string[] = privacyList
+      .map(x => x.name);
+    const usersIds: number[] = await this.getUsersIds(usernames);
+    const insertList: string[] = [];
+    for (let i = 0; i < usernames.length; i++)
+      insertList.push(
+        `(${box_id}, ${usersIds[i]}, '${privacyList[i].access_level}')`
+      );
+    await this.poolClient.query(
+      `insert into box_access (box_id, person_id, privilege) values ${insertList.join(', ')};`
+    );
+  }
+
+  public async insertBox(
+    boxData: boxData,
+    privacyList: null|privacyList
+  ): Promise<boxData|null> {
+    const insertedBox: boxData = 
+      await this.insertValue('boxes', boxData, ['name', 'id']);
+    if (privacyList)
+      await this.insertLimitedUsers(insertedBox.id, privacyList);
+    return insertedBox;
+  }
+
+  public async findUserBox(
+    owner_id: number,
+    name: string
+  ): Promise<boxData|null> {
+    const res: boxData[]|null =  await this.selectValues(
+      'boxes',
+      { owner_id, name },
+      ['name']
+    );
+    return res ? res[0] : null;
   }
 
   public async removeBox(id: number): Promise<void> {
-    await this.poolClient.query(
-      'delete from boxes where id = $1;', [id]
-    );
+    await this.removeValue('boxes', { id });
   }
 
   public async updateBox(
     id: number,
-    boxData: boxInput
+    boxData: boxData
   ): Promise<void> {
     await this.updateValueById('boxes', id, boxData);
-  }
-
-  // privacy setting up
-
-  private async addUserToBox(
-    id: number,
-    access_modifiers: ['read'?, 'write'?]
-  ): Promise<void> {
-    await this.poolClient.query(
-      'insert into box_access (privileges) values ($1) where id = $2;',
-      [access_modifiers, id]
-    );
-  }
-
-  public async removeUserFromBox (
-    boxId: number,
-    userId: number
-  ): Promise<void> {
-    await this.poolClient.query(
-      'delete from box_access where box_id = $1 and person_id = $2;',
-      [boxId, userId]
-    );
-  }
-
-  public async switchAccess(
-    boxId: number,
-    access_level: 'public'|'private'|'limited',
-    limited: [
-      number,               // userId
-      ['read'?, 'write'?]   //access_modifiers
-    ] = [-1, []]
-  ): Promise<void> {
-    await this.poolClient.query(
-      'update boxes set access_level = $1 where id = $2;',
-      [access_level, boxId]
-    );
-    if (access_level === 'limited')
-      await this.addUserToBox(...limited);
-    else
-      await this.poolClient.query(
-        'delete from box_access where box_id = $1;', [boxId]
-      );
   }
 }

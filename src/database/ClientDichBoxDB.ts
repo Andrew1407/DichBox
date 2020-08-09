@@ -1,7 +1,7 @@
 import { Pool, PoolClient, QueryResult } from 'pg';
 import {
-  userInput,
-  boxInput,
+  userData,
+  boxData,
   dataElement,
   subscribersData 
 } from '../datatypes';
@@ -23,7 +23,7 @@ export default class ClientDichBoxDB {
     this.poolClient = await this.pool.connect();
   }
 
-  private formatData(data: userInput|boxInput|subscribersData): 
+  private formatData(data: userData|boxData|subscribersData): 
     [string[], dataElement[], string[]] {
       const keys: string[] = Object.keys(data);
       const values: any[] = Object.values(data);
@@ -33,36 +33,28 @@ export default class ClientDichBoxDB {
       return [ keys, values, valuesTemplate ];
   }
 
-  protected async findValueByColumns(
+  protected async selectValues(
     table: string,
-    data: boxInput|userInput
-  ): Promise<any> {
+    input: boxData|userData|subscribersData,
+    output: string[] = ['*']
+  ): Promise<any[]> {
     const [ keys, values, valuesTemplate ]: 
-      [string[], dataElement[], string[]] = this.formatData(data);
+      [string[], dataElement[], string[]] = this.formatData(input);
     const selectSearch: string[] = [];
     for (let i = 0; i < keys.length; i++)
       selectSearch.push(keys[i] + ' = ' + valuesTemplate[i]);
-      const res: QueryResult = await this.poolClient.query(
-        `select * from ${table} where ${selectSearch.join(' and ')};`,
-        values
-      );
-    return res.rowCount ? res.rows[0] : null;
-  }
-
-  protected async findValueById(
-    table: string,
-    id: number
-  ): Promise<any> {
     const res: QueryResult = await this.poolClient.query(
-      `select * from ${table} where id = $1;`, [id]
+      `select ${output} from ${table} where ${selectSearch.join(' and ')};`,
+      values
     );
-    return res.rowCount ? res.rows[0] : null;
+    return res.rowCount ? res.rows : null;
   }
 
   protected async updateValueById(
     table: string,
     id: number,
-    data: boxInput|userInput
+    data: boxData|userData,
+    returning: string[] = ['*']
   ): Promise<any> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(data);
@@ -70,7 +62,7 @@ export default class ClientDichBoxDB {
     for (let i = 0; i < keys.length; i++)
       updated.push(keys[i] + ' = ' + valuesTemplate[i]);
     const res: QueryResult = await this.poolClient.query(
-      `update ${table} set ${updated} where id = ${id} returning *;`,
+      `update ${table} set ${updated} where id = ${id} returning ${returning};`,
       values
     );
     return res.rowCount ? res.rows[0] : null;
@@ -78,14 +70,30 @@ export default class ClientDichBoxDB {
 
   protected async insertValue(
     table: string,
-    data: boxInput|userInput|subscribersData
+    data: boxData|userData|subscribersData,
+    returning: string[] = ['*']
   ): Promise<any> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(data);
     const res: QueryResult = await this.poolClient.query(
-      `insert into ${table} (${keys}) values (${valuesTemplate}) returning *;`,
+      `insert into ${table} (${keys}) values (${valuesTemplate}) returning ${returning};`,
       values
     );
     return res.rows[0];
+  }
+
+  protected async removeValue(
+    table: string,
+    searchParams: any
+  ): Promise<void> {
+    const [ keys, values, valuesTemplate ]: 
+      [string[], dataElement[], string[]] = this.formatData(searchParams);
+    const params: string[] = [];
+    for (let i = 0; i < keys.length; i++)
+      params.push(keys[i] + ' = ' + valuesTemplate[i]);
+    await this.poolClient.query(
+      `delete from ${table} where ${params};`,
+      values
+    );
   }
 }

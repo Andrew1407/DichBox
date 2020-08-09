@@ -1,57 +1,42 @@
 type userData = {
-  id: number,
-  name: string,
-  email: string,
-  passwd: string,
-  followers: number,
-  reg_date: Date,
-  description: string,
-  name_color: string,
-  description_color: string
-};
-
-type userInput = {
   id?: number,
   name?: string,
   email?: string,
   passwd?: string,
-  description?: string
-  description_color?: string,
-  name_color?: string
-};
-
-type boxData = {
-  id: number,
-  name: string,
-  name_color: string,
-  reg_date: Date,
-  description: string,
-  description_color: string,
-  owner_id: number,
-  access_level: 'public'|'private'|'limited'|'invetee'
-};
-
-type boxInput = {
-  name?: string,
-  owner_id?: number,
-  name_color?: string,
-  access_level?: 'public'|'private'|'limited'|'invetee'|'followers',
+  followers?: number,
+  reg_date?: Date|string,
   description?: string,
+  name_color?: string,
   description_color?: string
 };
 
+type boxData = {
+  id?: number,
+  name?: string,
+  name_color?: string,
+  reg_date?: Date|string,
+  description?: string,
+  description_color?: string,
+  owner_id?: number,
+  access_level?: 'public'|'private'|'limited'|'invetee'
+};
+
 type subscribersData = {
-  person_id: number,
-  subscription: number
+  person_id?: number,
+  subscription?: number
 };
 
 type dataElement = string|number|Date|number[];
+type privacyList = {
+  name: string,
+  access_level: string
+}[];
+
 
 export {
   userData,
-  userInput,
   boxData,
-  boxInput,
   dataElement,
-  subscribersData
+  subscribersData,
+  privacyList
 };

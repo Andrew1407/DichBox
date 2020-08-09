@@ -1,33 +1,32 @@
 import { QueryResult } from 'pg';
 import ClientDichBoxDB from './ClientDichBoxDB';
-import {
-  userInput,
-  userData,
-  subscribersData 
-} from '../datatypes';
+import { userData } from '../datatypes';
 
 export default class UserClientDichBoxDB extends ClientDichBoxDB {
-  public async insertUser(userData: userInput): Promise<userData> {
-    return await this.insertValue('users', userData);
+  public async insertUser(userData: userData): Promise<userData> {
+    return await this.insertValue('users', userData, ['id']);
   }
 
   public async updateUser(
     id: number,
-    userData: userInput
+    userData: userData
   ): Promise<userData|null> {
     return await this.updateValueById('users', id, userData);
   }
 
-  public async findUserByColumns(
-    values: userInput
-  ): Promise<userData|null> {
-    return await this.findValueByColumns('users', values);
+  public async getUsersData(
+    values: userData,
+    returning: string[] = ['*']
+  ): Promise<userData[]|null> {
+    return await this.selectValues('users', values, returning);
   }
 
-  public async findUserById(
-    id: number
+  public async getUserData(
+    values: userData,
+    returning: string[] = ['*']
   ): Promise<userData|null> {
-    return await this.findValueById('users', id);
+    const res = await this.selectValues('users', values, returning);
+    return res ? res[0] : null;
   }
 
   public async removeUser(id: number): Promise<void> {
@@ -43,45 +42,48 @@ export default class UserClientDichBoxDB extends ClientDichBoxDB {
 
   // subscribers
 
-  public async getUserSubsciptions(userId: string): Promise<number[]> {
-    const res: QueryResult = await this.poolClient.query(
-      'select subscription from subscribers where person_id = $1;',
-      [userId]
-    );
-    const subscriptions: number[] = res.rows
-      .map(x => x.subscription);
+  public async getUserSubsciptions(userId: number): Promise<number[]> {
+    const queryArgs: [string, userData, [string]] =
+      ['subscribers', { id: userId }, ['subscription']];
+    const queryRes: { subscription: number }[] =
+      await this.selectValues(...queryArgs);
+    const subscriptions: number[] = queryRes ?
+      queryRes.map(x => x.subscription): null;
     return subscriptions;
   }
 
   public async addSubsciber(
-    userId: number,
-    subscriptionId: number
+    person_id: number,
+    subscription: number
   ): Promise<void> {
-    const insertData: subscribersData = {
-      person_id: userId,
-      subscription: subscriptionId
-    }
-    await this.insertValue('subscribers', insertData);
+    await this.insertValue('subscribers', { person_id, subscription });
   }
 
   public async removeSubscriber(
-    userId: number,
-    subscriptionId: number
+    person_id: number,
+    subscription: number
   ): Promise<void> {
-    await this.poolClient.query(
-      'delete from subscribers where person_id = $1 and subscription = $2;',
-      [ userId, subscriptionId ]
-    );
+    await this.removeValue('subscribers', { person_id, subscription });
   }
 
   public async checkSubscription(
-    userId: number,
-    subscriptionId: number
+    person_id: number,
+    subscription: number
   ): Promise<boolean> {
-    const res: QueryResult = await this.poolClient.query(
-      'select subscription from subscribers where person_id = $1 and subscription = $2;',
-      [ userId, subscriptionId ]
+    const queryRes: { subscription: number }[] = await this.selectValues(
+      'subscribers',
+      { person_id, subscription },
+      ['person_id']
     );
-    return res.rowCount ? true : false;
+    return !!queryRes;
+  }
+
+  public async getUsernames(usersTemplate: string): Promise<userData[]|null> {
+    const res: QueryResult = await this.poolClient.query(
+      `select id, name from users where name like \'%${usersTemplate}%\' limit 10;`
+    );
+    const names: userData[]|null = res.rowCount ?
+      res.rows : null;
+    return names;
   }
 }

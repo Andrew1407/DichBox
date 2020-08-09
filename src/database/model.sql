@@ -56,15 +56,3 @@ create table box_access (
   privilege varchar(4) not null
 );
 
--- stored files and diretories
-create table box_entries (
-  id serial primary key,
-  box_id int not null 
-    references boxes (id) 
-    on delete cascade
-    on update cascade,
-  name varchar(350),
-  type varchar(5),
-  description varchar(200) default '',
-  file_entries text default ''
-);

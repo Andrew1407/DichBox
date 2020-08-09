@@ -22,10 +22,9 @@ export default class LogoManager {
     if (logoExists) {
       const userLogo: string = await fs.promises
         .readFile(logoPath, 'base64');
-      return  this.appendBase64Header(userLogo);
-    } else {
-      return null;
+      return this.appendBase64Header(userLogo);
     }
+    return null;
   }
 
   public async saveLogo(
@@ -42,6 +41,6 @@ export default class LogoManager {
     const logoPath = this.generateLogoPath(userId);
     const logoExists = fs.existsSync(logoPath);
     if (logoExists)
-      await fs.promises.unlink(logoPath);
+     await fs.promises.unlink(logoPath);
   }
 }
