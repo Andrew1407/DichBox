@@ -9,7 +9,7 @@ const Footer = () => (
       </small>
       </p>
     <p>
-      <b>Dich Connections</b>
+      <b>DichES</b>
     </p>  
     <p>
       <b>

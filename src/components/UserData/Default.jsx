@@ -34,20 +34,18 @@ const Default = ({ setMenuOption }) => {
   const removeOkClb = async () => {
     const rmBody = { id, confirmation: 'permitted' }
     const { data } = await axios.post('http://192.168.0.223:7041/users/remove', rmBody);
-    if (data.removed) {
+    if (data.removed)
       signOutOkClb();
-    }
   };
 
-  
   return (
-    <div id="menu-default">
+    <div className="menu-form">
       <img src={ logo } id="default-logo" />
-      <div id="un-desc">
-        <p id="default-username" style={{ color: userData.name_color }} >{ userData.name }</p>
-        <p id="default-desc" style={{ color: userData.description_color }} >{ userData.description }</p>
+      <div className="name-desc">
+        <p className="nd-name" style={{ color: userData.name_color }} >{ userData.name }</p>
+        <p className="nd-desc" style={{ color: userData.description_color }} >{ userData.description }</p>
       </div>
-      <div id="default-choice">
+      <div className="menu-options-list">
         { !userData.ownPage && id &&
           ( userData.follower ?
             <p>unsubscribe</p> :

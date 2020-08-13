@@ -31,10 +31,10 @@ const Header = () => {
         <h1>DichBox</h1>
       </div>
       <div id="header-menu">
-        <img src={defaultLogo}  onClick={ handleMenuClick } style={{ backgroundColor }} />
+        <img src={defaultLogo} onClick={ handleMenuClick } style={{ backgroundColor }} /> 
       </div>
       <div id="header-search">
-        <input type="text" placeholder="search boxes" />
+        <input type="text" placeholder="search boxes/users" />
       </div>
     </div>
   );

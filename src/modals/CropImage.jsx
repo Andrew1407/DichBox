@@ -15,7 +15,7 @@ const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited }) => {
   };
   const handleCancel = () => {
     setCropModalHidden(true);
-    setImg(null)
+    setImg(null);
   };
   const applyCrop = () => {
     getCroppped();

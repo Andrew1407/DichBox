@@ -109,3 +109,40 @@ body {
   color: rgb(0, 217, 255);
 }
 
+.menu-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.name-desc {
+  padding: 2%;
+  padding-top: 5%;
+  text-align: center;
+}
+
+.nd-name {
+  margin: 0;
+  font-size: 440%;
+  margin: 0 auto;
+  padding: 1%;
+}
+
+.nd-desc {
+  white-space: pre-wrap;
+  margin-top: 6%;
+  margin-left: 13%;
+  margin-right: 13%;
+  padding: 1%;
+  font-size: 170%;
+}
+
+.menu-options-list {
+  border-top: solid 4px orange;
+  border-bottom: solid 4px orange;
+  font-size: 170%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  margin-bottom: 6%;
+  padding-left: 3%;
+}

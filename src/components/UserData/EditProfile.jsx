@@ -160,8 +160,8 @@ const EditProfile = ({ menuOption, setMenuOption }) => {
   }, []);
 
   return (
-    <form id="edit-profile" onSubmit={ submitEditedFields } >
-      <div className="edit-field">
+    <form id="edit-profile" className="menu-form" onSubmit={ submitEditedFields } >
+      <div className="menu-form edit-field">
           <img id="edit-logo" src={ logoEdited ? logoEdited : logo } />
           <CropImage {...{ cropModalHidden, setCropModalHidden, setLogoEdited }} />
           <input type="button" value="change logo" className="edit-btn" onClick={ () => setCropModalHidden(false) } />

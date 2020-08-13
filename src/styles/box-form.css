@@ -1,9 +1,3 @@
-#create-box {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
 #create-box-title {
   text-align: center;
   font-size: 350%;
@@ -26,4 +20,9 @@
 #create-box-cancel {
   margin-top: 5%;
   margin-bottom: 5%;
+}
+
+#box-form-crop {
+  margin-top: 8%;
+  margin-left: 20%;
 }

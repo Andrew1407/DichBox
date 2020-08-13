@@ -4,7 +4,7 @@ import { useParams, Route, Switch } from 'react-router-dom';
 import Boxes from './Boxes';
 import Default from './Default';
 import EditProfile from './EditProfile';
-import CreateBox from './CreateBox';
+import BoxForm from './BoxForm';
 import BoxEntries from './BoxEntries';
 
 const UserData = ({ menuOption, setMenuOption }) => {
@@ -18,7 +18,7 @@ const UserData = ({ menuOption, setMenuOption }) => {
     default: <Default {...{ setMenuOption }} />,
     boxes: <Boxes {...{ menuOption, setMenuOption }} />,
     editProfile: <EditProfile {...{ menuOption, setMenuOption }} />,
-    createBox: <CreateBox {...{ setMenuOption }} />,
+    createBox: <BoxForm {...{ setMenuOption }} />,
     boxEntries: <BoxEntries />
   };
 

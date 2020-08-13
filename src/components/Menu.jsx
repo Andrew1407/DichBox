@@ -12,7 +12,7 @@ import '../styles/menu.css';
 const Menu = () => {
   const { menuVisible, setMenuVisible, username, id, userData, pathName } = useContext(UserContext);
   const { dispatchDataInput, cleanWarnings } = useContext(VerifiersContext);
-  const [menuOption, setMenuOption] = useState('createBox');
+  const [menuOption, setMenuOption] = useState('default');
   const history = useHistory();
   const handleArrowClick = modifier => e => {
     e.preventDefault();
@@ -31,18 +31,20 @@ const Menu = () => {
     cleanWarnings();
   };
   const handleHomeClick = useCallback(handleHomeClickClb, [userData, id, pathName]);
+  const homeIconVisible = (menuOption !== 'default') && id || 
+    history.location.pathname.split('/').length > 2;
 
-  // useEffect(() => {
-  //   if (menuOption !== 'default')
-  //     setMenuOption('default');
-  // }, [pathName])
+  useEffect(() => {
+    if (menuOption !== 'default')
+      setMenuOption('default');
+  }, [pathName]);
 
   return (
     menuVisible ? 
     ( <menu id="menu">
       <div id="menu-nav-btns">
         <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
-        <img src={ homeLogo } id="home-logo" onClick={ handleHomeClick } style={{ display: (menuOption !== 'default') && id ? 'block' : 'none' }} />
+        <img src={ homeLogo } id="home-logo" onClick={ handleHomeClick } style={{ display: homeIconVisible ? 'block' : 'none' }} />
       </div>
         <Switch>
           <Route exact path="/">

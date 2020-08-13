@@ -7,9 +7,9 @@ import CropImage from '../../modals/CropImage';
 import EditField from '../inputFields/EditField';
 import BoxPrivacy from '../inputFields/BoxPrivacy';
 import boxPrivacyReducer from '../../reducers/boxPrivacyReducer';
-import '../../styles/create-box.css';
+import '../../styles/box-form.css';
 
-const CreateBox = ({ setMenuOption }) => {
+const BoxForm = ({ setMenuOption, editParametrs }) => {
   const history = useHistory();
   const { 
     useVerifiers,
@@ -44,7 +44,10 @@ const CreateBox = ({ setMenuOption }) => {
   const handleCanelClickClb = () => {
     cleanWarnings();
     dispatchDataInput({ type: 'CLEAN_DATA' });
-    setMenuOption('boxes');
+    if (setMenuOption)
+      setMenuOption('boxes');
+    if (editParametrs)
+      editParametrs.setEditBoxState(false);
   };
   const handleCanelClick = useCallback(handleCanelClickClb, []);
   const handleInputClb = field => {
@@ -92,12 +95,12 @@ const CreateBox = ({ setMenuOption }) => {
   };
 
   return (
-    <form id="create-box" onSubmit={ handleSubmit } >
+    <form className="menu-form" onSubmit={ handleSubmit } >
       <h1 id="create-box-title">Create new box</h1>
       <div className="edit-field">
         { logoEdited && <img id="box-logo" src={ logoEdited } />}
         <CropImage  {...{ cropModalHidden, setCropModalHidden, setLogoEdited }} />
-        <input type="button" value= { logoEdited ? 'change logo' : '*set logo' } className="edit-btn" onClick={ () => setCropModalHidden(false) } />
+        <input type="button" value= { logoEdited ? 'change logo' : '*set logo' } className="edit-btn" id="box-form-crop" onClick={ () => setCropModalHidden(false) } />
         { logoEdited && <input type="button" value="cancel" value="cancel" className="edit-btn" onClick={ () => setLogoEdited(null) } /> }
       </div>
 
@@ -116,9 +119,9 @@ const CreateBox = ({ setMenuOption }) => {
       </div>
       
       <input className="edit-btn" type="submit" value="create box" { ...submitButton } />
-      <input className="edit-btn" type="submit" id="create-box-cancel" value="cancel" onClick={ handleCanelClick } />
+      <input className="edit-btn" type="button" id="create-box-cancel" value="cancel" onClick={ handleCanelClick } />
     </form>
   )
 };
 
-export default CreateBox;
+export default BoxForm;

@@ -11,7 +11,6 @@ body {
 }
 
 #header-name {
-  font-size: 290%;
   color: black;
   background-color: rgb(50, 211, 240);
   -webkit-transform: skewX(-25deg); 
@@ -25,13 +24,14 @@ body {
   padding-top: 1%;
   border-left: 7px solid rgb(75, 73, 73);
   border-right: 7px solid rgb(75, 73, 73);
-
+  font-size: 250%;
+  
 }
 
 #header-name > h1 {
   color: black;
   background: rgb(50, 211, 240);
-  margin: 0 auto;
+  margin: auto;
   -webkit-transform: skewX(25deg); 
 	-moz-transform: skewX(25deg); 
 	-ms-transform: skewX(25deg); 
@@ -55,7 +55,7 @@ body {
 }
 
 #header-search > input {
-  margin-top: 15%;
+  margin-top: 12%;
   padding-left: 1%;
   border: solid 4px;
   border-color: black;
@@ -71,13 +71,16 @@ body {
 }
 
 #header-menu {
-  margin-top: 0.5%;
-  padding: 1%;
+  display: block;
+  margin: auto
 }
 
-#header-menu > img{
-  padding: 8%;
-  height: 80px;
+#header-menu > img {
+  display: block;
+  margin: 0 auto;
+  padding: 7%;
+  /* width: 15%; */
+  width: 75px;
   border-radius: 50%;
   background-color: grey;
 }
