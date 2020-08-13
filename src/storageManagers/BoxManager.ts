@@ -33,4 +33,8 @@ export default class BoxManager {
       await this.boxLogo.saveLogo(logoSrc, boxId);
     }
   }
+
+  public async getLogoIfExists(boxId: number): Promise<string|null> {
+    return await this.boxLogo.getLogoIfExists(boxId);
+  }
 }

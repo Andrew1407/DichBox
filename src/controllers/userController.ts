@@ -13,34 +13,6 @@ const userLogo: LogoManager = new LogoManager('users');
 const clientDB: UserClientDichBoxDB = new UserClientDichBoxDB();
 clientDB.clientConnection();
 
-const formatUserFields = (
-  userData: userData,
-  modifier: boolean
-): userResponse => {
-  const { 
-    name,
-    description,
-    reg_date,
-    followers,
-    email,
-    name_color,
-    description_color,
-    id
-  }: userData = userData;
-  const dateFromated: string = new Date(reg_date).toLocaleDateString();
-  const regDate = dateFromated.replace(/\//g, '.');
-  const res: userResponse = {
-    name_color,
-    description_color,
-    id,
-    name,
-    reg_date: regDate,
-    description,
-    followers
-  };
-  return !modifier ? res : { ...res, email };
-};
-
 const signUpUser: middlewareFn = async (req: Request, res: Response) => {
   const clientData: userData = req.body;
   const { id }: userData = await clientDB.insertUser(clientData);
@@ -54,9 +26,13 @@ const findUser: middlewareFn = async (req: Request, res: Response) => {
   const ownPage: boolean = id === user.id;
   let userRes: userResponse|null = null;
   if (user) {
-    const dataFields: userResponse = formatUserFields(user, ownPage);
-    const logo: string = await userLogo.getLogo(user.id);
-    userRes = { ...dataFields, logo };
+    user.reg_date = new Date(user.reg_date)
+      .toLocaleDateString()
+      .replace(/\//g, '.');
+    if (!ownPage)
+      delete user.email;
+    const logo: string = await userLogo.getLogoIfExists(user.id);
+    userRes = { ...user, logo };
     if (!ownPage) {
       const follower: boolean = await clientDB.checkSubscription(user.id, id);
       userRes = { ...userRes, follower };
@@ -151,7 +127,7 @@ const findUsernames: middlewareFn = async (req: Request, res: Response) => {
       user: { id: number, name: string }
     ): Promise<foundUser> => ({
       name: user.name, 
-      logo: await userLogo.getLogo(user.id)
+      logo: await userLogo.getLogoIfExists(user.id)
     });
     foundUsers = await Promise.all(
       usernames.map(foudUsersMapper)

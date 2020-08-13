@@ -37,6 +37,25 @@ export default class ClientDichBoxDB {
     table: string,
     input: boxData|userData|subscribersData,
     output: string[] = ['*']
+  ): Promise<any[]|null> {
+    const [ keys, values, valuesTemplate ]: 
+      [string[], dataElement[], string[]] = this.formatData(input);
+    const selectSearch: string[] = [];
+    for (let i = 0; i < keys.length; i++)
+      selectSearch.push(keys[i] + ' = ' + valuesTemplate[i]);
+    const res: QueryResult = await this.poolClient.query(
+      `select ${output} from ${table} where (${selectSearch.join(' and ')});`,
+      values
+    );
+    return res.rowCount ? res.rows : null;
+  }
+
+  protected async selectJoiedValues(
+    tables: string[],
+    joinColumns: string[],
+    input: boxData|userData|subscribersData,
+    output: string[] = ['*'],
+    extraCondition: string = ''
   ): Promise<any[]> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(input);
@@ -44,10 +63,29 @@ export default class ClientDichBoxDB {
     for (let i = 0; i < keys.length; i++)
       selectSearch.push(keys[i] + ' = ' + valuesTemplate[i]);
     const res: QueryResult = await this.poolClient.query(
-      `select ${output} from ${table} where ${selectSearch.join(' and ')};`,
+      `select ${output} from ${tables[0]} a left join ${tables[1]} b on a.${joinColumns[0]} = b.${joinColumns[1]} where (${selectSearch.join(' and ')}) ${extraCondition};`,
       values
     );
-    return res.rowCount ? res.rows : null;
+    return res.rows;
+  }
+
+  protected async selectDoubleJoiedValues(
+    tables: string[],
+    joinConditions: string[],
+    input: boxData|userData|subscribersData,
+    output: string[] = ['*'],
+    extraCondition: string = ''
+  ): Promise<any[]> {
+    const [ keys, values, valuesTemplate ]: 
+      [string[], dataElement[], string[]] = this.formatData(input);
+    const selectSearch: string[] = [];
+    for (let i = 0; i < keys.length; i++)
+      selectSearch.push(keys[i] + ' = ' + valuesTemplate[i]);
+    const res: QueryResult = await this.poolClient.query(
+      `select ${output} from ${tables[0]} a left join ${tables[1]} b on ${joinConditions[0]} left join ${tables[2]} c on ${joinConditions[1]} where (${selectSearch.join(' and ')}) ${extraCondition};`,
+      values
+    );
+    return res.rows;
   }
 
   protected async updateValueById(

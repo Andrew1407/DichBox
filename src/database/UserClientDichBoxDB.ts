@@ -32,7 +32,7 @@ export default class UserClientDichBoxDB extends ClientDichBoxDB {
   public async removeUser(id: number): Promise<void> {
     const queries: string[] = [
       'delete from users where id = $1;',
-      `update users set subscriptions = array_remove(subscriptions, $1) where \'{${id}}\' <@ subscriptions;`,
+      // `update users set subscriptions = array_remove(subscriptions, $1) where \'{${id}}\' <@ subscriptions;`,
       // 'update users set followers = (followers - 1) where \'{$1}\' <@ distributors_arr;',
     ];
     queries.forEach(async query =>

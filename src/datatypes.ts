@@ -18,7 +18,10 @@ type boxData = {
   description?: string,
   description_color?: string,
   owner_id?: number,
-  access_level?: 'public'|'private'|'limited'|'invetee'
+  access_level?: 'public'|'private'|'limited'|'invetee',
+  owner_name?: string,
+  onwer_nc?: string,
+  privilege?: 'edit'|'view'
 };
 
 type subscribersData = {

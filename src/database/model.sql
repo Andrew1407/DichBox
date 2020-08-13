@@ -40,7 +40,8 @@ create table boxes (
   access_level varchar(9) not null,
   description varchar(200) default '',
   description_color varchar(8) default '#00d9ff',
-  reg_date timestamp default now()
+  reg_date timestamp default now(),
+  last_edited timestamp default now()
 );
 
 -- box privacy mode for user

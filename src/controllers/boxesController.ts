@@ -4,16 +4,24 @@ import BoxesClientDichBoxDB from '../database/BoxesClientDichBoxDB';
 import BoxManager from '../storageManagers/BoxManager';
 
 type middlewareFn = (req: Request, res: Response) => Promise<void>;
+type boxListRequest = {
+  viewerId: number,
+  boxOwnerId: number,
+  follower: boolean
+};
+// type boxRequest
 
 const boxManager: BoxManager = new BoxManager();
 const clientDB: BoxesClientDichBoxDB = new BoxesClientDichBoxDB();
 clientDB.clientConnection();
 
 const createBox: middlewareFn = async (req: Request, res: Response) => {
-  const boxData: boxData = req.body.boxData;
-  const boxLogo: string|null = req.body.logo;
-  const privacyList: privacyList|null = req.body.privacyList;
-  const username: string = req.body.username;
+  const { boxData, boxLogo, privacyList, username }: {
+    boxData: boxData,
+    boxLogo: string|null,
+    privacyList: privacyList|null,
+    username: string
+  } = req.body;
   const createdBox: boxData = await clientDB.insertBox(boxData, privacyList);
   await boxManager.createBox(
     username,
@@ -24,11 +32,9 @@ const createBox: middlewareFn = async (req: Request, res: Response) => {
 };
 
 const findUserBoxes: middlewareFn = async (req: Request, res: Response) => {
-  const viewerId: number = req.body.id;
-  const ownPage: boolean = req.body.ownPage;
-  const followed: boolean = req.body.followed;
+  const { viewerId,  boxOwnerId, follower }: boxListRequest = req.body;
   const boxesList: boxData[]|null = await clientDB.getBoxesList(
-    viewerId, ownPage, followed
+    viewerId, boxOwnerId, follower
   );
   res.json({ boxesList }).end();
 };
@@ -42,8 +48,34 @@ const verifyBoxName: middlewareFn = async (req: Request, res: Response) => {
   res.json({ foundValue }).end();
 };
 
+const getBoxDetais: middlewareFn = async (req: Request, res: Response) => {
+  const boxPath: string = req.body.path;
+  const follower: boolean = req.body.follower;
+  const owner_id: number = req.body.owner_id;
+  const viewer_id: number = req.body.viewer_id;
+  const boxName: string = boxPath
+    .split('/')
+    .slice(2, 3)[0];
+  const boxInfo: boxData|null = await clientDB.getBoxInfo(
+    boxName, viewer_id, owner_id, follower
+  );
+  if (boxInfo) {
+    const logo: string|null = await boxManager.getLogoIfExists(boxInfo.id);
+    delete boxInfo.id;
+    ['reg_date', 'last_edited'].forEach(x => {
+      boxInfo[x] = new Date(boxInfo[x])
+        .toLocaleString()
+        .replace(/\//g, '.');
+    });
+    res.json({ ...boxInfo, logo }).end();
+  } else {
+    res.json({}).end();
+  }
+};
+
 export {
   createBox,
   findUserBoxes,
-  verifyBoxName
+  verifyBoxName,
+  getBoxDetais
 };
