@@ -44,8 +44,8 @@ create table boxes (
   last_edited timestamp default now()
 );
 
--- box privacy mode for user
-create table box_access (
+-- limited mode view
+create table limited_viewers (
   box_id int not null 
     references boxes (id) 
     on delete cascade
@@ -53,7 +53,17 @@ create table box_access (
   person_id int not null 
     references users (id) 
     on delete cascade
-    on update cascade,
-  privilege varchar(4) not null
+    on update cascade
 );
 
+-- edit access
+create table box_editors (
+  box_id int not null 
+    references boxes (id) 
+    on delete cascade
+    on update cascade,
+  person_id int not null 
+    references users (id) 
+    on delete cascade
+    on update cascade
+);

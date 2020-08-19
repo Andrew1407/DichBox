@@ -10,6 +10,8 @@ type userData = {
   description_color?: string
 };
 
+type access_level = 'public'|'private'|'limited'|'invetee';
+
 type boxData = {
   id?: number,
   name?: string,
@@ -18,10 +20,12 @@ type boxData = {
   description?: string,
   description_color?: string,
   owner_id?: number,
-  access_level?: 'public'|'private'|'limited'|'invetee',
+  access_level?: access_level,
   owner_name?: string,
   onwer_nc?: string,
-  privilege?: 'edit'|'view'
+  editor?: boolean,
+  last_edited?: string,
+  box_id?: number
 };
 
 type subscribersData = {
@@ -30,16 +34,11 @@ type subscribersData = {
 };
 
 type dataElement = string|number|Date|number[];
-type privacyList = {
-  name: string,
-  access_level: string
-}[];
-
 
 export {
   userData,
   boxData,
   dataElement,
   subscribersData,
-  privacyList
+  access_level
 };

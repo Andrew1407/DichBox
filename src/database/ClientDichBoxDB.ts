@@ -33,6 +33,15 @@ export default class ClientDichBoxDB {
       return [ keys, values, valuesTemplate ];
   }
 
+  public async getUserId(name: string): Promise<number|null> {
+    const res: QueryResult = await this.poolClient.query(
+      'select id from users where name = $1',
+      [name]
+    );
+    if (!res.rowCount) return null;
+    return res.rows[0].id;
+  }
+
   protected async selectValues(
     table: string,
     input: boxData|userData|subscribersData,
@@ -44,7 +53,7 @@ export default class ClientDichBoxDB {
     for (let i = 0; i < keys.length; i++)
       selectSearch.push(keys[i] + ' = ' + valuesTemplate[i]);
     const res: QueryResult = await this.poolClient.query(
-      `select ${output} from ${table} where (${selectSearch.join(' and ')});`,
+      `select ${output} from ${table} where ${selectSearch.join(' and ')};`,
       values
     );
     return res.rowCount ? res.rows : null;
@@ -63,7 +72,7 @@ export default class ClientDichBoxDB {
     for (let i = 0; i < keys.length; i++)
       selectSearch.push(keys[i] + ' = ' + valuesTemplate[i]);
     const res: QueryResult = await this.poolClient.query(
-      `select ${output} from ${tables[0]} a left join ${tables[1]} b on a.${joinColumns[0]} = b.${joinColumns[1]} where (${selectSearch.join(' and ')}) ${extraCondition};`,
+      `select ${output} from ${tables[0]} a left join ${tables[1]} b on a.${joinColumns[0]} = b.${joinColumns[1]} where ${selectSearch.join(' and ')} ${extraCondition};`,
       values
     );
     return res.rows;
@@ -81,8 +90,9 @@ export default class ClientDichBoxDB {
     const selectSearch: string[] = [];
     for (let i = 0; i < keys.length; i++)
       selectSearch.push(keys[i] + ' = ' + valuesTemplate[i]);
+    // console.log(`select ${output} from ${tables[0]} a left join ${tables[1]} b on ${joinConditions[0]} left join ${tables[2]} c on ${joinConditions[1]} where ${selectSearch.join(' and ')} ${extraCondition};`)
     const res: QueryResult = await this.poolClient.query(
-      `select ${output} from ${tables[0]} a left join ${tables[1]} b on ${joinConditions[0]} left join ${tables[2]} c on ${joinConditions[1]} where (${selectSearch.join(' and ')}) ${extraCondition};`,
+      `select ${output} from ${tables[0]} a left join ${tables[1]} b on ${joinConditions[0]} left join ${tables[2]} c on ${joinConditions[1]} where ${selectSearch.join(' and ')} ${extraCondition};`,
       values
     );
     return res.rows;

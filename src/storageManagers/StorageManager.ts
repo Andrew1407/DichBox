@@ -1,11 +1,11 @@
 import * as fs  from 'fs';
 import * as path from 'path';
 
-export default class LogoManager {
+export default class StorageManager {
   private logosPath: string;
 
   constructor(logosType: string) {
-    this.logosPath  = path.join('..', 'DichStorage/logos', logosType);
+    this.logosPath  = path.join('../DichStorage/logos', logosType);
   }
 
   private generateLogoPath(id: number): string {
@@ -41,5 +41,17 @@ export default class LogoManager {
     const logoExists = fs.existsSync(logoPath);
     if (logoExists)
      await fs.promises.unlink(logoPath);
+  }
+
+  protected async createDir(...pathes: string[]): Promise<void> {
+    const dirPath: string = path.join('../DichStorage/boxes', ...pathes);
+    await fs.promises.mkdir(dirPath, { recursive: true });
+  }
+
+  protected async removeDir(...pathes: string[]): Promise<void> {
+    const dirPath: string = path.join('../DichStorage/boxes', ...pathes);
+    const exists: boolean = fs.existsSync(dirPath);
+    if (exists)
+      await fs.promises.rmdir(dirPath, { recursive: true });
   }
 }

@@ -7,9 +7,9 @@ import boxesRoutes from './routes/boxesRoutes';
 
 const app: Application = express();
 app.use(cors());
-app.use(bodyparser.json({ limit: '50mb' }))
+app.use(bodyparser.json({ limit: '100mb' }))
 app.use(bodyparser.urlencoded({
-  limit: '50mb',
+  limit: '100mb',
   extended: true
 }));
 

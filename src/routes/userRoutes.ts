@@ -1,16 +1,17 @@
-import * as express from 'express';
+import { Router } from 'express';
 import * as routes from '../controllers/userController';
 
-const usersRouter: express.Router = express.Router();
+const usersRouter: Router = Router();
 
-usersRouter.post('/create', routes.signUpUser);
-usersRouter.post('/find', routes.findUser);
-usersRouter.post('/enter', routes.signInUser);
-usersRouter.post('/verify', routes.verifyUserInput);
-usersRouter.post('/name', routes.getUsername);
-usersRouter.post('/passwd_verify', routes.verifyUserPassword);
-usersRouter.post('/edit', routes.editUser);
-usersRouter.post('/remove', routes.removeUser);
-usersRouter.post('/names_list', routes.findUsernames);
+usersRouter
+  .post('/create', routes.signUpUser)
+  .post('/find', routes.findUser)
+  .post('/enter', routes.signInUser)
+  .post('/verify', routes.verifyUserInput)
+  .post('/passwd_verify', routes.verifyUserPassword)
+  .post('/edit', routes.editUser)
+  .post('/remove', routes.removeUser)
+  .post('/names_list', routes.findUsernames)
+  .post('/access_lists', routes.getAccessLists);
 
 export default usersRouter;
