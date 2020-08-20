@@ -1,23 +1,30 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { UserContext } from '../../contexts/UserContext';
 import axios from 'axios';
+import { UserContext } from '../../contexts/UserContext';
+import { BoxesContext } from '../../contexts/BoxesContext';
+import { MenuContext } from '../../contexts/MenuContext';
 import BoxesList from './BoxesList';
 import '../../styles/menu-boxes.css';
 
-const Boxes = ({ menuOption, setMenuOption }) => {
-  const { userData, id } = useContext(UserContext);
-  const [boxesList, setBoxesList] = useState([]);
-  const [listOption, setListOption] = useState('all');
+const Boxes = () => {
+  const { menuOption, setMenuOption, menuVisible } = useContext(MenuContext);
+  const { userData, username } = useContext(UserContext);
+  const {
+    boxesList,
+    setBoxesList,
+    listOption,
+    setListOption
+  } = useContext(BoxesContext);
   const [searchInput, setSearchInput] = useState('');
 
   useEffect(() => {
     if (menuOption !== 'boxes')
       setMenuOption('boxes');
     const fetchBoxesList = async () => {
-      if (!boxesList.length && userData.id) {
+      if (!boxesList.length && userData.name) {
         const boxesBody = {
-          viewerId: id,
-          boxOwnerId: userData.id,
+          viewerName: username,
+          boxOwnerName: userData.name,
           follower: userData.follower
         };
         const { data } = await await axios.post('http://192.168.0.223:7041/boxes/user_boxes', boxesBody);
@@ -27,7 +34,6 @@ const Boxes = ({ menuOption, setMenuOption }) => {
     };
 
     fetchBoxesList();
-    return () => setBoxesList([]);
   }, [userData]);
 
   return (
@@ -39,18 +45,18 @@ const Boxes = ({ menuOption, setMenuOption }) => {
           </div>
             <label htmlFor="search">search:  </label>
             <input type="text" name="search" onChange={ e => setSearchInput(e.target.value) } />
-          <select id="boxes-select" onChange={ e => setListOption(e.target.value) } >
+          <select id="boxes-select" onChange={ e => setListOption(e.target.value) } defaultValue={ listOption } >
             <option value="all">all</option>
             <option value="public">public</option>
             { userData.ownPage && <option value="private">private</option> }
             <option value="followers">followers</option>
             <option value="limited">limited</option>
-            <option value="invetee">invetee</option>
+            { userData.ownPage && <option value="invetee">invetee</option> }        
           </select>
         </div>
-        { userData.ownPage && <input id="boxes-header-btn" type="button" value="[ + new box ]" onClick={ () => setMenuOption('createBox') } /> }
+        { userData.ownPage && <input id="boxes-header-btn" type="button" value="[ + new box ]" onClick={ () => (setBoxesList([]), setMenuOption('createBox')) } /> }
       </div>
-      <BoxesList {...{ boxesList, listOption, searchInput, setMenuOption }}/>
+      <BoxesList {...{ searchInput, setMenuOption }}/>
     </div>
   );
 };

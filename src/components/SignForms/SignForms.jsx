@@ -7,7 +7,7 @@ import { VerifiersContext } from '../../contexts/VerifiersContext';
 import '../../styles/sign-forms.css';
 
 const SingForms = () => {
-  const { dispatchId, id } = useContext(UserContext);  
+  const { dispatchUsername } = useContext(UserContext);  
   const {
     useVerifiers,
     fetchUserInput,
@@ -45,7 +45,7 @@ const SingForms = () => {
   const signUpVerParams = {
     ...signInVerParams,
     name: {
-      regExp: /^(?!search$)[\S]{5,40}$/,
+      regExp: /^(?!search$)[\S]{1,40}$/,
       warningRegExp: 'Username length should be unique, 5-40 symbols (no spaces)',
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
@@ -72,19 +72,19 @@ const SingForms = () => {
     const { data } = await axios.post('http://192.168.0.223:7041/users/create', dataInput);
     cleanWarnings();
     dispatchDataInput({ type: 'CLEAN_DATA' });
-    dispatchId({ type: 'SET_ID', id: data.id });
+    dispatchUsername({ type: 'SET_NAME', value: data.name });
   };
-  const submitSignUp = useCallback(submitSignUpClb, [dataInput, id]);
+  const submitSignUp = useCallback(submitSignUpClb, [dataInput]);
   
   const submitSignInClb = async e => {
     e.preventDefault();
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
     const { data } = await axios.post('http://192.168.0.223:7041/users/enter', dataInput );
-    if (data.id) {
+    if (data.name) {
       cleanWarnings();
-      dispatchId({ type: 'SET_ID', id: data.id });
       dispatchDataInput({ type: 'CLEAN_DATA' });
+      dispatchUsername({ type: 'SET_NAME', value: data.name });
     } else {
       const passwd = {
         borderColor: 'crimson',
@@ -95,7 +95,7 @@ const SingForms = () => {
   };
   const submitSignIn = useCallback(
     submitSignInClb, 
-    [dataInput, warnings, correctInput, id]
+    [dataInput, warnings, correctInput]
   );
 
   // submit buttom

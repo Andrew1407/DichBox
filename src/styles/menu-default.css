@@ -17,13 +17,16 @@
   justify-content: space-between;
   font-size: 130%;
   font-style: italic;
-  margin-top: 10%;
+  margin-top: 8%;
   border-top: 3px solid grey;
 }
 
 .default-extra {
   font-size: 140%;
   font-style: italic;
+  margin: 0;
+  margin-bottom: 3%;
+  margin-left: 1%;
 }
 
 #extra-reg-date {

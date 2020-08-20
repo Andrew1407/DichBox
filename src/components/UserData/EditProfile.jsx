@@ -3,14 +3,16 @@ import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
+import { MenuContext } from '../../contexts/MenuContext';
 import CropImage from '../../modals/CropImage';
 import EditField from '../inputFields/EditField';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import '../../styles/edit-profile.css';
 
-const EditProfile = ({ menuOption, setMenuOption }) => {
+const EditProfile = () => {
   const history = useHistory();
-  const { userData, dispatchUserData, id, setUsername } = useContext(UserContext);
+  const { menuOption, setMenuOption } = useContext(MenuContext);
+  const { userData, dispatchUserData, username, dispatchUsername } = useContext(UserContext);
   const { 
     useVerifiers,
     fetchUserInput,
@@ -61,8 +63,8 @@ const EditProfile = ({ menuOption, setMenuOption }) => {
       }
     },
     name: {
-      regExp: /^(?!search$)[\S]{5,40}$/,
-      warningRegExp: 'Username length should be 5-40 symbols (unique, no spaces)',
+      regExp: /^(?!search$)[\S]{1,40}$/,
+      warningRegExp: 'Username length should be 1-40 symbols (unique, no spaces)',
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
         const { foundValue } = await fetchUserInput('name', input);
@@ -77,7 +79,7 @@ const EditProfile = ({ menuOption, setMenuOption }) => {
       warningRegExp: 'Password length should be 5-16 symbols (no spaces)',
       warningFetch: 'Wrong password',
       fetchVerifier: async input => {
-        const { foundValue } = await fetchPasswdVer(userData.id, input);
+        const { foundValue } = await fetchPasswdVer(userData.name, input);
         return foundValue !== input;
       }
     },
@@ -124,13 +126,13 @@ const EditProfile = ({ menuOption, setMenuOption }) => {
         return { ...body, passwd: dataInput[field] };
       return { ...body, [field]: dataInput[field] }; 
     }, {});
-    const editedBody = { id, edited };
+    const editedBody = { username, edited };
     if (logoEdited)
       editedBody.logo = logoEdited;
     const { data } =  await axios.post('http://192.168.0.223:7041/users/edit', editedBody);
     dispatchUserData({ type: 'REFRESH_DATA', data });
     if (data.name) {
-      setUsername(data.name);
+      dispatchUsername({ type: 'SET_NAME', value: data.name});
       history.push('/' + data.name);
     }
     cleanWarnings();
@@ -139,11 +141,11 @@ const EditProfile = ({ menuOption, setMenuOption }) => {
   };
   const submitEditedFields = useCallback(
     submitEditedFieldsClb,
-    [dataInput, id, editedFields, logoEdited, userData]
+    [dataInput, username, editedFields, logoEdited, userData]
   );
   useEffect(() => {
     const userDataIsFetched = Object.keys(userData).length;
-    if (userDataIsFetched && menuOption === 'editProfile' && id) {
+    if (userDataIsFetched && menuOption === 'editProfile' && username) {
       const editDefaultFields = {
         name: userData.name,
         email: userData.email,
@@ -162,10 +164,11 @@ const EditProfile = ({ menuOption, setMenuOption }) => {
   return (
     <form id="edit-profile" className="menu-form" onSubmit={ submitEditedFields } >
       <div className="menu-form edit-field">
-          <img id="edit-logo" src={ logoEdited ? logoEdited : logo } />
+          <img id="edit-logo" src={ logoEdited ? logoEdited === 'removed' ? logoDefault : logoEdited : logo } />
           <CropImage {...{ cropModalHidden, setCropModalHidden, setLogoEdited }} />
           <input type="button" value="change logo" className="edit-btn" onClick={ () => setCropModalHidden(false) } />
-          { logoEdited && <input type="button" value="cancel" value="cancel" className="edit-btn" onClick={ () => setLogoEdited(null) } /> }
+          { logoEdited !== 'removed' && userData.logo && <input type="button" value="set default" className="edit-btn" onClick={ () => setLogoEdited('removed') } /> }
+          { logoEdited && <input type="button" value="cancel" className="edit-btn" onClick={ () => setLogoEdited(null) } /> }
       </div>
 
       <div className="edit-field" id="edit-uname">
@@ -189,7 +192,7 @@ const EditProfile = ({ menuOption, setMenuOption }) => {
           <EditField {...{ disabled: !correctInput.passwd, label: 'new password', type: 'password', inputValue: dataInput.newPasswd, warning: warnings.newPasswd, handleOnChange: handleInputChange('newPasswd') }} />
         </div>
         }
-        <input className="edit-btn" type="button" onClick={ handlePasswdFormClick } value={ passwdFormHidden ? 'change password' : 'cancel' }/>
+        <input className="edit-btn" id="edit-user-passwd-btn" type="button" onClick={ handlePasswdFormClick } value={ passwdFormHidden ? 'change password' : 'cancel' }/>
       </div>
 
       <input className="edit-btn" id="edit-submit" type="submit" value="edit profile" disabled={ submitButton.disabled } style={ submitButton.style } />

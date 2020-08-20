@@ -18,9 +18,11 @@ const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited }) => {
     setImg(null);
   };
   const applyCrop = () => {
-    getCroppped();
-    setImg(null);
-    setCropModalHidden(true);
+    if (imgCropped) {
+      getCroppped();
+      setImg(null);
+      setCropModalHidden(true);
+    }
   };
   const getCroppped = () => {
     const canvas = document.createElement('canvas');

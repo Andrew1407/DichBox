@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
+import { BoxesContext } from '../../contexts/BoxesContext';
 
-const BoxesList = ({ boxesList, listOption, searchInput, setMenuOption }) => {
+const BoxesList = ({ searchInput, setMenuOption }) => {
   const history = useHistory();
   const { userData } = useContext(UserContext);
+  const { setListOption, boxesList, listOption, setBoxesList } = useContext(BoxesContext);
 
   let showBoxes = boxesList;
   if (!!searchInput || listOption !== 'all')
@@ -17,9 +19,12 @@ const BoxesList = ({ boxesList, listOption, searchInput, setMenuOption }) => {
 
   return ( showBoxes.length ?
     <div id="boxes-list">
-      {showBoxes.map(box => 
-        <div key={ `${box.name}, ${box.access_level}` } onClick={ () => history.push(`/${box.owner_name}/${box.name}`) } >
-          <p style={{ color: box.name_color }} >{box.name}</p>
+      { showBoxes.map(box => 
+        <div className="boxes-items" key={ `${box.name}, ${box.access_level}` } onClick={ () =>(setBoxesList([]), setListOption('all'), history.push(`/${box.owner_name}/${box.name}`)) } >
+          <p>
+            <span style={{ color: box.name_color }} >{ box.name }</span>
+            <span className="item-access">({ box.access_level })</span>
+          </p>
         </div>  
       )}
     </div> :

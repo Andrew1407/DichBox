@@ -1,16 +1,21 @@
-import React, { useContext, useState, useReducer, useCallback } from 'react';
+import React, { useContext, useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
 import { UserContext } from '../../contexts/UserContext';
+import { BoxesContext } from '../../contexts/BoxesContext';
+import { MenuContext } from '../../contexts/MenuContext';
 import CropImage from '../../modals/CropImage';
 import EditField from '../inputFields/EditField';
 import BoxPrivacy from '../inputFields/BoxPrivacy';
-import boxPrivacyReducer from '../../reducers/boxPrivacyReducer';
+import SearchUsers from '../inputFields/SearchUsers';
 import '../../styles/box-form.css';
 
-const BoxForm = ({ setMenuOption, editParametrs }) => {
+const BoxForm = ({ editParametrs }) => {
   const history = useHistory();
+  const params = useParams();
+  const { setMenuOption } = useContext(MenuContext);
+  const { boxDetails, setBoxDetails, setEditBoxState } = useContext(BoxesContext);
   const { 
     useVerifiers,
     fetchBoxInput,
@@ -20,19 +25,25 @@ const BoxForm = ({ setMenuOption, editParametrs }) => {
     dispatchDataInput,
     cleanWarnings,
   } = useContext(VerifiersContext);
-  const { id, username } = useContext(UserContext);
+  const { username, userData } = useContext(UserContext);
   const [logoEdited, setLogoEdited] = useState(null);
   const [cropModalHidden, setCropModalHidden] = useState(true);
   const [inputFields, setInputFields] = useState([]);
-  const [privacy, dispatchPrivacy] = useReducer(boxPrivacyReducer, { type: 'public', accessList: [] })
+  const [changedList, setChangedList] = useState(false);
+  const [privacy, setPrivacy] = useState('public');
+  const [limitedList, setLimitedList] = useState([]);
+  const [editorsList, setEditorsList] = useState([]);
   const verParams = {
     name: {
-      regExp: /^(?!search$)[^\s/]{5,40}$/,
-      warningRegExp: 'Box name length should be 5-40 symbols (unique, no spaces and no path definitions like "../path1/path2)"',
+      regExp: /^(?!search$)[^\s/]{1,40}$/,
+      warningRegExp: 'Box name length should be 1-40 symbols (unique, no spaces and no path definitions like: "../path1/path2/...")',
       warningFetch: 'You already have a box with the same name',
       fetchVerifier: async input => {
-        const { foundValue } = await fetchBoxInput(id, input);
-        return foundValue === input;
+        const { foundValue } = await fetchBoxInput(username, input);
+        let res = foundValue === input;
+        if (!editParametrs.edit)
+          res &= foundValue !== editParametrs.boxDetails.name;
+        return res;
       }
     },
     name_color: {},
@@ -46,7 +57,7 @@ const BoxForm = ({ setMenuOption, editParametrs }) => {
     dispatchDataInput({ type: 'CLEAN_DATA' });
     if (setMenuOption)
       setMenuOption('boxes');
-    if (editParametrs)
+    if (editParametrs.edit)
       editParametrs.setEditBoxState(false);
   };
   const handleCanelClick = useCallback(handleCanelClickClb, []);
@@ -64,44 +75,102 @@ const BoxForm = ({ setMenuOption, editParametrs }) => {
   );
   const handleSubmitClb = async e => {
     e.preventDefault();
-    const isCorrect = getVerifiersState(inputFields);
-    if (isCorrect) {
-      const access_level = privacy.type;
+    const isCorrect = editParametrs.edit ?
+      inputFields.length || !!logoEdited || changedList :
+      getVerifiersState(inputFields) && inputFields.length;
+    const access_level = privacy;
+    const [ editors, limitedUsers ] = [editorsList, limitedList]
+      .map(arr => arr.length ? arr.map(user => user.name) : null);
+    const submitBody = {
+      username,
+      logo: logoEdited,
+      limitedUsers: privacy === 'limited' ?
+        limitedUsers : null,
+      editors
+    };
+    if (!editParametrs.edit && isCorrect) {
       const createBody = {
-        username,
-        boxData: { ...dataInput, access_level, owner_id: id },
-        logo: logoEdited,
-        privacyList: privacy.accessList.length ?
-          privacy.accessList : null
+        ...submitBody,
+        boxData: { ...dataInput, access_level },
       };
       const { data } = await axios.post('http://192.168.0.223:7041/boxes/create', createBody);
       history.push(`/${username}/${data.name}`);
-      cleanWarnings();
-      dispatchDataInput({ type: 'CLEAN_DATA' });
+    } else if (editParametrs.edit && isCorrect) {
+      const edited = !inputFields.length ? null :
+        inputFields.reduce((obj, field) => (
+          { ...obj, [field]: dataInput[field] }
+        ), {});
+      const editBody = {
+        ...submitBody,
+        boxData: privacy === boxDetails.access_level ? 
+          edited : { ...edited, access_level },
+        boxName: params.box,
+      };
+      const { data } = await axios.post('http://192.168.0.223:7041/boxes/edit', editBody);
+      setBoxDetails({ ...boxDetails, ...data });
+      if (data.name)
+        history.push(`/${username}/${data.name}`);
+      setEditBoxState(false);
     }
   };
   const handleSubmit = useCallback(
     handleSubmitClb,
-    [inputFields, dataInput, privacy, correctInput]
+    [inputFields, dataInput, privacy, correctInput, logoEdited, limitedList, editorsList, userData]
   );
 
-  const ableSubmit = dataInput.name &&
-    (getVerifiersState(inputFields) || logoEdited);
+  const ableSubmit = editParametrs.edit ? 
+    inputFields.length || !!logoEdited || changedList :
+    dataInput.name && (getVerifiersState(inputFields) || !!logoEdited);
   const submitButton = {
     disabled: !ableSubmit,
     style: ableSubmit ?
       { borderColor: 'rgb(0, 255, 76)', color: 'rgb(0, 255, 76)' } :
       { borderColor: 'rgb(0, 217, 255)', color: 'rgb(0, 217, 255)' }
   };
+  
+  useEffect(() => {
+    const fetchLimitedList = async () => {
+      const { boxDetails } = editParametrs;
+      const boxPrivacy = boxDetails.access_level;
+      const defaultValues = {};
+      const wasteFields = /^(owner_(name|nc)|reg_date|last_edited|access_level|logo)$/;
+      for (const key in boxDetails)
+        if (!wasteFields.test(key))
+          defaultValues[key] = boxDetails[key];
+      dispatchDataInput({ type: 'SET_DATA', data: defaultValues });
+      const listBody = {
+        username: boxDetails.owner_name,
+        boxName: boxDetails.name
+      };
+      const { data } = await axios.post('http://192.168.0.223:7041/users/access_lists', listBody);
+      const { limitedUsers, editors } = data;
+      setLimitedList(limitedUsers);
+      setEditorsList(editors);
+      setPrivacy(boxPrivacy);
+    };
+
+    if (editParametrs.edit)
+      fetchLimitedList();
+
+    return () => {
+      cleanWarnings();
+      dispatchDataInput({ type: 'CLEAN_DATA' });
+      setLimitedList([]);
+      setEditorsList([]);
+    };
+  }, []);
 
   return (
     <form className="menu-form" onSubmit={ handleSubmit } >
-      <h1 id="create-box-title">Create new box</h1>
+      <h1 id="create-box-title">{ editParametrs.edit ? 'Edit box' : 'Create new box'}</h1>
       <div className="edit-field">
-        { logoEdited && <img id="box-logo" src={ logoEdited } />}
+        { (logoEdited || editParametrs.boxDetails.logo) && logoEdited !== 'removed' &&
+          <img id="box-logo" src={ logoEdited && logoEdited !== 'removed' ? logoEdited : editParametrs.boxDetails.logo } />
+        }
         <CropImage  {...{ cropModalHidden, setCropModalHidden, setLogoEdited }} />
-        <input type="button" value= { logoEdited ? 'change logo' : '*set logo' } className="edit-btn" id="box-form-crop" onClick={ () => setCropModalHidden(false) } />
-        { logoEdited && <input type="button" value="cancel" value="cancel" className="edit-btn" onClick={ () => setLogoEdited(null) } /> }
+        <input type="button" value= { logoEdited ? 'change logo' : '*set logo' } className="edit-btn edit-box-btn" id="box-form-crop" onClick={ () => setCropModalHidden(false) } />
+        { editParametrs.boxDetails.logo && logoEdited !== 'removed' && <input type="button" value="remove logo" className="edit-btn edit-box-btn" onClick={ () => setLogoEdited('removed') } /> }
+        { logoEdited && <input type="button" value="cancel" className="edit-btn edit-box-btn" onClick={ () => setLogoEdited(null) } /> }
       </div>
 
       <div className="edit-field">
@@ -115,10 +184,15 @@ const BoxForm = ({ setMenuOption, editParametrs }) => {
       </div>
 
       <div className="edit-field">
-        <BoxPrivacy {...{ privacy, dispatchPrivacy }} />
+        <BoxPrivacy {...{ privacy, setPrivacy, limitedList, setLimitedList, setChangedList, changedList }} />
+      </div>
+
+      <div className="edit-field">
+        <p>*allow users to view/edit/remove/create directories and files:</p>
+        <SearchUsers {...{ changedList, setChangedList, inputList: editorsList, setInputList: setEditorsList }}/>
       </div>
       
-      <input className="edit-btn" type="submit" value="create box" { ...submitButton } />
+      <input className="edit-btn" type="submit" value={ editParametrs.edit ? 'edit box' : 'create box'} { ...submitButton } />
       <input className="edit-btn" type="button" id="create-box-cancel" value="cancel" onClick={ handleCanelClick } />
     </form>
   )

@@ -61,10 +61,25 @@
 }
 
 #boxes-list {
-  padding-top: 5%;
+  padding-top: 3%;
+  padding-left: 1%;
 }
 
 #boxes-list-empty {
   text-align: center;
   margin-top: 10%;
+}
+
+.boxes-items {
+  font-size: 190%;
+}
+
+.boxes-items > p {
+  margin-left: 1%;
+}
+
+.item-access {
+  font-style: italic;
+  font-size: 75%;
+  padding-left: 2%;
 }

@@ -2,14 +2,16 @@ import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { UserContext } from '../../contexts/UserContext';
+import { MenuContext } from '../../contexts/MenuContext';
 import ConfirmModal from '../../modals/ConfirmModal';
 import '../../styles/menu-default.css';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 
 
-const Default = ({ setMenuOption }) => {
+const Default = () => {
   const history = useHistory();
-  const { userData, id, dispatchId, dispatchUserData, setUsername, setPathName } = useContext(UserContext);
+  const { userData, username, dispatchUsername, dispatchUserData, setPathName } = useContext(UserContext);
+  const { setMenuOption } = useContext(MenuContext);
   const [modalOptions, setModalOptions] = useState(null);
   const logo = userData.logo ? userData.logo : logoDefault;
   const handeMenuChoice = choice => e => {
@@ -23,8 +25,7 @@ const Default = ({ setMenuOption }) => {
     okClb
   });
   const signOutOkClb = () => {
-    dispatchId({ type: 'REMOVE_ID' });
-    setUsername('');
+    dispatchUsername({ type: 'REMOVE_NAME' });
     setModalOptions(null);
     dispatchUserData({ type: 'CLEAN_DATA' });
     setPathName('');
@@ -32,7 +33,7 @@ const Default = ({ setMenuOption }) => {
   };
 
   const removeOkClb = async () => {
-    const rmBody = { id, confirmation: 'permitted' }
+    const rmBody = { username, confirmation: 'permitted' }
     const { data } = await axios.post('http://192.168.0.223:7041/users/remove', rmBody);
     if (data.removed)
       signOutOkClb();
@@ -46,7 +47,7 @@ const Default = ({ setMenuOption }) => {
         <p className="nd-desc" style={{ color: userData.description_color }} >{ userData.description }</p>
       </div>
       <div className="menu-options-list">
-        { !userData.ownPage && id &&
+        { !userData.ownPage && !!username &&
           ( userData.follower ?
             <p>unsubscribe</p> :
             <p>subscribe</p>

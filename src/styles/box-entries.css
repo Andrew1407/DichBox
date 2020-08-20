@@ -23,6 +23,14 @@
   padding-top: 5%;
 }
 
+#nd-box-type {
+  font-size: 165%;
+}
+
+#nd-box-type > span {
+  color: orange;
+}
+
 .nd-box-info {
   font-size: 126%;
 }
@@ -76,4 +84,8 @@
   margin-bottom: 4%;
   background-color: black;
   color: rgb(0, 217, 255);
+}
+
+#box-entries-back-btn {
+  margin-bottom: 8%;
 }
