@@ -35,7 +35,7 @@ const BoxForm = ({ editParametrs }) => {
   const [editorsList, setEditorsList] = useState([]);
   const verParams = {
     name: {
-      regExp: /^(?!search$)[^\s/]{1,40}$/,
+      regExp: /^[^\s/]{1,40}$/,
       warningRegExp: 'Box name length should be 1-40 symbols (unique, no spaces and no path definitions like: "../path1/path2/...")',
       warningFetch: 'You already have a box with the same name',
       fetchVerifier: async input => {

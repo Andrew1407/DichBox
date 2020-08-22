@@ -1,0 +1,26 @@
+.entries-empty {
+  text-align: center;
+  font-weight: bold;
+  font-size: 120%;
+}
+
+.box-entries-item {
+  display: flex;
+  align-items: center;
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+
+.box-entries-item > p {
+  margin: 0;
+}
+
+.box-entries-item > img {
+  margin-right: 2%;
+  height: 25px;
+}
+
+#mol-units-list {
+  padding-bottom: 4%;
+  padding-top: 4%;
+}

@@ -14,8 +14,8 @@ import '../styles/menu.css';
 const Menu = () => {
   const { username, userData, pathName } = useContext(UserContext);
   const { dispatchDataInput, cleanWarnings } = useContext(VerifiersContext);
-  const { setBoxesList, setBoxDetails, setEditBoxState, setBoxHiddenState } = useContext(BoxesContext);
-  const { menuOption, setMenuOption, menuVisible, setMenuVisible, } = useContext(MenuContext);
+  const { setBoxesList, setBoxDetails, setEditBoxState, setBoxHiddenState, setPathEntries } = useContext(BoxesContext);
+  const { menuOption, setMenuOption, menuVisible, setMenuVisible } = useContext(MenuContext);
   const history = useHistory();
   const handleArrowClick = modifier => e => {
     e.preventDefault();
@@ -34,6 +34,7 @@ const Menu = () => {
     cleanWarnings();
     setBoxDetails({});
     setBoxHiddenState(false);
+    setPathEntries([]);
     if (`/${pathName}` !== currentPath)
       history.push('/' + pathName);
   };

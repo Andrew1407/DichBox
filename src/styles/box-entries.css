@@ -11,12 +11,6 @@
   width: 53%;
 }
 
-#entries-empty {
-  text-align: center;
-  font-weight: bold;
-  font-size: 120%;
-}
-
 #nd-owner {
   border-top: 5px solid grey;
   font-size: 200%;
@@ -53,13 +47,67 @@
   justify-content: space-between;
 }
 
+#entries-editor {
+  border-top: 5px solid grey;
+  border-bottom: 5px solid grey;
+  padding: 5%;
+}
+
 #entries-options {
   display: flex;
   flex-direction: row;
-  padding: 5%;
-  border-top: 5px solid grey;
-  padding-bottom: 5%;
-  border-bottom: 5px solid grey;
+}
+
+#be-add-file {
+  text-align: left;
+  font-size: 130%;
+  margin-top: 10%;
+  margin-bottom: 2%;
+  justify-content: space-evenly;
+}
+
+#be-add-file > * {
+  margin-right: 1%;
+  display: inline-block;
+}
+
+#be-add-file > label {
+  font-size: 120%;
+  font-style: italic;
+}
+
+#be-add-file > input[type="text"] {
+  font-size: 110%;
+  padding: 1% 2%;
+  min-width: 45%;
+  outline: none;
+  border-color: black;
+  border-bottom: 2px solid rgb(0, 217, 255);
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+#be-add-file > input[type="text"]:focus {
+  border-bottom: 4px solid rgb(0, 217, 255);
+}
+
+#be-add-file > input[type="button"] {
+  font-size: 90%;
+  outline: none;
+  padding: 1% 2%;
+  background-color: black;
+  color: rgb(0, 217, 255);
+  border: 2px solid rgb(0, 217, 255);
+}
+
+#be-add-file-warning {
+  margin-top: 3%;
+  color: crimson;
+  font-size: 100%;
+}
+
+#be-add-file-warning > b {
+  color: red;
 }
 
 #entries-search {
@@ -88,4 +136,13 @@
 
 #box-entries-back-btn {
   margin-bottom: 8%;
+}
+
+#box-entries-path {
+  font-size: 170%;
+}
+
+#be-path-first {
+  font-size: 110%;
+  font-weight: bold;
 }
