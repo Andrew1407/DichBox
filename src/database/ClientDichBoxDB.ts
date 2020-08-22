@@ -26,6 +26,8 @@ export default class ClientDichBoxDB {
   private formatData(data: userData|boxData|subscribersData): 
     [string[], dataElement[], string[]] {
       const keys: string[] = Object.keys(data);
+      if (!keys.length)
+        return [ [], [], [] ];
       const values: any[] = Object.values(data);
       const valuesTemplate: string[] = [];
       for (let i = 1; i <= values.length; i++)
@@ -38,8 +40,8 @@ export default class ClientDichBoxDB {
       'select id from users where name = $1',
       [name]
     );
-    if (!res.rowCount) return null;
-    return res.rows[0].id;
+    return res.rowCount ?
+      res.rows[0].id : null;
   }
 
   protected async selectValues(
@@ -90,7 +92,6 @@ export default class ClientDichBoxDB {
     const selectSearch: string[] = [];
     for (let i = 0; i < keys.length; i++)
       selectSearch.push(keys[i] + ' = ' + valuesTemplate[i]);
-    // console.log(`select ${output} from ${tables[0]} a left join ${tables[1]} b on ${joinConditions[0]} left join ${tables[2]} c on ${joinConditions[1]} where ${selectSearch.join(' and ')} ${extraCondition};`)
     const res: QueryResult = await this.poolClient.query(
       `select ${output} from ${tables[0]} a left join ${tables[1]} b on ${joinConditions[0]} left join ${tables[2]} c on ${joinConditions[1]} where ${selectSearch.join(' and ')} ${extraCondition};`,
       values

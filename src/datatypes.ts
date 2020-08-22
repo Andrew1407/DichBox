@@ -25,7 +25,8 @@ type boxData = {
   onwer_nc?: string,
   editor?: boolean,
   last_edited?: string,
-  box_id?: number
+  box_id?: number,
+  person_id?: number
 };
 
 type subscribersData = {
@@ -35,10 +36,35 @@ type subscribersData = {
 
 type dataElement = string|number|Date|number[];
 
+type entryType = 'file'|'dir'|'img';
+
+type fileEntries = {
+  name: string,
+  src: string
+};
+
+type dirEntries = {
+  type: entryType,
+  name: string
+};
+
+type pathEntries = {
+  type: entryType,
+  dir?: {
+   src: dirEntries[],
+   name: string
+  },  
+  file?: fileEntries
+}
+
 export {
   userData,
   boxData,
   dataElement,
   subscribersData,
-  access_level
+  access_level,
+  pathEntries,
+  dirEntries,
+  fileEntries,
+  entryType
 };

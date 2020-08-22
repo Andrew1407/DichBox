@@ -15,20 +15,22 @@ type foundUser = {
 };
 
 
-const storageManager: UserStotageManager = new UserStotageManager;
+const userStorage: UserStotageManager = new UserStotageManager;
 const clientDB: UserClientDichBoxDB = new UserClientDichBoxDB();
 clientDB.clientConnection();
 
 const foudUsersMapper = async (user: userData): Promise<foundUser> => ({
   name: user.name, 
   name_color: user.name_color,
-  logo: await storageManager.getLogoIfExists(user.id)
+  logo: await userStorage.getLogoIfExists(user.id)
 });
 
 const signUpUser: middlewareFn = async (req: Request, res: Response) => {
   const clientData: userData = req.body;
-  const nameInserted: userData = await clientDB.insertUser(clientData);
-  res.json(nameInserted).end();
+  const inserted: userData = await clientDB.insertUser(clientData);
+  await userStorage.createUserStorage(inserted.id);
+  delete inserted.id;
+  res.json(inserted).end();
 };
 
 const findUser: middlewareFn = async (req: Request, res: Response) => {
@@ -44,7 +46,7 @@ const findUser: middlewareFn = async (req: Request, res: Response) => {
   user.reg_date = new Date(user.reg_date)
     .toLocaleDateString()
     .replace(/\//g, '.');
-  const logo: string|null = await storageManager.getLogoIfExists(user.id);
+  const logo: string|null = await userStorage.getLogoIfExists(user.id);
   userRes = { ...user, logo, follower: false };
   if (!ownPage) {
     delete user.email;
@@ -104,10 +106,10 @@ const editUser: middlewareFn = async (req: Request, res: Response) => {
   }
   if (editedLogo) 
     if (editedLogo === 'removed') {
-      await storageManager.removeLogoIfExists(id);
+      await userStorage.removeLogoIfExists(id);
       editedResponse.logo = null;
     } else {
-      const savedLogo: string = await storageManager.saveLogo(editedLogo, id);
+      const savedLogo: string = await userStorage.saveLogo(editedLogo, id);
       editedResponse.logo = savedLogo;
     }
   res.json({ ...editedResponse }).end();
@@ -122,7 +124,7 @@ const removeUser: middlewareFn = async (req: Request, res: Response) => {
   }
   const id: number = await clientDB.getUserId(name);
   await Promise.all([
-    storageManager.removeUser(id),
+    userStorage.removeUser(id),
     clientDB.removeUser(id)
   ]);
   res.json({ removed: true }).end();

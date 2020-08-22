@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { boxData } from '../datatypes';
+import { boxData, pathEntries, entryType } from '../datatypes';
 import BoxesClientDichBoxDB from '../database/BoxesClientDichBoxDB';
 import BoxesStorageManager from '../storageManagers/BoxesStorageManager';
 
@@ -10,9 +10,17 @@ type boxListRequest = {
   follower: boolean
 };
 
-const storageManager: BoxesStorageManager = new BoxesStorageManager();
+const boxesStorage: BoxesStorageManager = new BoxesStorageManager();
 const clientDB: BoxesClientDichBoxDB = new BoxesClientDichBoxDB();
 clientDB.clientConnection();
+
+const formatDate = (obj: any): void => {
+  for (const key in obj)
+    if (/^(reg_date|last_edited)$/.test(key))
+      obj[key] = new Date(obj[key])
+        .toLocaleString()
+        .replace(/\//g, '.');
+};
 
 const createBox: middlewareFn = async (req: Request, res: Response) => {
   const { boxData, logo, limitedUsers, editors, username }: {
@@ -25,7 +33,7 @@ const createBox: middlewareFn = async (req: Request, res: Response) => {
   const createdBox: boxData = await clientDB.insertBox(
     username, boxData, limitedUsers, editors
   );
-  await storageManager.createBox(
+  await boxesStorage.createBox(
     createdBox.owner_id,
     createdBox.id,
     logo
@@ -63,37 +71,132 @@ const getBoxDetais: middlewareFn = async (req: Request, res: Response) => {
     res.json({}).end();
     return;
   }
-  const logo: string|null = await storageManager.getLogoIfExists(boxInfo.id);
+  const logo: string|null =
+    await boxesStorage.getLogoIfExists(boxInfo.id, boxInfo.owner_id);
   delete boxInfo.id;
-  ['reg_date', 'last_edited'].forEach(x => {
-    boxInfo[x] = new Date(boxInfo[x])
-      .toLocaleString()
-      .replace(/\//g, '.');
-  });
-  delete boxInfo.id;
+  delete boxInfo.owner_id;
+  formatDate(boxInfo);
   res.json({ ...boxInfo, logo }).end();
 };
 
 const editBox: middlewareFn = async (req: Request, res: Response) => {
   const username: string = req.body.username;
   const logo: string|null = req.body.logo;
-  const limitedList: string[] = req.body.limitedUsers;
-  const editorsList: string[] = req.body.editors;
+  const limitedList: string[]|null = req.body.limitedUsers;
+  const editorsList: string[]|null = req.body.editors;
   const boxData: boxData|null = req.body.boxData;
   const boxName: string = req.body.boxName;
-  console.log(req.body)
-  const updated: boxData = await clientDB.updateBox(
+  const updated: boxData|null = await clientDB.updateBox(
     username, boxName, boxData, limitedList, editorsList
   );
-  // if (boxData && boxData.name)
-  //   await storageManager.renameBox(username, boxName, boxData.name);
-  // if (logo)
-  //   await (logo === 'removed') ?
-  //     storageManager.removeLogoIfExists(updated.id) :
-  //     storageManager.saveLogo(logo, updated.id);
-  // delete updated.id;
-  // res.json({ ...updated, logo }).end();
-  res.end();
+  if (!updated) {
+    res.json({}).end();
+    return;
+  }
+  if (logo) await (logo === 'removed') ?
+    boxesStorage.removeLogoIfExists(updated.id, updated.owner_id) :
+    boxesStorage.saveLogo(logo, updated.id, updated.owner_id);
+  delete updated.id;
+  delete updated.owner_id;
+  formatDate(updated)
+  const editedLogo: string|null = !logo || logo === 'removed' ?
+    null : logo
+  res.json({ ...updated, logo: editedLogo }).end();
+};
+
+const removeBox: middlewareFn = async (req: Request, res: Response) => {
+  const { confirmation, username, boxName, ownPage }: {
+    confirmation: string,
+    username: string,
+    boxName: string,
+    ownPage: boolean
+  } = req.body;
+  if (!ownPage && confirmation !== 'permitted') {
+    res.json({ removed: true }).end();
+    return;
+  }
+  const ids: [number, number]|null =
+    await clientDB.getUserBoxIds(username, boxName);
+  if (!ids) {
+    res.json({ removed: true }).end();
+    return;
+  }
+  await Promise.all([
+    clientDB.removeBox(ids[1]),
+    boxesStorage.removeBox(...ids)
+  ]);
+  res.json({ removed: true }).end();
+};
+
+const getPathFiles: middlewareFn = async (req: Request, res: Response) => {
+  const { boxPath, viewerName, follower, initial }: {
+    boxPath: string[]
+    viewerName: string,
+    follower: boolean,
+    initial: boolean
+  } = req.body;
+  const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
+  const extraPath: string[] = boxPath.slice(2);
+  const checkup: [number, number]|null = await clientDB.checkBoxAccess(
+    ownerName, viewerName, boxName, follower
+  );
+  if (!checkup) { 
+    res.json({ entries: null }).end();
+    return;
+  }
+  const entries: pathEntries = 
+    await boxesStorage.getPathEntries(checkup, initial, extraPath);
+  res.json({ entries }).end();
+};
+
+const createFile: middlewareFn = async (req: Request, res: Response) => {
+  const { boxPath, viewerName, follower, fileName, type }: {
+    boxPath: string[]
+    viewerName: string,
+    follower: boolean,
+    fileName: string,
+    type: entryType
+  } = req.body;
+  const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
+  const extraPath: string[] = boxPath.slice(2);
+  const checkup: [number, number]|null = await clientDB.checkBoxAccess(
+    ownerName, viewerName, boxName, follower
+  );
+  if (!checkup) { 
+    res.json({ created: null }).end();
+    return;
+  }
+  const edited: boxData = await clientDB.updateBox(
+    ownerName,
+    boxName,
+    { last_edited: 'now()' },
+  );
+  formatDate(edited);
+  const created: pathEntries = 
+    await boxesStorage.addFile(fileName, type, checkup, extraPath);
+  res.json({ created, last_edited: edited.last_edited }).end();
+};
+
+const getFile: middlewareFn = async (req: Request, res: Response) => {
+  const { boxPath, viewerName, follower, name, type }: {
+    boxPath: string[]
+    viewerName: string,
+    follower: boolean,
+    name: string,
+    type: entryType
+  } = req.body;
+  const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
+  const extraPath: string[] = boxPath.slice(2);
+  const checkup: [number, number]|null = await clientDB.checkBoxAccess(
+    ownerName, viewerName, boxName, follower
+  );
+  if (!checkup) { 
+    res.json({ foundData: null }).end();
+    return;
+  }
+  const foundData: string|null =
+    await boxesStorage.readFile(name, type, checkup, extraPath);
+  res.json({ foundData, found: true }).end();
 };
 
 export {
@@ -101,5 +204,9 @@ export {
   findUserBoxes,
   verifyBoxName,
   getBoxDetais,
-  editBox
+  editBox,
+  removeBox,
+  getPathFiles,
+  createFile,
+  getFile
 };

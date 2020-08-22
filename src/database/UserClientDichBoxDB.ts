@@ -4,7 +4,7 @@ import { userData } from '../datatypes';
 
 export default class UserClientDichBoxDB extends ClientDichBoxDB {
   public async insertUser(userData: userData): Promise<userData> {
-    return await this.insertValue('users', userData, ['name']);
+    return await this.insertValue('users', userData, ['name', 'id']);
   }
 
   public async updateUser(

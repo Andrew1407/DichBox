@@ -1,6 +1,6 @@
 import { QueryResult } from 'pg';
 import ClientDichBoxDB from './ClientDichBoxDB';
-import { boxData, access_level } from '../datatypes';
+import { boxData } from '../datatypes';
 
 export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
   public async getBoxesList(
@@ -27,18 +27,18 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
   }
 
   private async getLimitedBoxes(
-    owner_id: number,
-    person_id: number
+    person_id: number,
+    owner_id: number
   ): Promise<boxData[]> {
     const output: string[] = [
       'c.name as owner_name',
-      'a.name',
-      'a.name_color',
-      '\'invetee\' as access_level'
+      'b.name',
+      'b.name_color',
+      'access_level'
     ];
     const sharedBoxes: boxData[] = await this.selectDoubleJoiedValues(
-      ['boxes', 'limited_viewers', 'users'],
-      ['a.id = b.box_id', 'a.owner_id = c.id'],
+      ['limited_viewers', 'boxes', 'users'],
+      ['b.id = a.box_id', 'b.owner_id = c.id'],
       { owner_id, person_id },
       output
     );
@@ -134,7 +134,13 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       'a.description',
       'a.description_color'
     ];
-    const getters: any = {
+    type gettersFns = {
+      public: () => Promise<boxData|null>,
+      private: () => Promise<boxData|null>,
+      followers: () => Promise<boxData|null>,
+      limited: () => Promise<boxData|null>,
+    };
+    const getters: gettersFns = {
       public: async (): Promise<boxData|null> => {
         const box: boxData[] = await this.selectJoiedValues(
           ['boxes', 'users'],
@@ -187,11 +193,13 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
     const box: boxData|null =  await this.boxInfoGetter(
       boxType, boxName, viewer_id, owner_id, follower
     );
+    if (!box)
+      return null;
     const boxId: number = typeRes[0].id;
     const editor: boolean = ownPage ? ownPage :
       await this.checkEditor(boxId, viewer_id);
     return box ?
-      { ...box, ...typeRes[0], editor } : null;
+      { ...box, ...typeRes[0], editor, owner_id } : null;
   }
 
   private async checkEditor(
@@ -250,30 +258,147 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
   }
 
   public async updateBox(
-    owner_id: number,
+    ownerName: string,
     boxName: string,
     boxData: boxData|null,
-    access_level: access_level,
-    limitedUsers: any[]|null
-  ): Promise<boxData> {
-    const [ currentData ]: any[] = await this.selectValues(
-      'boxes', { owner_id, name: boxName }, ['id', 'access_level']
+    limitedlist: string[]|null = null,
+    editorslist: string[]|null = null
+  ): Promise<boxData|null> {
+    const beforeUpdateRes: boxData[] = await this.selectJoiedValues(
+      ['boxes', 'users'],
+      ['owner_id', 'id'],
+      {}, ['a.id', 'access_level'],
+      `a.name = '${boxName}' and b.name = '${ownerName}'`
     );
+    if (!beforeUpdateRes.length)
+      return null;
+    const beforeUpdate: boxData = beforeUpdateRes[0];
+    const returnColumns: string[] = ['last_edited', 'owner_id'];
+    if (boxData)
+      returnColumns.push(...Object.keys(boxData));
+    if (!returnColumns.includes('access_level'))
+      returnColumns.push('access_level');
     const updated: boxData = await this.updateValueById(
       'boxes',
-      currentData.id,
-      { ...boxData, access_level, last_edited: 'now()' },
-      [ ...Object.keys(boxData ? boxData : {}), 'last_edited', 'access_level' ]
+      beforeUpdate.id,
+      { ...boxData, last_edited: 'now()' },
+      returnColumns
     );
+    if (editorslist)
+      await this.updateAccessList('box_editors', beforeUpdate.id, editorslist);
+    else
+      await this.removeValue('box_editors', { box_id: beforeUpdate.id });
     const isLimited = (x: string): boolean => x === 'limited';
     const [ limitedNew, limitedOld ]: boolean[] =
-      [updated.access_level, currentData.access_level].map(isLimited);
+      [updated.access_level, beforeUpdate.access_level].map(isLimited);
     if (!limitedNew && !limitedOld)
-      return { ...updated, id: currentData.id };
-    return { ...updated, id: currentData.id };
+      return { ...updated, id: beforeUpdate.id };
+    const [ wasLimited, setLimited, remainedLimited ]: boolean[] = [
+      limitedOld && !limitedNew,
+      !limitedOld && limitedNew,
+      limitedOld && limitedNew,
+    ];
+    if (wasLimited || !limitedlist)
+      await this.removeValue('limited_viewers', { box_id: beforeUpdate.id });
+    else if (setLimited)
+      await this.insertPermissions('limited_viewers', beforeUpdate.id, limitedlist);
+    else if (remainedLimited)
+      await this.updateAccessList('limited_viewers', beforeUpdate.id, limitedlist);
+    return { ...updated, id: beforeUpdate.id };
   }
     
+  private async updateAccessList(
+    table: string,
+    box_id: number,
+    usernames: string[]
+  ): Promise<void> {
+    const currentList: { person_id: number }[]|null  = await this.selectValues(
+      table, { box_id }, ['person_id']
+    );
+    if (!currentList) {
+      await this.insertPermissions(table, box_id, usernames);
+      return;
+    }
+    const currentIds: number[] = currentList.map(x => x.person_id);
+    const newIds: number[] = await this.getUsersIds(usernames);
+    const queries: string[] = [
+      `delete from ${table} where box_id = $1 and person_id not in (${newIds});`,
+    ];
+    const insertIds: number[] = newIds.filter(id => !currentIds.includes(id));
+    if (insertIds.length) {
+      const insertValues: string[] = insertIds.map(id => `($1, ${id})`);
+      queries.push(
+        `insert into ${table} (box_id, person_id) values ${insertValues};`
+      );
+    }
+    await Promise.all(
+      queries.map(q => this.poolClient.query(q, [box_id]))
+    );
+  }
+
+  public async getUserBoxIds(
+    username: string,
+    boxName: string
+  ): Promise<[number, number]|null> {
+    const foundRes: boxData[] = await this.selectJoiedValues(
+      ['boxes', 'users'],
+      ['owner_id', 'id'],
+      {}, ['owner_id', 'a.id'],
+      `a.name = '${boxName}' and b.name = '${username}'`
+    );
+    if (!foundRes.length)
+      return null;
+    const [{ owner_id, id }]: boxData[] = foundRes;
+    return [ owner_id, id ];
+  }
+
   public async removeBox(id: number): Promise<void> {
     await this.removeValue('boxes', { id });
+  }
+
+  public async checkBoxAccess(
+    ownerName: string,
+    viewerName: string,
+    boxName: string,
+    follower: boolean
+  ): Promise<[number, number]|null> {
+    const ownPage: boolean = ownerName === viewerName;
+    const idsRes: boxData[] = await this.selectJoiedValues(
+      ['boxes', 'users'],
+      ['owner_id', 'id'],
+      {}, ['owner_id', 'a.id', 'access_level'],
+      `a.name = '${boxName}' and b.name = '${ownerName}'`
+    );
+    if (!idsRes.length)
+      return null;
+    const ownerId: number = idsRes[0].owner_id;
+    const boxId: number = idsRes[0].id;
+    const res: [number, number] = [ownerId, boxId];
+    if (ownPage)
+      return res;
+    const privacy: string = idsRes[0].access_level;
+    const permitted: boolean = 
+      (privacy === 'public') ||
+      (privacy === 'private' && ownPage) ||
+      (privacy === 'followers' && follower);
+    if (permitted) 
+      return res;
+    if (privacy === 'limited') {
+      const viewerRes: boxData[]|null = await this.selectValues(
+        'users', { name: viewerName }, ['id']
+      );
+      if (!viewerRes)
+        return null;
+      const viewerId: number = viewerRes[0].id;
+      const args: [boxData, string[]] =
+        [ { box_id: boxId, person_id: viewerId }, ['box_id'] ];
+      const getRes = (table: string): Promise<boxData[]|null> => 
+        this.selectValues(table, ...args);
+      const editorRes: boxData[]|null = await getRes('box_editors');
+      if (editorRes) return res;
+      const limitedRes: boxData[]|null = await getRes('limited_viewers');
+      if (limitedRes) return res;
+    }
+    return null;    
   }
 }
