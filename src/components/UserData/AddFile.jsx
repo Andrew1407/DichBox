@@ -43,7 +43,15 @@ const AddFile = ({ addFileVisible, pathName }) => {
     const isFile = type === 'file';
       setPathEntries(isFile ? file.src : dir.src);
     if (isFile)
-      dispatchOpenedFiles({ type: 'FILE_APPEND', file: { name: file.name, src: '' } });
+      dispatchOpenedFiles({ 
+        type: 'FILE_APPEND',
+        file: {
+          name: file.name,
+          src: '',
+          filePath: `${userData.name}/${pathName.join('/')}`,
+          opened: true
+        }
+      });
     setBoxDetails({ ...boxDetails, last_edited });
     setNameInput('');
   };

@@ -141,7 +141,7 @@ const EditProfile = () => {
   };
   const submitEditedFields = useCallback(
     submitEditedFieldsClb,
-    [dataInput, username, editedFields, logoEdited, userData]
+    [dataInput, username, editedFields, logoEdited, userData, correctInput]
   );
   useEffect(() => {
     const userDataIsFetched = Object.keys(userData).length;

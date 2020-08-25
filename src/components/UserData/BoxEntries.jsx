@@ -23,7 +23,7 @@ const BoxEntries = () => {
   const [entriesSearch, setEntriesSearch] = useState('');
   const [addFileVisible, setAddFileVisible] = useState('');
   const { setMenuOption } = useContext(MenuContext)
-  const { userData, pathName, username } = useContext(UserContext);
+  const { userData, dispatchUserData, pathName, username } = useContext(UserContext);
   const { 
     boxInfoHidden,
     setBoxHiddenState,
@@ -106,10 +106,14 @@ const BoxEntries = () => {
         viewerName: username
       };
       const { data } = await axios.post('http://192.168.0.223:7041/boxes/details', dataBody);
-      if (data.name)
+      if (data.name) {
         setBoxDetails(data);
-      else 
+        const editor = data.editor
+        dispatchUserData({ type: 'REFRESH_DATA', data: { editor } });
+      }
+      else {
         setBoxErr(true);
+      }
     };
 
     fetchBoxData();

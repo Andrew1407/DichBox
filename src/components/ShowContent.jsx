@@ -1,15 +1,15 @@
-import React, { useContext, useEffect } from 'react';
-import { MenuContext } from '../contexts/MenuContext';
+import React from 'react';
+import FilesList from './FilesContent/FilesList';
+import ShowArea from './FilesContent/ShowArea';
 import '../styles/show-content.css';
 
 
 const ShowContent = () => {
-  const { openedFiles } = useContext(MenuContext);
-  useEffect(() => console.log(openedFiles), [openedFiles])
-  
+    
   return (
     <div id="show-content" >
-      <h1>nothing to do there</h1>
+      <FilesList />
+      <ShowArea />
     </div>
   );
 };

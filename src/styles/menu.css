@@ -1,7 +1,9 @@
 #menu {
   padding: 1%;
-  border-right: 7px solid rgb(75, 73, 73);
-  width: 30%;
+  border-right: 4px solid rgb(75, 73, 73);
+  min-width: 30%;
+  max-width: 30%;
+  flex-grow: 1;
   margin: 0;
   max-height: 1000px;
   overflow-y: scroll;

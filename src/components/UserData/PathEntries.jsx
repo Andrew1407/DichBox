@@ -13,7 +13,7 @@ const PathEntries = ({ entriesSearch }) => {
   const pathDepth = history.location.pathname
     .split('/').filter(x => x);
   const { pathEntries, fetchEntries, boxDetails } = useContext(BoxesContext);
-  const { dispatchOpenedFiles, openedFiles } = useContext(MenuContext);
+  const { dispatchOpenedFiles, openedFiles, searchFileInOpenedList } = useContext(MenuContext);
   const { userData, username } = useContext(UserContext);
 
   const filteredSearch = pathEntries
@@ -26,6 +26,13 @@ const PathEntries = ({ entriesSearch }) => {
   };
 
   const handleClickFileClb = unit => async () => {
+    const filePath = history.location.pathname;
+    const foundFile = searchFileInOpenedList(unit.name, filePath);
+    if (foundFile.index !== -1) {
+      if (!foundFile.opened)
+        dispatchOpenedFiles({ type: 'FILE_OPEN', index: foundFile.index });
+      return;
+    }
     const getBody = {
       ...unit,
       boxPath: pathDepth,
@@ -37,7 +44,9 @@ const PathEntries = ({ entriesSearch }) => {
     if (!found) return;
     const file = {
       name: unit.name,
-      src: foundData
+      src: foundData,
+      filePath,
+      opened: true
     };
     dispatchOpenedFiles({ type: 'FILE_APPEND', file });
   };

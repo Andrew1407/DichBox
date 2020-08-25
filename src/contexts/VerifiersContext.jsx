@@ -39,7 +39,7 @@ const VerifiersContextProvider = props => {
     const verFields = Object.keys(verParams);
     const getVerifiersState = (arr = verFields) => arr.reduce(
       (isCorrectAll, isCorrectField) =>
-        isCorrectAll && correctInput[isCorrectField], true
+        (isCorrectAll && correctInput[isCorrectField]), true
     );
     const getVerifier = field => {
       const verifierParams = verParams[field];

@@ -1,0 +1,127 @@
+#show-content {
+  flex-grow: 2;
+  max-height: 1000px;
+  border-left: 5px solid rgb(75, 73, 73);
+  overflow: hidden;
+  padding-bottom: 5%;
+}
+
+#files-list {
+  padding-left: 1%;
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  height: 5.5%;
+  border-bottom: 5px solid rgb(75, 73, 73);
+  overflow-y: hidden;
+}
+
+/* width */
+#files-list::-webkit-scrollbar {
+  height: 6px;
+}
+
+/* Track */
+#files-list::-webkit-scrollbar-track {
+  background: rgb(75, 73, 73);
+}
+
+/* Handle */
+#files-list::-webkit-scrollbar-thumb {
+  background: grey;
+}
+
+/* Handle on hover */
+#files-list::-webkit-scrollbar-thumb:hover {
+  background: orange;
+}
+
+#opened-first {
+  border-left: 5px solid rgb(75, 73, 73);
+}
+
+.opened-file {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+  padding: 8px;
+  border-right: 5px solid rgb(75, 73, 73);
+  font-size: 150%;
+  -webkit-transform: skewX(-25deg); 
+	-moz-transform: skewX(-25deg); 
+	-ms-transform: skewX(-25deg); 
+	-o-transform: skewX(-25deg); 
+  transform: skewX(-25deg);
+}
+
+.opened-file > * {
+  -webkit-transform: skewX(25deg); 
+  -moz-transform: skewX(25deg); 
+  -ms-transform: skewX(25deg); 
+  -o-transform: skewX(25deg); 
+  transform: skewX(25deg); 
+}
+
+.opened-file-name {
+  font-family: "AkrobatBold";
+  padding-left: 10px;
+  padding-right: 15px;
+}
+
+.opened-file-close {
+  height: 26px;
+  padding-top: 5px;
+  padding-right: 3px;
+}
+
+#show-area {
+  padding: 2% 1%;
+  height: 98%;
+}
+
+#show-area > textarea {
+  font-size: 140%;
+  font-family: "Roboto-Regular";
+  resize: none;
+  background-color: black;
+  border: 3px double grey;
+  color: rgb(0, 217, 255);
+  padding: 1% 1.5%;
+  width: 97%;
+  height: 97%;
+  
+}
+
+#show-area > textarea::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+#show-area > textarea::-webkit-scrollbar-thumb {
+  background: grey;
+}
+
+#show-area > textarea::-webkit-scrollbar-thumb:hover {
+  background: rgb(0, 217, 255);
+}
+
+@font-face {
+  font-family: "AkrobatBold";
+  src: url("./fonts/19205.otf");
+}
+
+@font-face {
+  font-family: "Roboto-Regular";
+  src: url("./fonts/Roboto-Regular.ttf");
+}
+
+@font-face {
+  font-family: "Ubuntu Mono";
+  src: url("./fonts/UbuntuMono-R.ttf");
+}
+
+@font-face {
+  font-family: "Driodc sans";
+  src: url("./fonts/3947.ttf");
+}
