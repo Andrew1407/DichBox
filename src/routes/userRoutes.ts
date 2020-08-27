@@ -12,6 +12,7 @@ usersRouter
   .post('/edit', routes.editUser)
   .post('/remove', routes.removeUser)
   .post('/names_list', routes.findUsernames)
-  .post('/access_lists', routes.getAccessLists);
+  .post('/access_lists', routes.getAccessLists)
+  .post('/subscription', routes.subscription);
 
 export default usersRouter;

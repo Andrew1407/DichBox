@@ -40,7 +40,8 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       ['limited_viewers', 'boxes', 'users'],
       ['b.id = a.box_id', 'b.owner_id = c.id'],
       { owner_id, person_id },
-      output
+      output,
+      'order by last_edited desc'
     );
     return sharedBoxes;
   }
@@ -57,7 +58,8 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       ['boxes', 'users'],
       ['owner_id', 'id'],
       { owner_id },
-      returnColumns
+      returnColumns,
+      'order by last_edited desc'
     );
     return userBoxes;
   }
@@ -83,7 +85,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       ['owner_id', 'id'],
       { owner_id },
       returnColumns,
-      `and (${selectCondition})`
+      `and (${selectCondition}) order by last_edited desc`
     );
     return visitorBoxes;
   }
@@ -99,7 +101,8 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       ['boxes', 'box_editors', 'users'],
       ['a.id = b.box_id', 'a.owner_id = c.id'],
       { person_id },
-      returnColumns
+      returnColumns,
+      'order by last_edited desc'
     );
     return inveteeBoxes;
   }

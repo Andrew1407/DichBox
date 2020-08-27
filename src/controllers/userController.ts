@@ -51,7 +51,7 @@ const findUser: middlewareFn = async (req: Request, res: Response) => {
   if (!ownPage) {
     delete user.email;
     const searchId: number = await clientDB.getUserId(username);
-    const follower: boolean = await clientDB.checkSubscription(user.id, searchId);
+    const follower: boolean = await clientDB.checkSubscription(searchId, user.id);
     userRes.follower = follower;
   }
   delete userRes.id;
@@ -156,6 +156,21 @@ const getAccessLists: middlewareFn = async (req: Request, res: Response) => {
   res.json({ limitedUsers, editors }).end();
 };
 
+const subscription: middlewareFn = async (req: Request, res: Response) => {
+  const action: 'subscribe'|'unsubscribe' = req.body.action;
+  const personName: string = req.body.personName;
+  const subscriptionName: string = req.body.subscriptionName;
+  const followers: number|null = 
+    await clientDB.subscibe(personName, subscriptionName, action);
+  if (followers === null) {
+    res.json({}).end();
+    return;
+  }
+  const follower: boolean = action === 'subscribe' ?
+    true : false
+  res.json({ follower, followers }).end();
+};
+
 export {
   findUser,
   signUpUser,
@@ -165,5 +180,6 @@ export {
   editUser,
   removeUser,
   findUsernames,
-  getAccessLists
+  getAccessLists,
+  subscription
 };

@@ -5,6 +5,7 @@ import {
   dataElement,
   subscribersData 
 } from '../datatypes';
+import { join } from 'path';
 
 export default class ClientDichBoxDB {
   private pool: Pool;
@@ -133,7 +134,7 @@ export default class ClientDichBoxDB {
 
   protected async removeValue(
     table: string,
-    searchParams: any
+    searchParams: any,
   ): Promise<void> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(searchParams);
@@ -141,7 +142,7 @@ export default class ClientDichBoxDB {
     for (let i = 0; i < keys.length; i++)
       params.push(keys[i] + ' = ' + valuesTemplate[i]);
     await this.poolClient.query(
-      `delete from ${table} where ${params};`,
+      `delete from ${table} where ${params.join(' and ')};`,
       values
     );
   }

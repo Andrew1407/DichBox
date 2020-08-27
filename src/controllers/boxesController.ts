@@ -99,9 +99,10 @@ const editBox: middlewareFn = async (req: Request, res: Response) => {
   delete updated.id;
   delete updated.owner_id;
   formatDate(updated)
-  const editedLogo: string|null = !logo || logo === 'removed' ?
-    null : logo
-  res.json({ ...updated, logo: editedLogo }).end();
+  const jsonRes: boxData & { logo?: string } = 
+    !logo || logo === 'removed' ?
+      updated : { ...updated, logo } ;
+  res.json(jsonRes).end();
 };
 
 const removeBox: middlewareFn = async (req: Request, res: Response) => {

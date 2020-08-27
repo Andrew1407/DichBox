@@ -1,6 +1,6 @@
 import { QueryResult } from 'pg';
 import ClientDichBoxDB from './ClientDichBoxDB';
-import { userData } from '../datatypes';
+import { userData, boxData, subscribersData } from '../datatypes';
 
 export default class UserClientDichBoxDB extends ClientDichBoxDB {
   public async insertUser(userData: userData): Promise<userData> {
@@ -52,25 +52,44 @@ export default class UserClientDichBoxDB extends ClientDichBoxDB {
     return subscriptions;
   }
 
-  public async addSubsciber(
-    person_id: number,
-    subscription: number
-  ): Promise<void> {
-    await this.insertValue('subscribers', { person_id, subscription });
-  }
-
-  public async removeSubscriber(
-    person_id: number,
-    subscription: number
-  ): Promise<void> {
-    await this.removeValue('subscribers', { person_id, subscription });
+  public async subscibe(
+    personName: string,
+    subscriptionName: string,
+    action: 'subscribe'|'unsubscribe'
+  ): Promise<number|null> {
+    const [ person_id, subscription ]: (number|null)[] = await Promise.all(
+      [personName, subscriptionName].map(x => this.getUserId(x))
+    );
+    if (!person_id || !subscription)
+      return null;
+    const getQueries = (): Promise<any>[] => {
+      const args: ['subscribers', subscribersData] = [
+        'subscribers',
+        { person_id, subscription }
+      ];
+      const [ subsMethod, followersSign ]: [string, string] =
+        action === 'subscribe' ?
+          ['insertValue', '+'] :
+          ['removeValue', '-'];
+      return [
+        this.poolClient.query(
+          `update users set followers = (followers ${followersSign} 1) where id = $1 returning followers;`,
+          [subscription]
+        ),
+        this[subsMethod](...args)
+      ];
+    };
+    
+    const [ followersRes ]: any[] = await Promise.all(getQueries());
+    const followers: number = followersRes.rows[0].followers;
+    return followers;
   }
 
   public async checkSubscription(
     person_id: number,
     subscription: number
   ): Promise<boolean> {
-    const queryRes: { subscription: number }[] = await this.selectValues(
+    const queryRes: ({ subscription: number }|null)[] = await this.selectValues(
       'subscribers',
       { person_id, subscription },
       ['person_id']
