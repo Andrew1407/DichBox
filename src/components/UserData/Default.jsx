@@ -39,6 +39,18 @@ const Default = () => {
       signOutOkClb();
   };
 
+  const handleSubscribtion = action => async () => {
+    const subsBody = {
+      action,
+      personName: username,
+      subscriptionName: userData.name
+    };
+    const { data } = await axios.post('http://192.168.0.223:7041/users/subscription', subsBody);
+    if (data.followe === null) return;
+    const { follower, followers } = data;
+    dispatchUserData({ type: 'REFRESH_DATA', data: { follower, followers } });
+  };
+
   return (
     <div className="menu-form">
       <img src={ logo } id="default-logo" />
@@ -49,8 +61,8 @@ const Default = () => {
       <div className="menu-options-list">
         { !userData.ownPage && !!username &&
           ( userData.follower ?
-            <p>unsubscribe</p> :
-            <p>subscribe</p>
+            <p style={{ color: 'rgb(204, 0, 255)' }} onClick={ handleSubscribtion('unsubscribe') } >unsubscribe</p> :
+            <p style={{ color: 'rgb(0, 255, 76)' }} onClick={ handleSubscribtion('subscribe') } >subscribe</p>
           )
         }
         { userData.ownPage && <p id="default-edit" onClick={ handeMenuChoice('editProfile') }>edit profile</p> }

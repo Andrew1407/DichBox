@@ -11,9 +11,11 @@
   flex-direction: row;
   justify-content: space-evenly;
   margin-bottom: 5%;
+  text-align: center;
 }
 
 #sign-switch > p {
+  width: 20%;
   font-size: 200%;
   outline: none;
   padding: 2% 4%;

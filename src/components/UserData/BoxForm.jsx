@@ -115,7 +115,7 @@ const BoxForm = ({ editParametrs }) => {
   };
   const handleSubmit = useCallback(
     handleSubmitClb,
-    [inputFields, dataInput, privacy, correctInput, logoEdited, limitedList, editorsList, userData]
+    [inputFields, dataInput, privacy, correctInput, logoEdited, limitedList, editorsList, userData, boxDetails]
   );
 
   const ableSubmit = editParametrs.edit ? 

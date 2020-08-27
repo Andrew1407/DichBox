@@ -24,6 +24,8 @@ const filesReducer = (state, action) => {
     },
     FILE_OPEN: () => {
       const { index } = action;
+      if (index >= state.length)
+        return state;
       closeOpenedFile();
       stateCopy[index].opened = true;
       return stateCopy;

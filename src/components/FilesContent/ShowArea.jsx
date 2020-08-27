@@ -6,11 +6,14 @@ const ShowArea = () => {
   const [visibleFile, setVisibleFile] = useState(null);
 
   useEffect(() => {
-    for (const file of openedFiles)
-      if (file.opened) {
-        setVisibleFile(file);
-        break;
-      }
+    const showEntries = () => {
+      for (const file of openedFiles)
+        if (file.opened)
+          return setVisibleFile(file);
+      return setVisibleFile(null);
+    };
+
+    showEntries();
   }, [openedFiles]);
 
   return (

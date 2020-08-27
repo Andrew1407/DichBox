@@ -5,15 +5,13 @@ import crossIcon from '../../styles/imgs/file-close.png';
 const FilesList = () => {
   const { openedFiles, dispatchOpenedFiles } = useContext(MenuContext);
 
-  const showFileClb = (isOpened, index) => () => {
-    if (isOpened) return;
-    dispatchOpenedFiles({ type: 'FILE_OPEN', index });
+  const showFile = (isOpened, index) => () => {
+    if (!isOpened)
+      dispatchOpenedFiles({ type: 'FILE_OPEN', index });
   }; 
-  const showFile = useCallback(showFileClb, [openedFiles]);
 
   const closeFile = index => () =>
     dispatchOpenedFiles({ type: "FILE_CLOSE", index }); 
-
 
   return (
     <div id="files-list">{
