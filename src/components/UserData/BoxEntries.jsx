@@ -63,7 +63,7 @@ const BoxEntries = () => {
       boxName: boxDetails.name,
       ownPage: userData.ownPage
     };
-    const { data } = await axios.post('http://192.168.0.223:7041/boxes/remove', rmBody);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/remove`, rmBody);
     if (data.removed)
       handleViewBoxesClick();
   };
@@ -105,7 +105,7 @@ const BoxEntries = () => {
         ownerName: userData.name,
         viewerName: username
       };
-      const { data } = await axios.post('http://192.168.0.223:7041/boxes/details', dataBody);
+      const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/details`, dataBody);
       if (data.name) {
         setBoxDetails(data);
         const editor = data.editor

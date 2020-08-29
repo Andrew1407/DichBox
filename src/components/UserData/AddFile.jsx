@@ -36,7 +36,7 @@ const AddFile = ({ addFileVisible, pathName }) => {
       viewerName: username,
       boxPath: [boxDetails.owner_name, ...pathName]
     };
-    const { data } = await axios.post('http://192.168.0.223:7041/boxes/files/create', createBody);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/create`, createBody);
     const { created, last_edited } = data;
     if (!created) return;
     const { type, dir, file } = created;

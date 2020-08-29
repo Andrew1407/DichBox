@@ -129,7 +129,7 @@ const EditProfile = () => {
     const editedBody = { username, edited };
     if (logoEdited)
       editedBody.logo = logoEdited;
-    const { data } =  await axios.post('http://192.168.0.223:7041/users/edit', editedBody);
+    const { data } =  await axios.post(`${process.env.APP_ADDR}/users/edit`, editedBody);
     dispatchUserData({ type: 'REFRESH_DATA', data });
     if (data.name) {
       dispatchUsername({ type: 'SET_NAME', value: data.name});

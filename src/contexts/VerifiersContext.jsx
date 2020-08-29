@@ -22,17 +22,17 @@ const VerifiersContextProvider = props => {
   const setWarningsOnHandle = useCallback(setWarningsOnHandleClb, [warnings, correctInput]);
   const fetchBoxInput = async (username, boxName) => {
     const verifyBody = { username, boxName };
-    const { data } = await axios.post('http://192.168.0.223:7041/boxes/verify', verifyBody);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/verify`, verifyBody);
     return data;
   };
   const fetchUserInput = async (inputField, inputValue) => {
     const verifyBody = { inputField, inputValue };
-    const { data } = await axios.post('http://192.168.0.223:7041/users/verify', verifyBody);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/users/verify`, verifyBody);
     return data;
   };
   const fetchPasswdVer = async (username, passwd) => {
     const passwdBody = { username, passwd };
-    const { data } = await axios.post('http://192.168.0.223:7041/users/passwd_verify', passwdBody);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/users/passwd_verify`, passwdBody);
     return data;
   }
   const useVerifiersClb = verParams => {

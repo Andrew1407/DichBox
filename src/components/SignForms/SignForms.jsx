@@ -69,7 +69,7 @@ const SingForms = () => {
     e.preventDefault();
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
-    const { data } = await axios.post('http://192.168.0.223:7041/users/create', dataInput);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/users/create`, dataInput);
     cleanWarnings();
     dispatchDataInput({ type: 'CLEAN_DATA' });
     dispatchUsername({ type: 'SET_NAME', value: data.name });
@@ -80,7 +80,7 @@ const SingForms = () => {
     e.preventDefault();
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
-    const { data } = await axios.post('http://192.168.0.223:7041/users/enter', dataInput );
+    const { data } = await axios.post(`${process.env.APP_ADDR}/users/enter`, dataInput );
     if (data.name) {
       cleanWarnings();
       dispatchDataInput({ type: 'CLEAN_DATA' });

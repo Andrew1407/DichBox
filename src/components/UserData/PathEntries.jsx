@@ -39,7 +39,7 @@ const PathEntries = ({ entriesSearch }) => {
       follower: userData.follower,
       viewerName: username
     };
-    const { data } = await axios.post('http://192.168.0.223:7041/boxes/files/get', getBody);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/get`, getBody);
     const { foundData, found } = data;
     if (!found) return;
     const file = {

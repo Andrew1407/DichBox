@@ -34,7 +34,7 @@ const Default = () => {
 
   const removeOkClb = async () => {
     const rmBody = { username, confirmation: 'permitted' }
-    const { data } = await axios.post('http://192.168.0.223:7041/users/remove', rmBody);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/users/remove`, rmBody);
     if (data.removed)
       signOutOkClb();
   };
@@ -45,7 +45,7 @@ const Default = () => {
       personName: username,
       subscriptionName: userData.name
     };
-    const { data } = await axios.post('http://192.168.0.223:7041/users/subscription', subsBody);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/users/subscription`, subsBody);
     if (data.followe === null) return;
     const { follower, followers } = data;
     dispatchUserData({ type: 'REFRESH_DATA', data: { follower, followers } });

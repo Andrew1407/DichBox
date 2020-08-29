@@ -8,6 +8,8 @@ import defaultLogo from '../styles/imgs/default-user-logo.png';
 import '../styles/header.css';
 
 const Header = () => {
+  console.log(process.env.APP_ADDR)
+
   const {
     username,
     setPathName,

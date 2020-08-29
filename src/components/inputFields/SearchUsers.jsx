@@ -16,7 +16,7 @@ const SearchUsers = ({ changedList, setChangedList, inputList, setInputList }) =
     setSearchInput(nameTemplate);
     if (nameTemplate) {
       const listBody = { nameTemplate, username }
-      const { data } = await axios.post('http://192.168.0.223:7041/users/names_list', listBody);
+      const { data } = await axios.post(`${process.env.APP_ADDR}/users/names_list`, listBody);
       setFoundUsers(data.foundUsers);
     } else {
       setFoundUsers([]);

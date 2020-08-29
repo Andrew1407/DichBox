@@ -1,6 +1,9 @@
 const path = require('path');
 const autoprefixer = require('autoprefixer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
+require('dotenv').config();
+
 
 module.exports = {
   entry: './src/index.jsx',
@@ -37,10 +40,11 @@ module.exports = {
           { 
             loader: 'css-loader',
             options: {
-                // modules: {
-                //   localIdentName: "[name]__[local]___[hash:base64:5]",
-                // },														
-                sourceMap: true
+                modules: {
+                  localIdentName: "[local]"
+                  // localIdentName: "[name]__[local]___[hash:base64:5]",
+                },														
+                sourceMap: true 
             }
           },
           { 
@@ -56,7 +60,7 @@ module.exports = {
       },
       {
         test: /\.(png|jpe?g|gif)$/,
-        loader: 'url-loader?limit=10000&name=img/[name].[ext]'
+        loader: 'url-loader?limit=1000000&name=img/[name].[ext]'
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|otf)$/,
@@ -73,10 +77,11 @@ module.exports = {
       filename: 'index.html',
       inject: 'body'
     }),
+    new Dotenv()
   ],
   devServer: {
-    port: 7042,
-    host: '192.168.0.20',
+    port: process.env.DEV_SERVER_PORT || 7042,
+    host: process.env.DEV_SERVER_HOST || 'localhost',
     historyApiFallback: true,
   }
 }

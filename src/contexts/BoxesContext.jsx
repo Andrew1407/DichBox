@@ -25,7 +25,7 @@ const BoxesContextProvider = props => {
       follower: userData.follower,
       initial
     };
-    const { data } = await axios.post('http://192.168.0.223:7041/boxes/files/list', filesBody);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/list`, filesBody);
     const { entries } = data;
     if (!entries) {
       setBoxErr(true);

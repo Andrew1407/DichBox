@@ -20,7 +20,7 @@ const UserContextProvider = props => {
     const fetchUserData = async () => {
       if (pathName && pathName.length) {
         const findBody = { username, pathName };
-        const { data } = await axios.post('http://192.168.0.223:7041/users/find', findBody);
+        const { data } = await axios.post(`${process.env.APP_ADDR}/users/find`, findBody);
         dispatchUserData({ type: 'REFRESH_DATA', data });
       }
     };

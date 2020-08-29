@@ -93,7 +93,7 @@ const BoxForm = ({ editParametrs }) => {
         ...submitBody,
         boxData: { ...dataInput, access_level },
       };
-      const { data } = await axios.post('http://192.168.0.223:7041/boxes/create', createBody);
+      const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/create`, createBody);
       history.push(`/${username}/${data.name}`);
     } else if (editParametrs.edit && isCorrect) {
       const edited = !inputFields.length ? null :
@@ -106,7 +106,7 @@ const BoxForm = ({ editParametrs }) => {
           edited : { ...edited, access_level },
         boxName: params.box,
       };
-      const { data } = await axios.post('http://192.168.0.223:7041/boxes/edit', editBody);
+      const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/edit`, editBody);
       setBoxDetails({ ...boxDetails, ...data });
       if (data.name)
         history.push(`/${username}/${data.name}`);
@@ -142,7 +142,7 @@ const BoxForm = ({ editParametrs }) => {
         username: boxDetails.owner_name,
         boxName: boxDetails.name
       };
-      const { data } = await axios.post('http://192.168.0.223:7041/users/access_lists', listBody);
+      const { data } = await axios.post(`${process.env.APP_ADDR}/users/access_lists`, listBody);
       const { limitedUsers, editors } = data;
       setLimitedList(limitedUsers);
       setEditorsList(editors);

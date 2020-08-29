@@ -27,7 +27,7 @@ const Boxes = () => {
           boxOwnerName: userData.name,
           follower: userData.follower
         };
-        const { data } = await await axios.post('http://192.168.0.223:7041/boxes/user_boxes', boxesBody);
+        const { data } = await await axios.post(`${process.env.APP_ADDR}/boxes/user_boxes`, boxesBody);
         if (data.boxesList)
           setBoxesList(data.boxesList);
       }
