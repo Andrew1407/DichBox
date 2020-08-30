@@ -12,7 +12,7 @@ import trashBin from '../../styles/imgs/trash-bin.png';
 import addFileLogo from '../../styles/imgs/add-file.png';
 import addFolderLogo from '../../styles/imgs/add-folder.png';
 import boxMoreLogo from '../../styles/imgs/box-more.png';
-import boxEditLogo from '../../styles/imgs/box-edit.svg';
+import boxEditLogo from '../../styles/imgs/box-edit.png';
 import '../../styles/box-entries.css';
 
 

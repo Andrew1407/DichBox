@@ -75,7 +75,7 @@ const PathEntries = ({ entriesSearch }) => {
         !unit.name ? null : 
         <div className="box-entries-item" key={ unit.name } onClick={ unit.type === 'dir' ? hadnleHistoryMove([...pathDepth, unit.name]) : handleClickFile(unit) } >
           <img src={ unit.type === 'dir' ? dirLogo : fileLogo } />
-          <p>{ unit.name }</p>
+          <p>{ unit.name.length > 20 ? `${unit.name.slice(0, 19)}...` : unit.name }</p>
         </div>
       )}
       {  !!entriesSearch && !!pathEntries.length && !filteredSearch.length && 

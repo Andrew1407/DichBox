@@ -91,6 +91,7 @@ const EditProfile = () => {
     }
   };
   const { getVerifiersState, getOnChangeVerifier } = useVerifiers(signVerParams);
+
   const handleInputChangeClb = field => {
     const fieldVerifier = getOnChangeVerifier(field);
     return e => {
@@ -106,6 +107,7 @@ const EditProfile = () => {
     handleInputChangeClb,
     [editedFields, warnings, correctInput]
   );
+  
   const ableSubmit = (editedFields.length ? 
     getVerifiersState(editedFields) : getVerifiersState())
     || logoEdited;

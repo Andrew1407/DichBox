@@ -30,6 +30,13 @@ const filesReducer = (state, action) => {
       stateCopy[index].opened = true;
       return stateCopy;
     },
+    FILE_EDIT: () => {
+      const { name, filePath, edited } = action.file;
+      return stateCopy.map(file =>
+        file.name === name && file.filePath === filePath ?
+          { ...file, edited } : file
+      );
+    }
   };
   const actionType = actions[action.type];
   return actionType ? actionType() : state;

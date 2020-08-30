@@ -5,7 +5,7 @@ const verifyDataReducer = (state, action) => {
     CLEAN_DATA: {}
   };
   const actionType = actions[action.type];
-  return actionType ? actionType : state;
+  return actionType || state;
 };
 
 export default verifyDataReducer;

@@ -8,8 +8,6 @@ import defaultLogo from '../styles/imgs/default-user-logo.png';
 import '../styles/header.css';
 
 const Header = () => {
-  console.log(process.env.APP_ADDR)
-
   const {
     username,
     setPathName,
@@ -22,7 +20,8 @@ const Header = () => {
   const history = useHistory();
   const handleMenuClickClb = e => {
     e.preventDefault();
-    if (pathName === username) {
+    const currentUsername = username || '';
+    if (pathName === currentUsername) {
       setMenuVisible(!menuVisible);
     }
     else {
