@@ -23,6 +23,7 @@ const BoxesContextProvider = props => {
       boxPath,
       viewerName: username,
       follower: userData.follower,
+      editor: userData.editor,
       initial
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/list`, filesBody);

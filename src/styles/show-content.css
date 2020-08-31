@@ -81,6 +81,7 @@
 }
 
 #show-area > textarea {
+  outline: none;
   margin-top: 0.7%;
   font-size: 140%;
   font-family: "Roboto-Regular";
@@ -90,7 +91,7 @@
   color: rgb(0, 217, 255);
   padding: 1% 1.5%;
   width: 97%;
-  height: 97%; 
+  height: 91%; 
 }
 
 #edit-menu {

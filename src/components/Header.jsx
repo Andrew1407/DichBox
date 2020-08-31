@@ -18,10 +18,10 @@ const Header = () => {
   const { dispatchDataInput, cleanWarnings } = useContext(VerifiersContext);
   const { setBoxesList, setBoxHiddenState, setBoxDetails } = useContext(BoxesContext);
   const history = useHistory();
-  const handleMenuClickClb = e => {
-    e.preventDefault();
+  const handleMenuClickClb = () => {
     const currentUsername = username || '';
-    if (pathName === currentUsername) {
+    const currentPathName = pathName || '';
+    if (currentPathName === currentUsername) {
       setMenuVisible(!menuVisible);
     }
     else {

@@ -36,6 +36,30 @@ const filesReducer = (state, action) => {
         file.name === name && file.filePath === filePath ?
           { ...file, edited } : file
       );
+    },
+    FILE_WRITE: () => {
+      const { name, filePath, src } = action.file;
+      return stateCopy.map(file =>
+        file.name === name && file.filePath === filePath ?
+          { name, filePath, src, opened: file.opened } : file
+      );
+    },
+    FILES_CANCEL_EDITED: () => {
+      stateCopy.forEach(file => delete file.edited);
+      return stateCopy;
+    },
+    FILES_WRITE_ALL: () => {
+      const { files } = action;
+      return stateCopy.map(f => {
+        if (!f)
+          return f;
+        const [ edited ] = files.filter(fEdited =>
+          f.name === fEdited.name &&
+          f.filePath === fEdited.filePath
+        );
+        console.log(edited || f)
+        return edited || f;
+      });
     }
   };
   const actionType = actions[action.type];

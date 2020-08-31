@@ -37,7 +37,8 @@ const PathEntries = ({ entriesSearch }) => {
       ...unit,
       boxPath: pathDepth,
       follower: userData.follower,
-      viewerName: username
+      viewerName: username,
+      editor: userData.editor
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/get`, getBody);
     const { foundData, found } = data;
@@ -55,8 +56,8 @@ const PathEntries = ({ entriesSearch }) => {
     [pathDepth, userData, username, openedFiles]
   );
 
-  useEffect(() => {      
-    if (boxDetails.name && !pathEntries.length) {
+  useEffect(() => {
+    if (!pathEntries.length && userData.editor !== undefined) {
       const initial = true;
       fetchEntries(pathDepth, initial);
     }

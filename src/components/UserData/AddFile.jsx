@@ -34,7 +34,8 @@ const AddFile = ({ addFileVisible, pathName }) => {
       type: addFileVisible,
       follower: userData.follower,
       viewerName: username,
-      boxPath: [boxDetails.owner_name, ...pathName]
+      boxPath: [boxDetails.owner_name, ...pathName],
+      editor: userData.editor
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/create`, createBody);
     const { created, last_edited } = data;
