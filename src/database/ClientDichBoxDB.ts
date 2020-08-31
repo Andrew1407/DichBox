@@ -1,11 +1,13 @@
 import { Pool, PoolClient, QueryResult } from 'pg';
+import * as dotenv from 'dotenv';
 import {
   userData,
   boxData,
   dataElement,
   subscribersData 
 } from '../datatypes';
-import { join } from 'path';
+
+dotenv.config();
 
 export default class ClientDichBoxDB {
   private pool: Pool;
@@ -13,10 +15,10 @@ export default class ClientDichBoxDB {
   
   constructor() {
     this.pool = new Pool({
-      host: 'localhost',
-      user: 'andrew1407',
-      password: 'sasik',
-      database: 'dich_box'
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWD,
+      database: process.env.DB_NAME
     });
   }
 

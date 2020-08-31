@@ -121,4 +121,19 @@ export default class BoxesStorageManager extends StorageManager {
       .readFile(filePath, 'utf-8');
     return src;
   }
+
+  public async editFile(
+    ids: [number, number],
+    filePath: string[],
+    src: string
+  ): Promise<boolean> {
+    const idsStr: string[] = ids.map(x => x.toString());
+    const filePathStr: string = path
+      .join('../DichStorage/boxes', ...idsStr, ...filePath);
+    const exists: boolean = fs.existsSync(filePathStr);
+    if (!exists)
+      return false;
+    await fs.promises.writeFile(filePathStr, src);
+    return true;
+  }
 }

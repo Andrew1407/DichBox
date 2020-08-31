@@ -125,8 +125,9 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
     person_id: number,
     owner_id: number,
     follower: boolean,
+    editor: boolean
   ): Promise<boxData|null> {
-    const ownPage: boolean = person_id === owner_id;
+    const viewPermitted: boolean = (person_id === owner_id) || editor;
     const returnColumns: string[] = [
       'a.name',
       'a.name_color',
@@ -155,15 +156,15 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
         return box.length ? box[0] : null;
       },
       private: async (): Promise<boxData|null> => {
-        return ownPage ?
+        return viewPermitted ?
           await getters.public() : null;
       },
       followers: async (): Promise<boxData|null> => {
-        return ownPage || follower ?
+        return viewPermitted || follower ?
           await getters.public() : null;
       },
       limited: async (): Promise<boxData|null> => {
-        if (ownPage)
+        if (viewPermitted)
           return await getters.public();
         const box: boxData[] = await this.selectDoubleJoiedValues(
           ['boxes', 'users', 'limited_viewers'],
@@ -192,17 +193,14 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
     );
     if (!typeRes)
       return null;
-    const boxType: string = typeRes[0].access_level;
-    const box: boxData|null =  await this.boxInfoGetter(
-      boxType, boxName, viewer_id, owner_id, follower
-    );
-    if (!box)
-      return null;
     const boxId: number = typeRes[0].id;
     const editor: boolean = ownPage ? ownPage :
       await this.checkEditor(boxId, viewer_id);
-    return box ?
-      { ...box, ...typeRes[0], editor, owner_id } : null;
+    const boxType: string = typeRes[0].access_level;
+    const box: boxData|null =  await this.boxInfoGetter(
+      boxType, boxName, viewer_id, owner_id, follower, editor
+    );
+    return box ? { ...box, ...typeRes[0], editor, owner_id } : null;  
   }
 
   private async checkEditor(
@@ -363,7 +361,8 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
     ownerName: string,
     viewerName: string,
     boxName: string,
-    follower: boolean
+    follower: boolean,
+    editor: boolean = false
   ): Promise<[number, number]|null> {
     const ownPage: boolean = ownerName === viewerName;
     const idsRes: boxData[] = await this.selectJoiedValues(
@@ -377,7 +376,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
     const ownerId: number = idsRes[0].owner_id;
     const boxId: number = idsRes[0].id;
     const res: [number, number] = [ownerId, boxId];
-    if (ownPage)
+    if (ownPage || editor)
       return res;
     const privacy: string = idsRes[0].access_level;
     const permitted: boolean = 

@@ -130,16 +130,17 @@ const removeBox: middlewareFn = async (req: Request, res: Response) => {
 };
 
 const getPathFiles: middlewareFn = async (req: Request, res: Response) => {
-  const { boxPath, viewerName, follower, initial }: {
+  const { boxPath, viewerName, follower, initial, editor }: {
     boxPath: string[]
     viewerName: string,
     follower: boolean,
-    initial: boolean
+    initial: boolean,
+    editor: boolean
   } = req.body;
   const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
   const extraPath: string[] = boxPath.slice(2);
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
-    ownerName, viewerName, boxName, follower
+    ownerName, viewerName, boxName, follower, editor
   );
   if (!checkup) { 
     res.json({ entries: null }).end();
@@ -151,17 +152,18 @@ const getPathFiles: middlewareFn = async (req: Request, res: Response) => {
 };
 
 const createFile: middlewareFn = async (req: Request, res: Response) => {
-  const { boxPath, viewerName, follower, fileName, type }: {
+  const { boxPath, viewerName, follower, fileName, type, editor }: {
     boxPath: string[]
     viewerName: string,
     follower: boolean,
     fileName: string,
+    editor: boolean,
     type: entryType
   } = req.body;
   const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
   const extraPath: string[] = boxPath.slice(2);
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
-    ownerName, viewerName, boxName, follower
+    ownerName, viewerName, boxName, follower, editor
   );
   if (!checkup) { 
     res.json({ created: null }).end();
@@ -179,17 +181,18 @@ const createFile: middlewareFn = async (req: Request, res: Response) => {
 };
 
 const getFile: middlewareFn = async (req: Request, res: Response) => {
-  const { boxPath, viewerName, follower, name, type }: {
+  const { boxPath, viewerName, follower, name, type, editor }: {
     boxPath: string[]
     viewerName: string,
     follower: boolean,
     name: string,
+    editor: boolean,
     type: entryType
   } = req.body;
   const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
   const extraPath: string[] = boxPath.slice(2);
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
-    ownerName, viewerName, boxName, follower
+    ownerName, viewerName, boxName, follower, editor
   );
   if (!checkup) { 
     res.json({ foundData: null }).end();
@@ -198,6 +201,54 @@ const getFile: middlewareFn = async (req: Request, res: Response) => {
   const foundData: string|null =
     await boxesStorage.readFile(name, type, checkup, extraPath);
   res.json({ foundData, found: true }).end();
+};
+
+const saveFile: middlewareFn = async (req: Request, res: Response) => {
+  const { editor, editorName, files }: {
+    editorName: string,
+    editor: boolean,
+    files: {
+      src: string,
+      filePathStr: string
+    }[]
+  } = req.body;
+  if (!files.length) {
+    res.json({}).end();
+    return;
+  }
+  if (!editor) {
+    res.json({}).end();
+    return;
+  }
+  const editorId: number|null = await clientDB.getUserId(editorName);
+  if (!editorId) {
+    res.json({}).end();
+    return;
+  }
+  const filesFormated: {
+    src: string,
+    filePath: string[]
+  }[] = files.map(f => ({
+    src: f.src,
+    filePath: f.filePathStr
+      .split('/')
+      .splice(1)
+  }));
+  const [ [ ownerName, boxName ], extraPath ]: string[][] = [
+    filesFormated[0].filePath.slice(0, 2),
+    filesFormated[0].filePath.slice(2),
+  ];
+  const checkup: [number, number]|null = await clientDB.checkBoxAccess(
+    ownerName, editorName, boxName, true, editor
+  );
+  if (!checkup) { 
+    res.json({ foundData: null }).end();
+    return;
+  }
+  let edited: boolean = true;
+  for (const { src, filePath } of filesFormated)
+    edited = edited && await boxesStorage.editFile(checkup, filePath.slice(2), src);
+  res.json({ edited }).end();
 };
 
 export {
@@ -209,5 +260,6 @@ export {
   removeBox,
   getPathFiles,
   createFile,
-  getFile
+  getFile,
+  saveFile
 };

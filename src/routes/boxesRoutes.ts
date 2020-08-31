@@ -12,6 +12,7 @@ boxesRouter
   .post('/remove', routes.removeBox)
   .post('/files/list', routes.getPathFiles)
   .post('/files/create', routes.createFile)
+  .post('/files/save', routes.saveFile)
   .post('/files/get', routes.getFile);
 
 export default boxesRouter;
