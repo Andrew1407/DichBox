@@ -36,7 +36,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       'b.name_color',
       'access_level'
     ];
-    const sharedBoxes: boxData[] = await this.selectDoubleJoiedValues(
+    const sharedBoxes: boxData[] = await this.selectDoubleJoinedValues(
       ['limited_viewers', 'boxes', 'users'],
       ['b.id = a.box_id', 'b.owner_id = c.id'],
       { owner_id, person_id },
@@ -54,7 +54,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
         'a.name_color',
         'access_level'
       ];
-    const userBoxes: boxData[] = await this.selectJoiedValues(
+    const userBoxes: boxData[] = await this.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       { owner_id },
@@ -80,7 +80,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       'a.name_color as name_color',
       'access_level'
     ];
-    const visitorBoxes: boxData[] =  await this.selectJoiedValues(
+    const visitorBoxes: boxData[] =  await this.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       { owner_id },
@@ -97,7 +97,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       'a.name_color',
       '\'invetee\' as access_level'
     ];
-    const inveteeBoxes: boxData[] = await this.selectDoubleJoiedValues(
+    const inveteeBoxes: boxData[] = await this.selectDoubleJoinedValues(
       ['boxes', 'box_editors', 'users'],
       ['a.id = b.box_id', 'a.owner_id = c.id'],
       { person_id },
@@ -146,7 +146,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
     };
     const getters: gettersFns = {
       public: async (): Promise<boxData|null> => {
-        const box: boxData[] = await this.selectJoiedValues(
+        const box: boxData[] = await this.selectJoinedValues(
           ['boxes', 'users'],
           ['owner_id', 'id'],
           { owner_id },
@@ -166,7 +166,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       limited: async (): Promise<boxData|null> => {
         if (viewPermitted)
           return await getters.public();
-        const box: boxData[] = await this.selectDoubleJoiedValues(
+        const box: boxData[] = await this.selectDoubleJoinedValues(
           ['boxes', 'users', 'limited_viewers'],
           ['a.owner_id = b.id', 'a.id = c.box_id'],
           { owner_id, person_id },
@@ -265,7 +265,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
     limitedlist: string[]|null = null,
     editorslist: string[]|null = null
   ): Promise<boxData|null> {
-    const beforeUpdateRes: boxData[] = await this.selectJoiedValues(
+    const beforeUpdateRes: boxData[] = await this.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       {}, ['a.id', 'access_level'],
@@ -341,7 +341,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
     username: string,
     boxName: string
   ): Promise<[number, number]|null> {
-    const foundRes: boxData[] = await this.selectJoiedValues(
+    const foundRes: boxData[] = await this.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       {}, ['owner_id', 'a.id'],
@@ -365,7 +365,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
     editor: boolean = false
   ): Promise<[number, number]|null> {
     const ownPage: boolean = ownerName === viewerName;
-    const idsRes: boxData[] = await this.selectJoiedValues(
+    const idsRes: boxData[] = await this.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       {}, ['owner_id', 'a.id', 'access_level'],

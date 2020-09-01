@@ -1,6 +1,6 @@
 import { QueryResult } from 'pg';
 import ClientDichBoxDB from './ClientDichBoxDB';
-import { userData, boxData, subscribersData } from '../datatypes';
+import { userData, subscribersData } from '../datatypes';
 
 export default class UserClientDichBoxDB extends ClientDichBoxDB {
   public async insertUser(userData: userData): Promise<userData> {
@@ -43,14 +43,18 @@ export default class UserClientDichBoxDB extends ClientDichBoxDB {
 
   // subscribers
 
-  public async getUserSubsciptions(id: number): Promise<number[]> {
-    const queryArgs: [string, userData, [string]] =
-      ['subscribers', { id }, ['subscription']];
-    const queryRes: { subscription: number }[] =
-      await this.selectValues(...queryArgs);
-    const subscriptions: number[] = queryRes ?
-      queryRes.map(x => x.subscription): null;
-    return subscriptions;
+  public async getUserSubsciptions(name: string): Promise<userData[]|null> {
+    const person_id: number|null = await this.getUserId(name);
+    if (!person_id)
+      return null;
+    const subs: userData[]|null = await this.selectJoinedValues(
+      ['subscribers', 'users'],
+      ['subscription', 'id'],
+      { person_id },
+      ['id', 'name', 'name_color']
+    );
+    subs.reverse();
+    return subs;
   }
 
   public async subscibe(
@@ -115,7 +119,7 @@ export default class UserClientDichBoxDB extends ClientDichBoxDB {
     username: string,
     boxName: string
   ): Promise<userData[][]> {
-    const [{ id }]: { id: number }[] = await this.selectJoiedValues(
+    const [{ id }]: { id: number }[] = await this.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       {}, ['a.id'],
@@ -133,11 +137,18 @@ export default class UserClientDichBoxDB extends ClientDichBoxDB {
     table: string,
     box_id: number
   ): Promise<userData[]> {
-    return await this.selectJoiedValues(
+    return await this.selectJoinedValues(
       [table, 'users'],
       ['person_id', 'id'],
       { box_id },
       ['name', 'name_color', 'id']
     );
+  }
+
+  public async searchUsers(nameTemplate: string): Promise<userData[]> {
+    const foundRes: QueryResult = await this.poolClient.query(
+      `select id, name, name_color from users where name like \'%${nameTemplate}%\' order by followers desc;`
+    );
+    return foundRes.rows;
   }
 }

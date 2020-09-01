@@ -19,7 +19,7 @@ const userStorage: UserStotageManager = new UserStotageManager;
 const clientDB: UserClientDichBoxDB = new UserClientDichBoxDB();
 clientDB.clientConnection();
 
-const foudUsersMapper = async (user: userData): Promise<foundUser> => ({
+const foundUsersMapper = async (user: userData): Promise<foundUser> => ({
   name: user.name, 
   name_color: user.name_color,
   logo: await userStorage.getLogoIfExists(user.id)
@@ -137,7 +137,7 @@ const findUsernames: middlewareFn = async (req: Request, res: Response) => {
   let foundUsers: foundUser[] = [];
   if (usernames)
     foundUsers = await Promise.all(
-      usernames.map(foudUsersMapper)
+      usernames.map(foundUsersMapper)
     );
   res.json({ foundUsers }).end();
 };
@@ -148,8 +148,8 @@ const getAccessLists: middlewareFn = async (req: Request, res: Response) => {
   const foundLists: userData[][] = 
     await clientDB.getLimitedUsers(username, boxName);
   const listsMapper = async (arr: userData[]): Promise<foundUser[]> => {
-    return await arr.length ?
-      Promise.all(arr.map(foudUsersMapper)) : [];
+    return !arr.length ? [] :
+      await Promise.all(arr.map(foundUsersMapper));
   };
   const [ limitedUsers, editors ]: foundUser[][] =
     await Promise.all(foundLists.map(listsMapper));
@@ -157,18 +157,50 @@ const getAccessLists: middlewareFn = async (req: Request, res: Response) => {
 };
 
 const subscription: middlewareFn = async (req: Request, res: Response) => {
-  const action: 'subscribe'|'unsubscribe' = req.body.action;
-  const personName: string = req.body.personName;
-  const subscriptionName: string = req.body.subscriptionName;
+  const { action, personName, subscriptionName, responseValues } : {
+    action: 'subscribe'|'unsubscribe',
+    personName: string,
+    subscriptionName: string,
+    responseValues: boolean
+  } = req.body;
   const followers: number|null = 
     await clientDB.subscibe(personName, subscriptionName, action);
   if (followers === null) {
     res.json({}).end();
     return;
   }
+  if (!responseValues) {
+    res.json({ unsubscribed: true }).end();
+    return;
+  }
   const follower: boolean = action === 'subscribe' ?
     true : false
   res.json({ follower, followers }).end();
+};
+
+const getSubscriptions: middlewareFn = async (req: Request, res: Response) => {
+  const name: string = req.body.name;
+  const foundPersons: userData[]|null = await clientDB.getUserSubsciptions(name);
+  if (!foundPersons) {
+    res.json({}).end();
+    return;
+  }
+  const subs: foundUser[] = await Promise.all(
+    foundPersons.map(foundUsersMapper)
+  );
+  res.json({ subs }).end();
+};
+
+const searchUsers: middlewareFn = async (req: Request, res: Response) => {
+  const searchStr: string = req.body.searchStr;
+  const searchFormated: string = Array.from(searchStr)
+    .filter(ch => ch !== ' ')
+    .join('');
+  const searchedUsers: userData[] = await clientDB.searchUsers(searchFormated);
+  const searched: foundUser[] = await Promise.all(
+    searchedUsers.map(foundUsersMapper)
+  );
+  res.json({ searched }).end();
 };
 
 export {
@@ -181,5 +213,7 @@ export {
   removeUser,
   findUsernames,
   getAccessLists,
-  subscription
+  subscription,
+  getSubscriptions,
+  searchUsers
 };

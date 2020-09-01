@@ -212,11 +212,7 @@ const saveFile: middlewareFn = async (req: Request, res: Response) => {
       filePathStr: string
     }[]
   } = req.body;
-  if (!files.length) {
-    res.json({}).end();
-    return;
-  }
-  if (!editor) {
+  if (!(files.length && editor)) {
     res.json({}).end();
     return;
   }
@@ -245,9 +241,14 @@ const saveFile: middlewareFn = async (req: Request, res: Response) => {
     res.json({ foundData: null }).end();
     return;
   }
-  let edited: boolean = true;
-  for (const { src, filePath } of filesFormated)
-    edited = edited && await boxesStorage.editFile(checkup, filePath.slice(2), src);
+  const filesWritted: boolean[] = await Promise.all(
+    filesFormated.map(f => boxesStorage.editFile(
+      checkup, f.filePath.slice(2), f.src
+    ))
+  );
+  const edited: boolean = filesWritted.reduce(
+    ((res, acc) => res && acc), true
+  );
   res.json({ edited }).end();
 };
 

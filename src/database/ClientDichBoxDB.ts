@@ -64,7 +64,7 @@ export default class ClientDichBoxDB {
     return res.rowCount ? res.rows : null;
   }
 
-  protected async selectJoiedValues(
+  protected async selectJoinedValues(
     tables: string[],
     joinColumns: string[],
     input: boxData|userData|subscribersData,
@@ -83,7 +83,7 @@ export default class ClientDichBoxDB {
     return res.rows;
   }
 
-  protected async selectDoubleJoiedValues(
+  protected async selectDoubleJoinedValues(
     tables: string[],
     joinConditions: string[],
     input: boxData|userData|subscribersData,
