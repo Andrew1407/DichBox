@@ -23,6 +23,7 @@ const ShowArea = () => {
     const file = new Blob([src], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
     element.download = name;
+    element.style.display = 'none';
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
     element.removeChild(element);

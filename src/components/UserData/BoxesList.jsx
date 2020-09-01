@@ -14,9 +14,10 @@ const BoxesList = ({ searchInput, setMenuOption }) => {
     if (openedFiles.length) {
       const file = openedFiles[0];
       if (file) {
-        const filesBoxName = file.filePath
-          .split('/')[2];
-        if (filesBoxName !== box.name)
+        const [ userName, filesBoxName ] = file.filePath
+          .split('/')
+          .slice(1, 3);
+        if (userName !== userData.name || filesBoxName !== box.name)
           dispatchOpenedFiles({type: 'FILES_CLOSE_ALL' });
       }
     }

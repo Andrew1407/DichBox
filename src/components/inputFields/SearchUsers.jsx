@@ -52,6 +52,7 @@ const SearchUsers = ({ changedList, setChangedList, inputList, setInputList }) =
     setSearchInput('');
   };
   const handleFoundUserClick = useCallback(handleFoundUserClickClb, [inputList]);
+  const shortenName = str => str.length < 20 ? str : `${str.slice(0, 19)}...`;
 
 
   return (
@@ -63,9 +64,9 @@ const SearchUsers = ({ changedList, setChangedList, inputList, setInputList }) =
         { !!foundUsers.length && 
           <div className="box-limited-search">
             { foundUsers.map(user => 
-              <div className="found-user" key={ user.name } onClick={ handleFoundUserClick(user) } >
-                <img src={ user.logo ? user.logo : logoDefault } />
-                <span style={{ color: user.name_color }}>{ user.name }</span>
+              <div title={ user.name } className="found-user" key={ user.name } onClick={ handleFoundUserClick(user) } >
+                <img src={ user.logo || logoDefault } />
+                <span style={{ color: user.name_color }}>{ shortenName(user.name) }</span>
               </div>
           )}
           </div>
@@ -74,9 +75,9 @@ const SearchUsers = ({ changedList, setChangedList, inputList, setInputList }) =
       <div className="box-limited-list">
         { inputList.map(user =>
           <div className="limited-user" key={ user.name }>
-            <div className="limited-user-data" >
-              <img src={ user.logo ? user.logo : logoDefault } />
-              <span style={{ color: user.name_color }} >{ user.name }</span>
+            <div title={ user.name } className="limited-user-data" >
+              <img src={ user.logo || logoDefault } />
+              <span style={{ color: user.name_color }} >{ shortenName(user.name) }</span>
             </div>           
             <img src={ trashBin } className="limited-user-rm" onClick={ handleUserRemove(user) } />
           </div>

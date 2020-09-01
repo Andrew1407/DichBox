@@ -22,7 +22,7 @@ const BoxEntries = () => {
   const [modalOptions, setModalOptions] = useState(null);
   const [entriesSearch, setEntriesSearch] = useState('');
   const [addFileVisible, setAddFileVisible] = useState('');
-  const { setMenuOption } = useContext(MenuContext)
+  const { setMenuOption, openedFiles, dispatchOpenedFiles } = useContext(MenuContext)
   const { userData, dispatchUserData, pathName, username } = useContext(UserContext);
   const { 
     boxInfoHidden,
@@ -64,8 +64,10 @@ const BoxEntries = () => {
       ownPage: userData.ownPage
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/remove`, rmBody);
-    if (data.removed)
+    if (data.removed) {
       handleViewBoxesClick();
+      dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
+    }
   };
 
   const handleBoxRemoveClb = () => setModalOptions({
@@ -74,7 +76,10 @@ const BoxEntries = () => {
     message: `Remove box "${boxDetails.name}" inevitably`,
     okClb: boxRemoveSubmit
   });
-  const handleBoxRemove = useCallback(handleBoxRemoveClb, [boxDetails]);
+  const handleBoxRemove = useCallback(
+    handleBoxRemoveClb,
+    [boxDetails, userData, openedFiles]
+  );
 
   const handleEntriesClickClb = i => async () => {
     const pathEnd = i + 1;

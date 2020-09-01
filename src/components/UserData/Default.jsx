@@ -13,7 +13,6 @@ const Default = () => {
   const { userData, username, dispatchUsername, dispatchUserData, setPathName } = useContext(UserContext);
   const { setMenuOption } = useContext(MenuContext);
   const [modalOptions, setModalOptions] = useState(null);
-  const logo = userData.logo ? userData.logo : logoDefault;
   const handeMenuChoice = choice => e => {
     e.preventDefault();
     setMenuOption(choice)
@@ -43,17 +42,18 @@ const Default = () => {
     const subsBody = {
       action,
       personName: username,
-      subscriptionName: userData.name
+      subscriptionName: userData.name,
+      responseValues: true
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/users/subscription`, subsBody);
-    if (data.followe === null) return;
+    if (data.followers === undefined) return;
     const { follower, followers } = data;
     dispatchUserData({ type: 'REFRESH_DATA', data: { follower, followers } });
   };
 
   return (
     <div className="menu-form">
-      <img src={ logo } id="default-logo" />
+      <img src={ userData.logo || logoDefault } id="default-logo" />
       <div className="name-desc">
         <p className="nd-name" style={{ color: userData.name_color }} >{ userData.name }</p>
         <p className="nd-desc" style={{ color: userData.description_color }} >{ userData.description }</p>

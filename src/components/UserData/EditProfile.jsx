@@ -24,7 +24,7 @@ const EditProfile = () => {
     cleanWarnings,
     setWarningsOnHandle
   } = useContext(VerifiersContext);
-  const logo = userData.logo ? userData.logo : logoDefault;
+  const logo = userData.logo || logoDefault;
   const [editedFields, setEditedFields] = useState([]);
   const [logoEdited, setLogoEdited] = useState(null);
   const [passwdFormHidden, setPasswdForm] = useState(true);

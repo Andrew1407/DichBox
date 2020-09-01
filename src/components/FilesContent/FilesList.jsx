@@ -16,7 +16,7 @@ const FilesList = () => {
   return (
     <div id="files-list">{
       openedFiles.map((file, i) => 
-        <div onClick={ showFile(file.opened, i) } id={ i ? '' : 'opened-first' } className="opened-file" key={ i } style={{ color: file.opened ? 'black': 'rgb(0, 217, 255)', backgroundColor: file.opened ? 'rgb(0, 217, 255)' : 'black' }} >
+        <div title={`${file.filePath.slice(1)}/${file.name}`} onClick={ showFile(file.opened, i) } id={ i ? '' : 'opened-first' } className="opened-file" key={ i } style={{ color: file.opened ? 'black': 'rgb(0, 217, 255)', backgroundColor: file.opened ? 'rgb(0, 217, 255)' : 'black' }} >
           <p className="opened-file-name">{ file.name }</p>
           <img className="opened-file-close" onClick={ closeFile(i) } src={ crossIcon } />
         </div>

@@ -55,7 +55,7 @@ body {
 }
 
 #header-search > input {
-  margin-top: 12%;
+  margin-top: 10%;
   padding-left: 1%;
   border: solid 4px;
   border-color: black;
@@ -83,6 +83,15 @@ body {
   width: 75px;
   border-radius: 50%;
   background-color: grey;
+}
+
+#header-search-list {
+  width: 26%;
+  height: 30%;
+  right: 3%;
+  bottom: 55%;
+  position: absolute;
+  background-color: blue;  
 }
 
 @font-face {

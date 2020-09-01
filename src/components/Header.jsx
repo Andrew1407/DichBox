@@ -1,13 +1,15 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import { MenuContext } from '../contexts/MenuContext';
 import { BoxesContext } from '../contexts/BoxesContext';
-import { useHistory } from 'react-router-dom';
 import { VerifiersContext } from '../contexts/VerifiersContext';
+import HeaderSearch from './HeaderSearch';
 import defaultLogo from '../styles/imgs/default-user-logo.png';
 import '../styles/header.css';
 
 const Header = () => {
+  const history = useHistory();
   const {
     username,
     setPathName,
@@ -17,7 +19,7 @@ const Header = () => {
   const { menuVisible, setMenuVisible } = useContext(MenuContext);
   const { dispatchDataInput, cleanWarnings } = useContext(VerifiersContext);
   const { setBoxesList, setBoxHiddenState, setBoxDetails } = useContext(BoxesContext);
-  const history = useHistory();
+  const [searchInput, setSearchInput] = useState('');
   const handleMenuClickClb = () => {
     const currentUsername = username || '';
     const currentPathName = pathName || '';
@@ -48,8 +50,9 @@ const Header = () => {
         <img src={defaultLogo} onClick={ handleMenuClick } style={{ backgroundColor }} /> 
       </div>
       <div id="header-search">
-        <input type="text" placeholder="search users" />
+        <input type="text" placeholder="search users" onChange={ e => setSearchInput(e.target.value) } />
       </div>
+      <HeaderSearch {...{ searchInput }}/>
     </div>
   );
 };
