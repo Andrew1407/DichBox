@@ -123,10 +123,10 @@ const ShowArea = () => {
     const showFile = () => {
       if (!openedFiles.length)
         return setVisibleFile(null);
+      const getFullPath = f => `${f.filePath}/${f.name}`;
       for (const file of openedFiles)
         if (file.opened)
-          if (visibleFile) {
-            const getFullPath = ({ name, filePath }) => `${filePath}/${name}`;
+          if (visibleFile) {    
             if (getFullPath(visibleFile) !== getFullPath(file))            
               return setVisibleFile(file);
           } else {
@@ -136,8 +136,6 @@ const ShowArea = () => {
 
     showFile();
   }, [openedFiles]);
-
-  console.log(openedFiles)
 
   return ( visibleFile &&
     <div id="show-area">

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useEffect } from 'react';
+import React, { useContext, useCallback, useEffect } from 'react';
 import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
 import { VerifiersContext } from '../contexts/VerifiersContext';
 import { UserContext } from '../contexts/UserContext';
@@ -14,8 +14,19 @@ import '../styles/menu.css';
 const Menu = () => {
   const { username, userData, pathName } = useContext(UserContext);
   const { dispatchDataInput, cleanWarnings } = useContext(VerifiersContext);
-  const { setBoxesList, setBoxDetails, setEditBoxState, setBoxHiddenState, setPathEntries } = useContext(BoxesContext);
-  const { menuOption, setMenuOption, menuVisible, setMenuVisible } = useContext(MenuContext);
+  const {
+    setBoxesList,
+    setBoxDetails,
+    setEditBoxState,
+    setBoxHiddenState,
+    setPathEntries
+  } = useContext(BoxesContext);
+  const {
+    menuOption,
+    setMenuOption,
+    menuVisible,
+    setMenuVisible
+  } = useContext(MenuContext);
   const history = useHistory();
   const handleArrowClick = modifier => e => {
     e.preventDefault();
@@ -38,7 +49,10 @@ const Menu = () => {
     if (`/${pathName}` !== currentPath)
       history.push('/' + pathName);
   };
-  const handleHomeClick = useCallback(handleHomeClickClb, [userData, username, pathName]);
+  const handleHomeClick = useCallback(
+    handleHomeClickClb,
+    [userData, username, pathName]
+  );
   const homeIconVisible = (menuOption !== 'default') && username || 
     history.location.pathname.split('/').length > 2;
 

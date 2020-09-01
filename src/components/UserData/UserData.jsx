@@ -7,6 +7,7 @@ import Default from './Default';
 import EditProfile from './EditProfile';
 import BoxForm from './BoxForm';
 import BoxEntries from './BoxEntries';
+import Subscriptions from './Subscriptions';
 
 const UserData = () => {
   const { setPathName, pathName } = useContext(UserContext);
@@ -21,7 +22,8 @@ const UserData = () => {
     boxes: <Boxes />,
     editProfile: <EditProfile />,
     createBox: <BoxForm editParametrs={{ boxDetails: {} }} />,
-    boxEntries: <BoxEntries />
+    boxEntries: <BoxEntries />,
+    subscriptions: <Subscriptions />
   };
 
   return (

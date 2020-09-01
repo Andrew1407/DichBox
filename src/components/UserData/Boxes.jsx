@@ -7,7 +7,7 @@ import BoxesList from './BoxesList';
 import '../../styles/menu-boxes.css';
 
 const Boxes = () => {
-  const { menuOption, setMenuOption, menuVisible } = useContext(MenuContext);
+  const { menuOption, setMenuOption } = useContext(MenuContext);
   const { userData, username } = useContext(UserContext);
   const {
     boxesList,

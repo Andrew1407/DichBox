@@ -51,8 +51,7 @@ const filesReducer = (state, action) => {
     FILES_WRITE_ALL: () => {
       const { files } = action;
       return stateCopy.map(f => {
-        if (!f)
-          return f;
+        if (!f) return f;
         const [ edited ] = files.filter(fEdited =>
           f.name === fEdited.name &&
           f.filePath === fEdited.filePath
@@ -60,7 +59,8 @@ const filesReducer = (state, action) => {
         console.log(edited || f)
         return edited || f;
       });
-    }
+    },
+    FILES_CLOSE_ALL: () => []
   };
   const actionType = actions[action.type];
   return actionType ? actionType() : state;

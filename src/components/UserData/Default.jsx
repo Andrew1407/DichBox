@@ -67,7 +67,7 @@ const Default = () => {
         }
         { userData.ownPage && <p id="default-edit" onClick={ handeMenuChoice('editProfile') }>edit profile</p> }
         <p id="default-boxes" onClick={ handeMenuChoice('boxes') }>boxes</p>
-        { userData.ownPage && <p>subscriptions</p> }
+        { userData.ownPage && <p onClick={ handeMenuChoice('subscriptions') }>subscriptions</p> }
         { userData.ownPage && <p>notifications</p> }
       </div>
       <p className="default-extra" >

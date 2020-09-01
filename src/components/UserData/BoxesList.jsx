@@ -1,12 +1,30 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { BoxesContext } from '../../contexts/BoxesContext';
+import { MenuContext } from '../../contexts/MenuContext';
 
 const BoxesList = ({ searchInput, setMenuOption }) => {
   const history = useHistory();
   const { userData } = useContext(UserContext);
+  const { openedFiles, dispatchOpenedFiles } = useContext(MenuContext);
   const { setListOption, boxesList, listOption, setBoxesList } = useContext(BoxesContext);
+
+  const handleBoxClickClb = box => () => {
+    if (openedFiles.length) {
+      const file = openedFiles[0];
+      if (file) {
+        const filesBoxName = file.filePath
+          .split('/')[2];
+        if (filesBoxName !== box.name)
+          dispatchOpenedFiles({type: 'FILES_CLOSE_ALL' });
+      }
+    }
+    setBoxesList([]);
+    setListOption('all');
+    history.push(`/${box.owner_name}/${box.name}`);
+  };
+  const handleBoxClick = useCallback(handleBoxClickClb, [openedFiles]);
 
   let showBoxes = boxesList;
   if (!!searchInput || listOption !== 'all')
@@ -20,7 +38,7 @@ const BoxesList = ({ searchInput, setMenuOption }) => {
   return ( showBoxes.length ?
     <div id="boxes-list">
       { showBoxes.map(box => 
-        <div className="boxes-items" key={ `${box.name}, ${box.access_level}` } onClick={ () =>(setBoxesList([]), setListOption('all'), history.push(`/${box.owner_name}/${box.name}`)) } >
+        <div className="boxes-items" key={ `${box.name}, ${box.access_level}` } onClick={ handleBoxClick(box) } >
           <p>
             <span style={{ color: box.name_color }} >{ box.name }</span>
             <span className="item-access">({ box.access_level })</span>
