@@ -6,6 +6,7 @@ import { MenuContext } from '../contexts/MenuContext';
 import { BoxesContext } from '../contexts/BoxesContext';
 import SignForms from './SignForms/SignForms';
 import UserData from './UserData/UserData';
+import SearchList from './SearchList';
 import hideImg from '../styles/imgs/hide-arrow.png';
 import showImg from '../styles/imgs/show-arrow.png';
 import homeLogo from '../styles/imgs/home-icon.png';
@@ -25,7 +26,10 @@ const Menu = () => {
     menuOption,
     setMenuOption,
     menuVisible,
-    setMenuVisible
+    setMenuVisible,
+    searchStr,
+    setSearchStr,
+    setUsersList
   } = useContext(MenuContext);
   const history = useHistory();
   const handleArrowClick = modifier => e => {
@@ -46,15 +50,18 @@ const Menu = () => {
     setBoxDetails({});
     setBoxHiddenState(false);
     setPathEntries([]);
+    setUsersList(null)
+    if (searchStr)
+      setSearchStr('');
     if (`/${pathName}` !== currentPath)
       history.push('/' + pathName);
   };
   const handleHomeClick = useCallback(
     handleHomeClickClb,
-    [userData, username, pathName]
+    [userData, username, pathName, searchStr]
   );
   const homeIconVisible = (menuOption !== 'default') && username || 
-    history.location.pathname.split('/').length > 2;
+    history.location.pathname.split('/').length > 2 || searchStr;
 
   useEffect(() => {
     if (menuOption !== 'default')
@@ -68,6 +75,8 @@ const Menu = () => {
         <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
         <img src={ homeLogo } id="home-logo" onClick={ handleHomeClick } style={{ display: homeIconVisible ? 'block' : 'none' }} />
       </div>
+      { searchStr ?
+        <SearchList /> :
         <Switch>
           <Route exact path="/">
             { username && userData ? <Redirect to={'/' + username} /> : <SignForms /> }
@@ -76,6 +85,7 @@ const Menu = () => {
             <UserData />
           </Route>       
         </Switch>
+      }
     </menu> ) :
     <img src={ showImg } className="arrow" id="show" onClick={ handleArrowClick(true) } />
   );

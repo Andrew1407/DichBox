@@ -4,8 +4,8 @@ import { UserContext } from '../contexts/UserContext';
 import { MenuContext } from '../contexts/MenuContext';
 import { BoxesContext } from '../contexts/BoxesContext';
 import { VerifiersContext } from '../contexts/VerifiersContext';
-import HeaderSearch from './HeaderSearch';
 import defaultLogo from '../styles/imgs/default-user-logo.png';
+import searchLogo from '../styles/imgs/search.png';
 import '../styles/header.css';
 
 const Header = () => {
@@ -16,13 +16,35 @@ const Header = () => {
     pathName,
     dispatchUserData
   } = useContext(UserContext);
-  const { menuVisible, setMenuVisible } = useContext(MenuContext);
+  const { menuVisible, setMenuVisible, setSearchStr, searchStr, setUsersList } = useContext(MenuContext);
   const { dispatchDataInput, cleanWarnings } = useContext(VerifiersContext);
   const { setBoxesList, setBoxHiddenState, setBoxDetails } = useContext(BoxesContext);
   const [searchInput, setSearchInput] = useState('');
+  const handleSearchClick = () => {
+    if (searchInput)
+      setSearchStr(searchInput)
+  };
+
+  const handleSearchInput = e => {
+    const input = e.target.value;
+    setSearchInput(input);
+    if (searchStr)
+      setSearchStr(input)
+    else
+      setUsersList(null);
+  };
+
   const handleMenuClickClb = () => {
     const currentUsername = username || '';
     const currentPathName = pathName || '';
+    console.log(searchInput)
+    if (searchInput)
+      setSearchInput('');
+    if (searchStr) {
+      setUsersList(null);
+      setSearchStr('');
+      return;
+    }
     if (currentPathName === currentUsername) {
       setMenuVisible(!menuVisible);
     }
@@ -38,7 +60,10 @@ const Header = () => {
     dispatchDataInput({ type: 'CLEAN_DATA' });
     cleanWarnings();
   };
-  const handleMenuClick = useCallback(handleMenuClickClb, [username, menuVisible, pathName]);
+  const handleMenuClick = useCallback(
+    handleMenuClickClb,
+    [username, menuVisible, pathName, searchStr, searchInput]
+  );
   const backgroundColor = username ? 'rgb(50, 211, 240)' : 'grey';       //for image state
 
   return (
@@ -50,9 +75,9 @@ const Header = () => {
         <img src={defaultLogo} onClick={ handleMenuClick } style={{ backgroundColor }} /> 
       </div>
       <div id="header-search">
-        <input type="text" placeholder="search users" onChange={ e => setSearchInput(e.target.value) } />
+        <input value={ searchInput } type="text" placeholder="search users" onChange={ handleSearchInput } />
+        <img src={ searchLogo } onClick={ handleSearchClick } />
       </div>
-      <HeaderSearch {...{ searchInput }}/>
     </div>
   );
 };

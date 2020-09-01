@@ -5,11 +5,11 @@ import { MenuContext } from '../../contexts/MenuContext';
 import { UserContext } from '../../contexts/UserContext';
 import logoDefault from '../../styles/imgs/default-user-logo.png'
 import logoUnsubscribe from '../../styles/imgs/unsubscribe.png'
-import '../../styles/subscriptions.css';
+import '../../styles/users-list.css';
 
 const Subscriptions = () => {
   const history = useHistory();
-  const { subscriptions, setSubscriptions } = useContext(MenuContext);
+  const { usersList, setUsersList } = useContext(MenuContext);
   const { userData } = useContext(UserContext);
   const [searchInput, setSearchInput] = useState('');
   const shortenName = str => str.length < 20 ? str : `${str.slice(0, 19)}...`;
@@ -22,23 +22,23 @@ const Subscriptions = () => {
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/users/subscription`, unsubBody);
     if (data.unsubscribed)
-      setSubscriptions(subscriptions.filter(s => 
+      setUsersList(usersList.filter(s => 
         s.name !== subscriptionName
       ));
   };
   const handleUnsubscribe = useCallback(
     handleUnsubscribeClb,
-    [userData, subscriptions]
+    [userData, usersList]
   );
 
   const handlePersonClick = username => () => {
     history.push(`/${username}`);
-    setSubscriptions(null);
+    setUsersList(null);
   };
 
   let foundPersons = [];
-  if (subscriptions)
-    foundPersons = subscriptions.filter(s => s.name.includes(searchInput));
+  if (usersList)
+    foundPersons = usersList.filter(s => s.name.includes(searchInput));
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -46,10 +46,10 @@ const Subscriptions = () => {
       const { data } =  await axios.post(`${process.env.APP_ADDR}/users/subs_list`, subsBody);
       const { subs } = data;
       if (subs)
-        setSubscriptions(subs);
+        setUsersList(subs);
     };
 
-    if (!subscriptions && userData.name)
+    if (!usersList && userData.name)
       fetchSubscriptions();
   }, [userData]);
 
@@ -62,7 +62,7 @@ const Subscriptions = () => {
       </div>
       { !foundPersons.length ? 
         <div>
-          <h1 id="subs-empty">No subscriptions found</h1>
+          <h1 id="subs-empty">No subscriptions were found</h1>
         </div> :
         <div>
           { foundPersons.map(person =>
@@ -72,7 +72,7 @@ const Subscriptions = () => {
                 <span style={{ color: person.name_color }}>{ shortenName(person.name) }</span>
               </div>
               <img title={`Unsubscribe from "${person.name}"`} src={ logoUnsubscribe } onClick={ handleUnsubscribe(person.name) }/>
-            </div>  
+            </div>
           )}
         </div>
       }
