@@ -6,13 +6,21 @@ const filesReducer = (state, action) => {
   });
   const actions = {
     FILE_APPEND: () => {
+      const { file } = action;
+      const foundFiles = stateCopy.filter(f =>
+        f && file.name === f.name && file.filePath === `/${f.filePath}`
+      );
+      if (foundFiles.length)
+        return state;
       closeOpenedFile();
       const leftArray = stateCopy.length === 10 ?
         stateCopy.slice(0, -1) : stateCopy;
       return [ action.file, ...leftArray ]
     },
     FILE_CLOSE: () => {
-      const { index } = action;
+      const index = Number(action.index);
+      if (!state[index] || index < 0 || index >= state.length)
+        return state;
       if (state.length > 1 && state[index].opened) {
         const nextOpened = (index + 1) >= state.length ?
           (index - 1) : (index + 1);
@@ -56,11 +64,47 @@ const filesReducer = (state, action) => {
           f.name === fEdited.name &&
           f.filePath === fEdited.filePath
         );
-        console.log(edited || f)
         return edited || f;
       });
     },
-    FILES_CLOSE_ALL: () => []
+    FILES_CLOSE_ALL: () => [],
+    FILE_RENAME: () => {
+      const index = Number(action.index);
+      const { name } = action;
+      if (!state[index] || index < 0 || index >= state.length)
+        return state;
+      return stateCopy.map((f, i) => (
+        i === index ? ({ ...f, name }) : f
+      ));
+    },
+    FILES_RENAME_PATH: () => {
+      const { oldPath, newPath } = action;
+      const rightPath = new RegExp('^' + oldPath);
+      return stateCopy.map(f => {
+        if (!rightPath.test(f.filePath))
+          return f;
+        const filePath = f.filePath
+          .replace(rightPath, newPath);
+        return { ...f, filePath }; 
+      });
+    },
+    FILES_CLOSE_BY_PATH: () => {
+      const { dirPath } = action;
+      const rightPaph = dirPath[0] === '/' ? 
+        dirPath : '/' + dirPath;
+      const filtered = stateCopy.filter(f => 
+        !f.filePath.startsWith(rightPaph)
+      );
+      if (!filtered.length)
+        return [ null ];
+      const isOpened = filtered.reduce(((res, f) => 
+        res || f.opened
+      ), false);
+      if (isOpened)
+        return filtered;
+      filtered[0].opened = true;
+      return filtered;
+    } 
   };
   const actionType = actions[action.type];
   return actionType ? actionType() : state;

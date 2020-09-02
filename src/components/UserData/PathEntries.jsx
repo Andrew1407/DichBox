@@ -6,16 +6,18 @@ import { MenuContext } from '../../contexts/MenuContext';
 import { UserContext } from '../../contexts/UserContext';
 import fileLogo from '../../styles/imgs/file-icon.png';
 import dirLogo from '../../styles/imgs/folder-icon.png';
+import removeEntry from '../../styles/imgs/entry-remove.png';
+import renameEntry from '../../styles/imgs/entry-rename.png';
 import '../../styles/path-entries.css';
 
-const PathEntries = ({ entriesSearch }) => {
+const PathEntries = ({ entriesSearch, setFileManupulation, addFileVisible, setAddFileVisible }) => {
   const history = useHistory();
   const pathDepth = history.location.pathname
     .split('/').filter(x => x);
   const { pathEntries, fetchEntries, boxDetails } = useContext(BoxesContext);
   const { dispatchOpenedFiles, openedFiles, searchFileInOpenedList } = useContext(MenuContext);
   const { userData, username } = useContext(UserContext);
-
+  const shortenName = str => str.length < 17 ? str : `${str.slice(0, 16)}...`;
   const filteredSearch = pathEntries
     .filter(x => x && x.name.includes(entriesSearch));
 
@@ -56,12 +58,17 @@ const PathEntries = ({ entriesSearch }) => {
     [pathDepth, userData, username, openedFiles]
   );
 
+  const handleFileManipulation = (action, file) => () => {
+    if (addFileVisible)
+      setAddFileVisible('');
+    setFileManupulation({ ...file, action, pathDepth });
+  };
+
   useEffect(() => {
     if (!pathEntries.length && userData.editor !== undefined) {
       const initial = true;
       fetchEntries(pathDepth, initial);
     }
-
   }, [userData, boxDetails, history.location]);
 
   return (
@@ -74,9 +81,17 @@ const PathEntries = ({ entriesSearch }) => {
       }
       { !!filteredSearch.length && filteredSearch.map(unit =>
         !unit.name ? null : 
-        <div className="box-entries-item" key={ unit.name } onClick={ unit.type === 'dir' ? hadnleHistoryMove([...pathDepth, unit.name]) : handleClickFile(unit) } >
-          <img src={ unit.type === 'dir' ? dirLogo : fileLogo } />
-          <p>{ unit.name.length > 20 ? `${unit.name.slice(0, 19)}...` : unit.name }</p>
+        <div className="be-item-wrap" key={ unit.name }>
+          <div title={ unit.name } className="box-entries-item" onClick={ unit.type === 'dir' ? hadnleHistoryMove([...pathDepth, unit.name]) : handleClickFile(unit) } >
+            <img src={ unit.type === 'dir' ? dirLogo : fileLogo } />
+            <p>{ shortenName(unit.name) }</p>
+          </div>
+          { userData.editor &&
+            <div className="be-item-icons">
+              <img src={ renameEntry } onClick={ handleFileManipulation('rename', unit) }/>
+              <img src={ removeEntry } onClick={ handleFileManipulation('remove', unit) }/>
+            </div>
+          }
         </div>
       )}
       {  !!entriesSearch && !!pathEntries.length && !filteredSearch.length && 

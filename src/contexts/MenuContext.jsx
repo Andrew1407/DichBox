@@ -13,7 +13,8 @@ const MenuContextProvider = props => {
   const searchFileInOpenedListClb = (searchName, searchPath) => {
     for (const index in openedFiles) {
       const { name, filePath, opened } = openedFiles[index];
-      const found = searchName == name && searchPath === filePath;
+      const fp = filePath[0] === '/' ? filePath : `/${filePath}`;
+      const found = searchName === name && searchPath === fp;
       if (found)
         return { index, opened };
     }

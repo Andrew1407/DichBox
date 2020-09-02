@@ -7,6 +7,7 @@ import { MenuContext } from '../../contexts/MenuContext';
 import ConfirmModal from '../../modals/ConfirmModal';
 import BoxForm from './BoxForm';
 import AddFile from './AddFile';
+import FileManipulator from './FileManipulator';
 import PathEntries from './PathEntries';
 import trashBin from '../../styles/imgs/trash-bin.png';
 import addFileLogo from '../../styles/imgs/add-file.png';
@@ -22,6 +23,7 @@ const BoxEntries = () => {
   const [modalOptions, setModalOptions] = useState(null);
   const [entriesSearch, setEntriesSearch] = useState('');
   const [addFileVisible, setAddFileVisible] = useState('');
+  const [fileManipulation, setFileManupulation] = useState(null);
   const { setMenuOption, openedFiles, dispatchOpenedFiles } = useContext(MenuContext)
   const { userData, dispatchUserData, pathName, username } = useContext(UserContext);
   const { 
@@ -88,11 +90,14 @@ const BoxEntries = () => {
     const initial = false;
     const nextPath = [userData.name, ...boxPath.slice(0, pathEnd)];
     await fetchEntries(nextPath, initial);
+    setFileManupulation(null);
     history.push(`/${nextPath.join('/')}`);
   };
   const handleEntriesClick = useCallback(handleEntriesClickClb, [boxPath]);
 
   const handleAddFile = type => () => {
+    if (fileManipulation)
+      setFileManupulation(null);
     if (!addFileVisible || addFileVisible !== type)
       setAddFileVisible(type);
     else
@@ -152,12 +157,13 @@ const BoxEntries = () => {
                   { userData.ownPage && <img src={ trashBin } className="entries-imgs" onClick={ handleBoxRemove } />}
                   <img src={ boxMoreLogo } className="entries-imgs" onClick={ () => setBoxHiddenState(!boxInfoHidden) } />
                 </div>
-                <AddFile {...{ addFileVisible, pathName: boxPath }} />
+                <AddFile {...{ setAddFileVisible, addFileVisible, pathName: boxPath, fileManipulation }} />
+                <FileManipulator {...{ fileManipulation, pathName: boxPath, setFileManupulation, addFileVisible }} />
               </div>
 
               <div id="entries-search">
                 <label htmlFor="entriesSearch">search:</label>
-                <input type="text" name="entriesSearch" onChange={ handleEntriesSearch } />
+                <input spellCheck="false" type="text" name="entriesSearch" onChange={ handleEntriesSearch } />
               </div>
 
               <p id="box-entries-path">
@@ -168,7 +174,7 @@ const BoxEntries = () => {
             </div>
           </div>
         </div>
-        <PathEntries  {...{ entriesSearch }} />
+        <PathEntries  {...{ entriesSearch, setFileManupulation, addFileVisible, setAddFileVisible  }} />
         <input className="edit-btn" id="box-entries-back-btn" type="button" value="view user boxes" onClick={ handleViewBoxesClick } />
         <ConfirmModal { ...modalOptions } />
       </div>)

@@ -24,3 +24,22 @@
   padding-bottom: 4%;
   padding-top: 4%;
 }
+
+.be-item-wrap, .be-item-icons {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+}
+
+.be-item-wrap {
+  padding-right: 8%;
+}
+
+.be-item-icons > img {
+  height: 28px;
+}
+
+.be-item-icons > img:first-child {
+  margin-right: 40%;
+}

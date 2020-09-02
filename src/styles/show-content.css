@@ -36,10 +36,6 @@
   background: orange;
 }
 
-#opened-first {
-  border-left: 5px solid rgb(75, 73, 73);
-}
-
 .opened-file {
   display: flex;
   flex-direction: row;
@@ -53,6 +49,10 @@
 	-ms-transform: skewX(-25deg); 
 	-o-transform: skewX(-25deg); 
   transform: skewX(-25deg);
+}
+
+.opened-file:first-child {
+  border-left: 5px solid rgb(75, 73, 73);
 }
 
 .opened-file > * {

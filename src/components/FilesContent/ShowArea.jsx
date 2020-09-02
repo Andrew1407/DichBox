@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { MenuContext } from '../../contexts/MenuContext';
 import { UserContext } from '../../contexts/UserContext';
+import { BoxesContext } from '../../contexts/BoxesContext';
 import editLogo from '../../styles/imgs/file-edit.png';
 import cancelEditLogo from '../../styles/imgs/file-edit-cancel.png';
 import saveLogo from '../../styles/imgs/file-save.png';
@@ -13,6 +14,7 @@ import downloadLogo from '../../styles/imgs/file-download.png';
 const ShowArea = () => {
   const { openedFiles, dispatchOpenedFiles } = useContext(MenuContext);
   const { userData, username } = useContext(UserContext);
+  const { boxDetails, setBoxDetails } = useContext(BoxesContext);
   const [visibleFile, setVisibleFile] = useState(null);
   const [fontSize, setFontSize] = useState(140);
   const [editMode, setEditMode] = useState(false);
@@ -62,8 +64,8 @@ const ShowArea = () => {
   );
 
   const handleFileSaveClb = async () => {
-    const cancelled = !editMode &&
-      visibleFile.edited === undefined &&
+    const cancelled = !editMode ||
+      visibleFile.edited === undefined ||
       visibleFile.src === visibleFile.edited;
     if (cancelled)
       return;
@@ -77,13 +79,14 @@ const ShowArea = () => {
       editor: userData.editor,
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/save`, saveBody );
-    if (data.edited) {
-      const file = { ...visibleFile };
-      delete file.edited;
-      file.src = edited;
-      setVisibleFile(file);
-      dispatchOpenedFiles({ type: 'FILE_WRITE', file });
-    }
+    const { last_edited } = data;
+    if (!data.edited) return;
+    setBoxDetails({ ...boxDetails, last_edited });
+    const file = { ...visibleFile };
+    delete file.edited;
+    file.src = edited;
+    setVisibleFile(file);
+    dispatchOpenedFiles({ type: 'FILE_WRITE', file });
   };
   const handleFileSave = useCallback(
     handleFileSaveClb,
@@ -96,28 +99,30 @@ const ShowArea = () => {
       (f && f.edited === f.src || f.edited === undefined) ? 
         arr : [ ...arr, { filePathStr: `${f.filePath}/${f.name}`, src: f.edited } ]
     ), []);
+    if (!editedFiles.length) return;
     const saveBody = {
       files: editedFiles,
       editorName: username,
       editor: userData.editor
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/save`, saveBody );
-    if (data.edited) {
-      const files = openedFiles.map(file => {
-        const fileCopy = { ...file };
-        if (file.edited !== undefined)
-          fileCopy.src = file.edited;
-        delete fileCopy.edited;
-        return fileCopy;
-      });
-      const [ visibleCopy ] = files.filter(f => 
-        f.name === visibleFile.name &&
-        f.filePath === visibleFile.filePath
-      );
-      if (visibleCopy)
-        setVisibleFile(visibleCopy);
-      dispatchOpenedFiles({ type: 'FILES_WRITE_ALL', files });
-    }
+    const { edited, last_edited } = data;
+    if (!edited) return;
+    setBoxDetails({ ...boxDetails, last_edited });
+    const files = openedFiles.map(file => {
+      const fileCopy = { ...file };
+      if (file.edited !== undefined)
+        fileCopy.src = file.edited;
+      delete fileCopy.edited;
+      return fileCopy;
+    });
+    const [ visibleCopy ] = files.filter(f => 
+      f.name === visibleFile.name &&
+      f.filePath === visibleFile.filePath
+    );
+    if (visibleCopy)
+      setVisibleFile(visibleCopy);
+    dispatchOpenedFiles({ type: 'FILES_WRITE_ALL', files });
   }
 
   useEffect(() => {

@@ -9,7 +9,7 @@ export const BoxesContext = createContext();
 const BoxesContextProvider = props => {
   const history = useHistory();
   const { userData, username } = useContext(UserContext);
-  const { dispatchOpenedFiles, openedFiles } = useContext(MenuContext);
+  const { dispatchOpenedFiles } = useContext(MenuContext);
   const [boxesList, setBoxesList] = useState([]);
   const [listOption, setListOption] = useState('all');
   const [boxInfoHidden, setBoxHiddenState] = useState(false);

@@ -106,10 +106,6 @@
   font-size: 100%;
 }
 
-#be-add-file-warning > b {
-  color: red;
-}
-
 #entries-search {
   padding-top: 6%;
   text-align: left;
