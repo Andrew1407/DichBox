@@ -13,6 +13,8 @@ boxesRouter
   .post('/files/list', routes.getPathFiles)
   .post('/files/create', routes.createFile)
   .post('/files/save', routes.saveFile)
-  .post('/files/get', routes.getFile);
+  .post('/files/get', routes.getFile)
+  .post('/files/remove', routes.removeFile)
+  .post('/files/rename', routes.renameFile);
 
 export default boxesRouter;

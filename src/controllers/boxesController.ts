@@ -166,7 +166,7 @@ const createFile: middlewareFn = async (req: Request, res: Response) => {
     ownerName, viewerName, boxName, follower, editor
   );
   if (!checkup) { 
-    res.json({ created: null }).end();
+    res.json({}).end();
     return;
   }
   const edited: boxData = await clientDB.updateBox(
@@ -230,15 +230,12 @@ const saveFile: middlewareFn = async (req: Request, res: Response) => {
       .split('/')
       .splice(1)
   }));
-  const [ [ ownerName, boxName ], extraPath ]: string[][] = [
-    filesFormated[0].filePath.slice(0, 2),
-    filesFormated[0].filePath.slice(2),
-  ];
+  const [ ownerName, boxName ]: string[] = filesFormated[0].filePath.slice(0, 2);
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
     ownerName, editorName, boxName, true, editor
   );
   if (!checkup) { 
-    res.json({ foundData: null }).end();
+    res.json({}).end();
     return;
   }
   const filesWritted: boolean[] = await Promise.all(
@@ -249,8 +246,81 @@ const saveFile: middlewareFn = async (req: Request, res: Response) => {
   const edited: boolean = filesWritted.reduce(
     ((res, acc) => res && acc), true
   );
-  res.json({ edited }).end();
+  if (!edited) {
+    res.json({}).end();
+    return;
+  }
+  const editedMark: boxData = await clientDB.updateBox(
+    ownerName,
+    boxName,
+    { last_edited: 'now()' },
+  );
+  formatDate(editedMark);
+  res.json({ edited, last_edited: editedMark.last_edited }).end();
 };
+
+const removeFile: middlewareFn = async (req: Request, res: Response) => {
+  const { boxPath, viewerName, follower, fileName, editor, type }: {
+    boxPath: string[]
+    viewerName: string,
+    follower: boolean,
+    fileName: string,
+    editor: boolean,
+    type: entryType
+  } = req.body;
+  const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
+  const extraPath: string[] = boxPath.slice(2);
+  const checkup: [number, number]|null = await clientDB.checkBoxAccess(
+    ownerName, viewerName, boxName, follower, editor
+  );
+  if (!checkup) { 
+    res.json({}).end();
+    return;
+  }
+  const removed: boolean = 
+    await boxesStorage.removeFile(fileName, type, checkup, extraPath);
+  if (!removed) { 
+    res.json({}).end();
+    return;
+  } 
+  const edited: boxData = await clientDB.updateBox(
+    ownerName,
+    boxName,
+    { last_edited: 'now()' },
+  );
+  formatDate(edited);
+  res.json({ removed, last_edited: edited.last_edited }).end();
+};
+
+const renameFile: middlewareFn = async (req: Request, res: Response) => {
+  const { boxPath, viewerName, follower, fileName, editor, newName }: {
+    boxPath: string[]
+    viewerName: string,
+    follower: boolean,
+    fileName: string,
+    newName: string,
+    editor: boolean
+  } = req.body;
+  const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
+  const extraPath: string[] = boxPath.slice(2);
+  const checkup: [number, number]|null = await clientDB.checkBoxAccess(
+    ownerName, viewerName, boxName, follower, editor
+  );
+  if (!checkup) { 
+    res.json({}).end();
+    return;
+  }
+  const edited: boxData = await clientDB.updateBox(
+    ownerName,
+    boxName,
+    { last_edited: 'now()' },
+  );
+  formatDate(edited);
+  const renamed: boolean = 
+    await boxesStorage.renameFile(newName, fileName, checkup, extraPath);
+  res.json({ renamed, last_edited: edited.last_edited }).end();
+};
+
 
 export {
   createBox,
@@ -262,5 +332,7 @@ export {
   getPathFiles,
   createFile,
   getFile,
-  saveFile
+  saveFile,
+  removeFile,
+  renameFile
 };

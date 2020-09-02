@@ -102,6 +102,43 @@ export default class BoxesStorageManager extends StorageManager {
     return { type, [type]: { src, name } };
   }
 
+  public async removeFile(
+    name: string,
+    type: entryType,
+    ids: [number, number],
+    extraPath: string[]
+  ): Promise<boolean> {
+    const idsStr: string[] = ids.map(x => x.toString());
+    const filePath: string = path
+      .join('../DichStorage/boxes', ...idsStr, ...extraPath, name);
+    const exists: boolean = fs.existsSync(filePath);
+    if (!exists)
+      return false;
+    if (type === 'dir')
+      await this.removeDir('boxes', ...idsStr, ...extraPath, name);
+    else
+      await fs.promises.unlink(filePath);
+    return true;
+  }
+
+  public async renameFile(
+    newName: string,
+    name: string,
+    ids: [number, number],
+    extraPath: string[]
+  ): Promise<boolean> {
+    const idsStr: string[] = ids.map(x => x.toString());
+    const dirPath: string = path
+      .join('../DichStorage/boxes', ...idsStr, ...extraPath);
+    const [ oldPath, newPath ]: string[] = [ name, newName ]
+      .map(p => path.join(dirPath, p));
+    const exists: boolean = fs.existsSync(oldPath);
+    if (!exists)
+      return false;
+    await fs.promises.rename(oldPath, newPath);
+    return true;
+  }
+
   public async readFile(
     name: string,
     type: entryType,
