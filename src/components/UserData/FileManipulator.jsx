@@ -100,10 +100,18 @@ const FileManipulator = ({ setFileManupulation, fileManipulation, addFileVisible
     [openedFiles, userData, boxDetails, pathEntries, fileManipulation, renameInput]
   );
 
+  const correntInput = renameInput && !warning ?
+    'rgb(0, 255, 76)' : 'rgb(0, 217, 255)';
+  const OkBtnStyle = { 
+    color: correntInput,
+    borderColor: correntInput 
+  };
+
   useEffect(() => {
     setRenameInput('');
     setWarning('');
   }, [addFileVisible, fileManipulation]);
+
 
   return ( fileManipulation &&
     <div className="menu-form">
@@ -115,7 +123,7 @@ const FileManipulator = ({ setFileManupulation, fileManipulation, addFileVisible
         </div>
       }
       <div id="fm-btns">
-        <input type="button" value="ok" onClick={ fileManipulation.action === 'rename' ? handleRename : handleRemove }/>
+        <input type="button" value="ok" style={ fileManipulation.action === 'rename' ? OkBtnStyle : {} } onClick={ fileManipulation.action === 'rename' ? handleRename : handleRemove }/>
         <input type="button" value="cancel" onClick={ () => setFileManupulation(null) } />
       </div>
     </div> 
