@@ -39,7 +39,7 @@ const SingForms = () => {
     },
     passwd: {
       regExp: /^[\S]{5,20}$/,
-      warningRegExp: 'Password length should be 5-16 symbols (no spaces)',
+      warningRegExp: 'Password length should be 5-16 symbols (no spaces, and pat marks)',
     }
   };
   const signUpVerParams = {
