@@ -33,8 +33,8 @@ const SingForms = () => {
         'This email is not registered',
       fetchVerifier: async input => {
         const fetchData = fetchUserInput;
-        const { foundValue } = await fetchData('email', input);
-        return isSignUp ? foundValue === input : foundValue !== input;
+        const found = await fetchData('email', input);
+        return isSignUp ? found : !found;
       }
     },
     passwd: {
@@ -50,8 +50,8 @@ const SingForms = () => {
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
         const fetchData = fetchUserInput;
-        const { foundValue } = await fetchData('name', input);
-        return foundValue === input;
+        const found = await fetchData('name', input);
+        return found;
       }
     }
   };

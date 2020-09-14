@@ -58,7 +58,7 @@ const EditProfile = () => {
       warningRegExp: 'Incorrect email input form',
       warningFetch: 'This email is already taken',
       fetchVerifier: async input => {
-        const { foundValue } = await fetchUserInput('email', input);
+        const foundValue = await fetchUserInput('email', input);
         return foundValue === input && foundValue !== userData.email;
       }
     },
@@ -67,7 +67,7 @@ const EditProfile = () => {
       warningRegExp: 'Username length should be 1-40 symbols (unique, no spaces)',
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
-        const { foundValue } = await fetchUserInput('name', input);
+        const foundValue = await fetchUserInput('name', input);
         return foundValue === input && foundValue !== userData.name;
       }
     },
@@ -79,8 +79,8 @@ const EditProfile = () => {
       warningRegExp: 'Password length should be 5-16 symbols (no spaces)',
       warningFetch: 'Wrong password',
       fetchVerifier: async input => {
-        const { foundValue } = await fetchPasswdVer(userData.name, input);
-        return foundValue !== input;
+        const passwdCorrect = await fetchPasswdVer(userData.name, input);
+        return !passwdCorrect;
       }
     },
     newPasswd: {

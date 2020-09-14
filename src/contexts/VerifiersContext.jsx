@@ -28,12 +28,12 @@ const VerifiersContextProvider = props => {
   const fetchUserInput = async (inputField, inputValue) => {
     const verifyBody = { inputField, inputValue };
     const { data } = await axios.post(`${process.env.APP_ADDR}/users/verify`, verifyBody);
-    return data;
+    return data.foundValue;
   };
   const fetchPasswdVer = async (username, passwd) => {
     const passwdBody = { username, passwd };
     const { data } = await axios.post(`${process.env.APP_ADDR}/users/passwd_verify`, passwdBody);
-    return data;
+    return data.checked;
   }
   const useVerifiersClb = verParams => {
     const verFields = Object.keys(verParams);
