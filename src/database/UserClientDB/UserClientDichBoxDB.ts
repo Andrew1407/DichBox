@@ -1,8 +1,8 @@
 import { QueryResult } from 'pg';
-import ClientDichBoxDB from './ClientDichBoxDB';
-import { userData, subscribersData } from '../datatypes';
+import ClientDichBoxDB from '../ClientDichBoxDB';
+import { userData, subscribersData } from '../../datatypes';
 
-export default class UserClientDichBoxDB extends ClientDichBoxDB {
+export default abstract class UserClientDichBoxDB extends ClientDichBoxDB {
   public async insertUser(userData: userData): Promise<userData> {
     return await this.insertValue('users', userData, ['name', 'id']);
   }

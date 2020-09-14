@@ -1,8 +1,8 @@
 import { QueryResult } from 'pg';
-import ClientDichBoxDB from './ClientDichBoxDB';
-import { boxData } from '../datatypes';
+import ClientDichBoxDB from '../ClientDichBoxDB';
+import { boxData } from '../../datatypes';
 
-export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
+export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
   public async getBoxesList(
     viewerName: string,
     boxOwnerName: string,
@@ -247,21 +247,22 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
   }
 
   public async findUserBox(
-    owner_id: number,
-    name: string
+    username: number,
+    boxName: string
   ): Promise<boxData|null> {
-    const res: boxData[]|null =  await this.selectValues(
-      'boxes',
-      { owner_id, name },
-      ['name']
+    const res: boxData[]|null =  await this.selectJoinedValues(
+      ['boxes', 'users'],
+      ['owner_id', 'id'],
+      {}, ['a.name'],
+      `a.name = '${boxName}' and b.name = '${username}'`
     );
-    return res ? res[0] : null;
+    return res.length ? res[0] : null;
   }
 
   public async updateBox(
     ownerName: string,
     boxName: string,
-    boxData: boxData|null,
+    boxData: boxData,
     limitedlist: string[]|null = null,
     editorslist: string[]|null = null
   ): Promise<boxData|null> {
@@ -389,8 +390,7 @@ export default class BoxesClientDichBoxDB extends ClientDichBoxDB {
       const viewerRes: boxData[]|null = await this.selectValues(
         'users', { name: viewerName }, ['id']
       );
-      if (!viewerRes)
-        return null;
+      if (!viewerRes) return null;
       const viewerId: number = viewerRes[0].id;
       const args: [boxData, string[]] =
         [ { box_id: boxId, person_id: viewerId }, ['box_id'] ];

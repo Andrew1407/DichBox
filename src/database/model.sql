@@ -28,6 +28,17 @@ create table subscribers (
     on update cascade
 );
 
+-- users's notifications
+create table notificatons (
+  person_id int not null 
+    references users (id) 
+    on delete cascade
+    on update cascade,
+  type varchar(12) not null,
+  values int[2] default null,
+  extra varchar(40)[] default null
+);
+
 -- storage units
 create table boxes (
   id serial primary key,
@@ -38,7 +49,7 @@ create table boxes (
     on delete cascade
     on update cascade,
   access_level varchar(9) not null,
-  description varchar(200) default '',
+  description varchar(100) default '',
   description_color varchar(8) default '#00d9ff',
   reg_date timestamp default now(),
   last_edited timestamp default now()

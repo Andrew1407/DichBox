@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { boxData, pathEntries, entryType } from '../datatypes';
-import BoxesClientDichBoxDB from '../database/BoxesClientDichBoxDB';
+import BoxesDataConnector from '../database/BoxesClientDB/BoxesDataConnector';
 import BoxesStorageManager from '../storageManagers/BoxesStorageManager';
 
 type middlewareFn = (req: Request, res: Response) => Promise<void>;
@@ -11,7 +11,7 @@ type boxListRequest = {
 };
 
 const boxesStorage: BoxesStorageManager = new BoxesStorageManager();
-const clientDB: BoxesClientDichBoxDB = new BoxesClientDichBoxDB();
+const clientDB: BoxesDataConnector = new BoxesDataConnector();
 clientDB.clientConnection();
 
 const formatDate = (obj: any): void => {
@@ -51,9 +51,9 @@ const findUserBoxes: middlewareFn = async (req: Request, res: Response) => {
 };
 
 const verifyBoxName: middlewareFn = async (req: Request, res: Response) => {
-  const user_id: number = req.body.id;
+  const username: number = req.body.username;
   const boxName: string = req.body.boxName;
-  const foundBox: boxData|null = await clientDB.findUserBox(user_id, boxName);
+  const foundBox: boxData|null = await clientDB.findUserBox(username, boxName);
   const foundValue: string|null = foundBox ?
     foundBox.name : null;
   res.json({ foundValue }).end();

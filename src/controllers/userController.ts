@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { userData } from '../datatypes';
-import UserClientDichBoxDB from '../database/UserClientDichBoxDB';
+import UserDataConnector from '../database/UserClientDB/UserDataConnector';
 import UserStotageManager from '../storageManagers/UserStotageManager';
 
 type middlewareFn = (req: Request, res: Response) => Promise<void>;
@@ -14,9 +14,8 @@ type foundUser = {
   logo: string|null
 };
 
-
 const userStorage: UserStotageManager = new UserStotageManager;
-const clientDB: UserClientDichBoxDB = new UserClientDichBoxDB();
+const clientDB: UserDataConnector = new UserDataConnector();
 clientDB.clientConnection();
 
 const foundUsersMapper = async (user: userData): Promise<foundUser> => ({
@@ -28,6 +27,10 @@ const foundUsersMapper = async (user: userData): Promise<foundUser> => ({
 const signUpUser: middlewareFn = async (req: Request, res: Response) => {
   const clientData: userData = req.body;
   const inserted: userData = await clientDB.insertUser(clientData);
+  if (!inserted) {
+  res.json({}).end();
+  return;
+}
   await userStorage.createUserStorage(inserted.id);
   delete inserted.id;
   res.json(inserted).end();
@@ -61,10 +64,7 @@ const findUser: middlewareFn = async (req: Request, res: Response) => {
 const signInUser: middlewareFn = async (req: Request, res: Response) => {
   const email: string = req.body.email;
   const passwd: string = req.body.passwd;
-  const user: userData = await clientDB.getUserData(
-    { email, passwd },
-    ['name']
-  );
+  const user: userData = await clientDB.signInUser(email, passwd);
   const name: string|null = user ? user.name : null;
   res.json({ name }).end();
 };
@@ -72,24 +72,15 @@ const signInUser: middlewareFn = async (req: Request, res: Response) => {
 const verifyUserInput: middlewareFn = async (req: Request, res: Response) => {
   const inputValue: string = req.body.inputValue;
   const column: string = req.body.inputField;
-  const verifyField: userData = { [column]: inputValue };
-  const foundUser: userData = await clientDB.getUserData(
-    verifyField,
-    [column]
-  );
-  const foundValue: string|number|null = foundUser ? foundUser[column] : null;
+  const foundValue: string = await clientDB.checkColumn(column, inputValue);
   res.json({ foundValue }).end();
 };
 
 const verifyUserPassword: middlewareFn = async (req: Request, res: Response) => {
   const name: string = req.body.username;
   const passwd: string = req.body.passwd;
-  const foundUser: userData = await clientDB.getUserData(
-    { name, passwd },
-    ['passwd']
-  );
-  const foundValue: string = foundUser ? foundUser.passwd : null;
-  res.json({ foundValue }).end();
+  const checked: boolean = await clientDB.checkPasswd(name, passwd);
+  res.json({ checked }).end();
 };
 
 const editUser: middlewareFn = async (req: Request, res: Response) => {
@@ -215,5 +206,5 @@ export {
   getAccessLists,
   subscription,
   getSubscriptions,
-  searchUsers
+  searchUsers,
 };
