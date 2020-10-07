@@ -7,7 +7,8 @@ type userData = {
   reg_date?: Date|string,
   description?: string,
   name_color?: string,
-  description_color?: string
+  description_color?: string,
+  notifications?: number
 };
 
 type access_level = 'public'|'private'|'limited'|'invetee';
@@ -32,6 +33,21 @@ type boxData = {
 type subscribersData = {
   person_id?: number,
   subscription?: number
+};
+
+type notificationsData = {
+  id?: number,
+  person_id?: number,
+  type?: string,
+  param?: number|null,
+  extra_values?: string[]|null,
+  note_date?: Date|string,
+  user_name?: string,
+  user_color?: string,
+  box_name?: string,
+  box_color?: string,
+  msgEntries?: string[],
+  icon?: string|null
 };
 
 type dataElement = string|number|Date|number[];
@@ -66,5 +82,6 @@ export {
   pathEntries,
   dirEntries,
   fileEntries,
-  entryType
+  entryType,
+  notificationsData
 };

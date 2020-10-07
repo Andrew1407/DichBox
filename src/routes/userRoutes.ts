@@ -15,6 +15,8 @@ usersRouter
   .post('/access_lists', routes.getAccessLists)
   .post('/subs_list', routes.getSubscriptions)
   .post('/subscription', routes.subscription)
-  .post('/search', routes.searchUsers);
+  .post('/search', routes.searchUsers)
+  .post('/notifications_list', routes.getNotifications)
+  .post('/notifications_remove', routes.removeNotifications);
 
 export default usersRouter;

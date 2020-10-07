@@ -4,7 +4,7 @@ import {
   userData,
   boxData,
   dataElement,
-  subscribersData 
+  subscribersData, notificationsData 
 } from '../datatypes';
 
 dotenv.config();
@@ -49,7 +49,7 @@ export default class ClientDichBoxDB {
 
   protected async selectValues(
     table: string,
-    input: boxData|userData|subscribersData,
+    input: boxData|userData|subscribersData|notificationsData,
     output: string[] = ['*']
   ): Promise<any[]|null> {
     const [ keys, values, valuesTemplate ]: 
@@ -67,7 +67,7 @@ export default class ClientDichBoxDB {
   protected async selectJoinedValues(
     tables: string[],
     joinColumns: string[],
-    input: boxData|userData|subscribersData,
+    input: boxData|userData|subscribersData|notificationsData,
     output: string[] = ['*'],
     extraCondition: string = ''
   ): Promise<any[]> {

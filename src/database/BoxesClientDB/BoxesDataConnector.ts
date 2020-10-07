@@ -10,15 +10,32 @@ export default class BoxesDataConnector extends BoxesClientDichBoxDB {
     this.validator = new BoxValidator();
   }
 
+  private async checkTakenName(
+    ownerName: string,
+    boxName: string
+  ): Promise<boolean> {
+    const foundRes: { id: number }[] = await this.selectJoinedValues(
+      ['boxes', 'users'],
+      ['owner_id', 'id'],
+      {},
+      ['a.id'],
+      `a.name = '${boxName}' and b.name = '${ownerName}'`
+    );
+    return !!foundRes.length;
+  }
+
   public async insertBox(
     ownerName: string,
     boxData: boxData|null,
     limitedUsers: string[]|null,
     editors: string[]|null
   ): Promise<boxData|null> {
-    if (!boxData) return null;
+    if (!boxData || !boxData.name)
+      return null;
     const correctData: boolean = this.validator.checkDataCreated(boxData);
     if (!correctData) return null;
+    const nameTaken: boolean = await this.checkTakenName(ownerName, boxData.name);
+    if (nameTaken) return null;
     return await super.insertBox(ownerName, boxData, limitedUsers, editors);
   }
 
@@ -27,11 +44,14 @@ export default class BoxesDataConnector extends BoxesClientDichBoxDB {
     boxName: string,
     boxData: boxData|null,
     limitedlist: string[]|null = null,
-    editorslist: string[]|null = null
+    editorsList: string[]|null = null
   ): Promise<boxData|null> {
-    if (!boxData) return null;
-    const correctData: boolean = this.validator.checkDataEdited(boxData);
-    if (!correctData) return null;
-    return await super.updateBox(ownerName, boxName, boxData, limitedlist, editorslist);
+    if (boxData) {
+      const correctData: boolean = this.validator.checkDataEdited(boxData);
+      if (!correctData) return null;
+      const nameTaken: boolean = await this.checkTakenName(ownerName, boxData.name);
+      if (nameTaken) return null;  
+    }
+    return await super.updateBox(ownerName, boxName, boxData, limitedlist, editorsList);
   }
 }

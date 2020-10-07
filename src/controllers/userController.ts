@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { userData } from '../datatypes';
+import { notificationsData, userData } from '../datatypes';
 import UserDataConnector from '../database/UserClientDB/UserDataConnector';
 import UserStotageManager from '../storageManagers/UserStotageManager';
 
@@ -109,7 +109,7 @@ const editUser: middlewareFn = async (req: Request, res: Response) => {
 const removeUser: middlewareFn = async (req: Request, res: Response) => {
   const name: string = req.body.username;
   const rmAccess: string = req.body.confirmation;
-  if (rmAccess !==  'permitted') {
+  if (rmAccess !== 'permitted') {
     res.json({ removed: false }).end();
     return;
   }
@@ -194,6 +194,38 @@ const searchUsers: middlewareFn = async (req: Request, res: Response) => {
   res.json({ searched }).end();
 };
 
+const getNotifications: middlewareFn = async (req: Request, res: Response) => {
+  const name: string = req.body.name;
+  const notifications: notificationsData[] = await clientDB.getNotifications(name);
+  if (!notifications.length) {
+    res.json({ notifications }).end();
+    return;
+  }
+  const ntsMapper = async (n: notificationsData): Promise<notificationsData> => {
+    const icon: string|null = !n.param || n.param == -1 ?
+      null : await userStorage.getLogoIfExists(n.param);
+    const note_date: string = new Date(n.note_date)
+      .toLocaleString()
+      .replace(/\//g, '.');
+    delete n.extra_values;
+    delete n.param;
+    return { ...n, icon, note_date };
+  };
+  const ntsRes: notificationsData[] = await Promise.all(
+    notifications.map(ntsMapper)
+  );
+  res.json({ notifications: ntsRes }).end();
+};
+
+const removeNotifications: middlewareFn = async (req: Request, res: Response) => {
+  const { username, ntsIds }: {
+    username: string,
+    ntsIds: number[]
+  } = req.body;
+  const removed: boolean = await clientDB.removeNotifications(username, ntsIds);
+  res.json({ removed }).end()
+};
+
 export {
   findUser,
   signUpUser,
@@ -207,4 +239,6 @@ export {
   subscription,
   getSubscriptions,
   searchUsers,
+  getNotifications,
+  removeNotifications
 };

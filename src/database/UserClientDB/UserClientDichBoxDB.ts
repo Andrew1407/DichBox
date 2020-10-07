@@ -1,8 +1,16 @@
 import { QueryResult } from 'pg';
 import ClientDichBoxDB from '../ClientDichBoxDB';
-import { userData, subscribersData } from '../../datatypes';
+import { userData, subscribersData, notificationsData } from '../../datatypes';
 
 export default abstract class UserClientDichBoxDB extends ClientDichBoxDB {
+  private async getNotificationsAmount(id: number): Promise<number> {
+    const res: QueryResult = await this.poolClient.query(
+      'select count(*) as notifications from notifications where person_id = $1;',
+      [id]
+    );
+    return res.rows[0].notifications;
+  }
+
   public async insertUser(userData: userData): Promise<userData> {
     return await this.insertValue('users', userData, ['name', 'id']);
   }
@@ -25,20 +33,14 @@ export default abstract class UserClientDichBoxDB extends ClientDichBoxDB {
     values: userData,
     returning: string[] = ['*']
   ): Promise<userData|null> {
-    const res = await this.selectValues('users', values, returning);
-    return res ? res[0] : null;
+    const userRes: userData[]|null = await this.selectValues('users', values, returning);
+    if (!userRes) return null;
+    const notifications: number = await this.getNotificationsAmount(userRes[0].id);
+    return { ...userRes[0], notifications };
   }
 
   public async removeUser(id: number): Promise<void> {
-    const subscriptions: string =
-      'select subscription from subscribers where person_id = $1';
-    const queries: string[] = [
-      `update users set followers = (followers - 1) where id in (${subscriptions});`,
-      'delete from users where id = $1;'
-    ];
-    queries.forEach(async query =>
-      await this.poolClient.query(query, [id])
-    );
+    this.removeValue('users', { id });
   }
 
   // subscribers
@@ -150,5 +152,31 @@ export default abstract class UserClientDichBoxDB extends ClientDichBoxDB {
       `select id, name, name_color from users where name like \'%${nameTemplate}%\' order by followers desc;`
     );
     return foundRes.rows;
+  }
+
+  public async getNotifications(name: string): Promise<notificationsData[]> {
+    return await this.selectJoinedValues(
+      ['notifications', 'users'],
+      ['person_id', 'id'],
+      { name },
+      ['a.id', 'note_date', 'type', 'param', 'extra_values']
+    );
+  }
+
+  public async removeNotifications(
+    name: string,
+    ids: number[]
+  ): Promise<boolean> {
+    const userId: number|null = await this.getUserId(name);
+    if (!(userId && ids.length))
+      return false;
+    const queryStr: string = ids.length > 1 ?
+      `delete from notifications where person_id = $1 and id in (${ids});` :
+      `delete from notifications where person_id = $1 and id = ${ids[0]};`;
+    await this.poolClient.query(
+      queryStr,
+      [userId]
+    );
+    return true;
   }
 }

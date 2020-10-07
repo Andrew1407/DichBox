@@ -22,6 +22,17 @@ const formatDate = (obj: any): void => {
         .replace(/\//g, '.');
 };
 
+const checkPathes = (pathes: string[][]): boolean => {
+  for (const p of pathes)
+    for (const dir of p) {
+      const invalid: boolean =  /^(\.)+$/.test(dir) ||
+        /((\/)|((\/)(\.)+)|((\.)+)(\/))/.test(dir);
+      if (invalid)
+        return false;
+    }
+  return true;
+};
+
 const createBox: middlewareFn = async (req: Request, res: Response) => {
   const { boxData, logo, limitedUsers, editors, username }: {
     boxData: boxData,
@@ -139,6 +150,10 @@ const getPathFiles: middlewareFn = async (req: Request, res: Response) => {
   } = req.body;
   const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
   const extraPath: string[] = boxPath.slice(2);
+  if (!checkPathes([extraPath])) { 
+    res.json({ entries: null }).end();
+    return;
+  }
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
     ownerName, viewerName, boxName, follower, editor
   );
@@ -162,6 +177,10 @@ const createFile: middlewareFn = async (req: Request, res: Response) => {
   } = req.body;
   const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
   const extraPath: string[] = boxPath.slice(2);
+  if (!checkPathes([extraPath])) { 
+    res.json({ entries: null }).end();
+    return;
+  }
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
     ownerName, viewerName, boxName, follower, editor
   );
@@ -191,6 +210,10 @@ const getFile: middlewareFn = async (req: Request, res: Response) => {
   } = req.body;
   const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
   const extraPath: string[] = boxPath.slice(2);
+  if (!checkPathes([extraPath])) { 
+    res.json({ entries: null }).end();
+    return;
+  }
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
     ownerName, viewerName, boxName, follower, editor
   );
@@ -203,7 +226,7 @@ const getFile: middlewareFn = async (req: Request, res: Response) => {
   res.json({ foundData, found: true }).end();
 };
 
-const saveFile: middlewareFn = async (req: Request, res: Response) => {
+const saveFiles: middlewareFn = async (req: Request, res: Response) => {
   const { editor, editorName, files }: {
     editorName: string,
     editor: boolean,
@@ -230,6 +253,11 @@ const saveFile: middlewareFn = async (req: Request, res: Response) => {
       .split('/')
       .splice(1)
   }));
+  const formatedPathes: string[][] = filesFormated.map(f => f.filePath);
+  if (!checkPathes(formatedPathes)) { 
+    res.json({}).end();
+    return;
+  }
   const [ ownerName, boxName ]: string[] = filesFormated[0].filePath.slice(0, 2);
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
     ownerName, editorName, boxName, true, editor
@@ -270,6 +298,10 @@ const removeFile: middlewareFn = async (req: Request, res: Response) => {
   } = req.body;
   const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
   const extraPath: string[] = boxPath.slice(2);
+  if (!checkPathes([extraPath])) { 
+    res.json({}).end();
+    return;
+  }
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
     ownerName, viewerName, boxName, follower, editor
   );
@@ -303,6 +335,10 @@ const renameFile: middlewareFn = async (req: Request, res: Response) => {
   } = req.body;
   const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
   const extraPath: string[] = boxPath.slice(2);
+  if (!checkPathes([extraPath])) { 
+    res.json({}).end();
+    return;
+  }
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
     ownerName, viewerName, boxName, follower, editor
   );
@@ -321,7 +357,6 @@ const renameFile: middlewareFn = async (req: Request, res: Response) => {
   res.json({ renamed, last_edited: edited.last_edited }).end();
 };
 
-
 export {
   createBox,
   findUserBoxes,
@@ -332,7 +367,7 @@ export {
   getPathFiles,
   createFile,
   getFile,
-  saveFile,
+  saveFiles,
   removeFile,
   renameFile
 };
