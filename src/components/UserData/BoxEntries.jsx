@@ -120,6 +120,8 @@ const BoxEntries = () => {
         setBoxDetails(data);
         const editor = data.editor
         dispatchUserData({ type: 'REFRESH_DATA', data: { editor } });
+        if (boxErr)
+          setBoxErr(false);
       }
       else {
         setBoxErr(true);
@@ -128,7 +130,6 @@ const BoxEntries = () => {
 
     fetchBoxData();
   }, [userData]);
-
 
   return (
     !boxErr &&

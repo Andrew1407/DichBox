@@ -39,7 +39,7 @@ const BoxesContextProvider = props => {
       if (initial)
         setBoxErr(true);
       else
-      dispatchOpenedFiles({ type: 'FILE_APPEND', file });
+        dispatchOpenedFiles({ type: 'FILE_APPEND', file });
   };
   const fetchEntries = useCallback(fetchEntriesClb, [userData, history.location]);
 

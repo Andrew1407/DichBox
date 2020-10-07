@@ -8,6 +8,7 @@ import EditProfile from './EditProfile';
 import BoxForm from './BoxForm';
 import BoxEntries from './BoxEntries';
 import Subscriptions from './Subscriptions';
+import Notifications from './Notifications';
 
 const UserData = () => {
   const { setPathName, pathName } = useContext(UserContext);
@@ -23,7 +24,8 @@ const UserData = () => {
     editProfile: <EditProfile />,
     createBox: <BoxForm editParametrs={{ boxDetails: {} }} />,
     boxEntries: <BoxEntries />,
-    subscriptions: <Subscriptions />
+    subscriptions: <Subscriptions />,
+    notifications: <Notifications />
   };
 
   return (

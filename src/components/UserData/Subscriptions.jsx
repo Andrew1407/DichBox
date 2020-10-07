@@ -3,8 +3,8 @@ import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { MenuContext } from '../../contexts/MenuContext';
 import { UserContext } from '../../contexts/UserContext';
-import logoDefault from '../../styles/imgs/default-user-logo.png'
-import logoUnsubscribe from '../../styles/imgs/unsubscribe.png'
+import logoDefault from '../../styles/imgs/default-user-logo.png';
+import logoUnsubscribe from '../../styles/imgs/unsubscribe.png';
 import '../../styles/users-list.css';
 
 const Subscriptions = () => {

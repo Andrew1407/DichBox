@@ -4,8 +4,8 @@ import axios from 'axios';
 import { UserContext } from '../../contexts/UserContext';
 import { MenuContext } from '../../contexts/MenuContext';
 import ConfirmModal from '../../modals/ConfirmModal';
-import '../../styles/menu-default.css';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
+import '../../styles/menu-default.css';
 
 
 const Default = () => {
@@ -68,7 +68,11 @@ const Default = () => {
         { userData.ownPage && <p id="default-edit" onClick={ handeMenuChoice('editProfile') }>edit profile</p> }
         <p id="default-boxes" onClick={ handeMenuChoice('boxes') }>boxes</p>
         { userData.ownPage && <p onClick={ handeMenuChoice('subscriptions') }>subscriptions</p> }
-        { userData.ownPage && <p>notifications</p> }
+        { userData.ownPage && 
+          <p onClick={ handeMenuChoice('notifications') }>notifications
+            { !!(+userData.notifications) && <span style={{ color: 'orange' }}> ({ userData.notifications })</span> }
+          </p>
+        }
       </div>
       <p className="default-extra" >
         folowers:
