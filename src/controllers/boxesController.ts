@@ -71,10 +71,12 @@ const verifyBoxName: middlewareFn = async (req: Request, res: Response) => {
 };
 
 const getBoxDetais: middlewareFn = async (req: Request, res: Response) => {
-  const follower: boolean = req.body.follower;
-  const ownerName: string = req.body.ownerName;
-  const viewerName: string = req.body.viewerName;
-  const boxName: string = req.body.boxName;
+  const { follower, ownerName, viewerName, boxName }: {
+    follower: boolean,
+    ownerName: string,
+    viewerName: string,
+    boxName: string
+  } = req.body;
   const boxInfo: boxData|null = await clientDB.getBoxInfo(
     boxName, viewerName, ownerName, follower
   );
@@ -167,13 +169,14 @@ const getPathFiles: middlewareFn = async (req: Request, res: Response) => {
 };
 
 const createFile: middlewareFn = async (req: Request, res: Response) => {
-  const { boxPath, viewerName, follower, fileName, type, editor }: {
+  const { boxPath, viewerName, follower, fileName, type, editor, src }: {
     boxPath: string[]
     viewerName: string,
     follower: boolean,
     fileName: string,
     editor: boolean,
-    type: entryType
+    type: entryType,
+    src?: string
   } = req.body;
   const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
   const extraPath: string[] = boxPath.slice(2);
@@ -184,10 +187,6 @@ const createFile: middlewareFn = async (req: Request, res: Response) => {
   const checkup: [number, number]|null = await clientDB.checkBoxAccess(
     ownerName, viewerName, boxName, follower, editor
   );
-  if (!checkup) { 
-    res.json({}).end();
-    return;
-  }
   const edited: boxData = await clientDB.updateBox(
     ownerName,
     boxName,
@@ -195,7 +194,7 @@ const createFile: middlewareFn = async (req: Request, res: Response) => {
   );
   formatDate(edited);
   const created: pathEntries = 
-    await boxesStorage.addFile(fileName, type, checkup, extraPath);
+    await boxesStorage.addFile(fileName, type, checkup, extraPath, src);
   res.json({ created, last_edited: edited.last_edited }).end();
 };
 

@@ -52,7 +52,7 @@ type notificationsData = {
 
 type dataElement = string|number|Date|number[];
 
-type entryType = 'file'|'dir'|'img';
+type entryType = 'file'|'dir'|'image';
 
 type fileEntries = {
   name: string,

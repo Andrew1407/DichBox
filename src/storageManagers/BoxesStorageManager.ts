@@ -38,10 +38,14 @@ export default class BoxesStorageManager extends StorageManager {
     const dirMapper = async (name: string): Promise<dirEntries> => {
       const fullPath: string = path.join(dirPath, name);
       const nameStats: fs.Stats = await fs.promises.lstat(fullPath);
-      if (await nameStats.isFile())
-        return { name, type: 'file' };
-      else if (await nameStats.isDirectory())
+      if (await nameStats.isFile()) {
+        const isImage: boolean = /\.(png|jpeg|jpg|webp|tiff|raw|gif|bmp)$/.test(name);
+        const type: entryType = isImage ? 'image' : 'file';
+        return { name, type };
+      }
+      else if (await nameStats.isDirectory()) {
         return { name, type: 'dir' };
+      }
       return { name, type: 'file' };
     };
     const entries: dirEntries[] = await Promise.all(
@@ -69,8 +73,7 @@ export default class BoxesStorageManager extends StorageManager {
       return { dir: { src, name }, type: 'dir' };
     }
     if (await pathStats.isFile()) {
-      if (initial)
-        return null;
+      if (initial) return null;
       const src: string = await fs.promises.readFile(boxPath, 'utf-8');
       const dirPath: string[] = boxPath.split('/');
       const name: string = dirPath.pop();
@@ -85,7 +88,8 @@ export default class BoxesStorageManager extends StorageManager {
     name: string,
     type: entryType,
     ids: [number, number],
-    extraPath: string[]
+    extraPath: string[],
+    entries: string|null = null
   ): Promise<pathEntries|null> {
     const idsStr: string[] = ids.map(x => x.toString());
     const boxPath: string = path
@@ -98,8 +102,11 @@ export default class BoxesStorageManager extends StorageManager {
       await fs.promises.mkdir(filePath)
     else if (type === 'file')
       await fs.promises.writeFile(filePath, '');
+    else if (type === 'image')
+      await fs.promises.writeFile(filePath, entries);
     const src: dirEntries[] = await this.getDirEntries(boxPath);
-    return { type, [type]: { src, name } };
+    const typeKey: entryType = type === 'dir' ? 'dir' : 'file';
+    return { type, [typeKey]: { src, name } };
   }
 
   public async removeFile(
@@ -145,14 +152,12 @@ export default class BoxesStorageManager extends StorageManager {
     ids: [number, number],
     extraPath: string[]
   ): Promise<string|null> {
-    if (type === 'dir')
-      return null;
+    if (type === 'dir') return null;
     const idsStr: string[] = ids.map(x => x.toString());
     const boxPath: string = path
       .join('../DichStorage/boxes', ...idsStr, ...extraPath);
     const exists: boolean = fs.existsSync(boxPath);
-    if (!exists)
-      return null;
+    if (!exists) return null;
     const filePath: string = path.join(boxPath, name);
     const src: string = await fs.promises
       .readFile(filePath, 'utf-8');
