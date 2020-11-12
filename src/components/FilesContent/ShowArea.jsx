@@ -28,7 +28,7 @@ const ShowArea = () => {
     element.style.display = 'none';
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
-    element.removeChild(element);
+    document.removeChild(element)
   };
   const handleDownload = useCallback(handleDownloadClb, [visibleFile]);
 
@@ -146,17 +146,22 @@ const ShowArea = () => {
   return ( visibleFile &&
     <div id="show-area">
       <div id="edit-menu">
-        { userData.editor && (editMode ?
+        { visibleFile.type !== 'image' && userData.editor && (editMode ?
           <img title="Set view mode" src={ cancelEditLogo } onClick={ () => (handleCancelEdit(), setEditMode(false)) } /> :
           <img title="Set edit mode" src={ editLogo } onClick={ () => setEditMode(true) } />
         )}
-        { userData.editor && <img onClick={ handleFileSave } title={`Save changes into "${visibleFile.name}"`} src={ saveLogo } /> }
-        { userData.editor && <img onClick={ handleFilesSaveAll } title="Save changes into all opened files" src={ saveAllLogo } /> }
+        { visibleFile.type !== 'image' && userData.editor && <img onClick={ handleFileSave } title={`Save changes into "${visibleFile.name}"`} src={ saveLogo } /> }
+        { visibleFile.type !== 'image' && userData.editor && <img onClick={ handleFilesSaveAll } title="Save changes into all opened files" src={ saveAllLogo } /> }
         <img title="Zoom in" src={ zoomInLogo } onClick={ handleZoom('in') }  />
         <img title="Zoom out" src={ zoomOutLogo } onClick={ handleZoom('out') } />
         <img title={ `Download "${visibleFile.name}"` } src={ downloadLogo } onClick={ handleDownload } />
       </div>
-      <textarea {...{ spellCheck: false, onChange: handleTextInput, style: { fontSize: `${fontSize}%` }, disabled: !editMode, value: (visibleFile ? (typeof visibleFile.edited === 'string') ? visibleFile.edited : visibleFile.src : '') }}></textarea>
+      { visibleFile.type === 'image' ?
+        <div id="show-image">
+          <img src={ visibleFile.src } style={{ width: `${fontSize}%` }} />
+        </div> :
+        <textarea {...{ spellCheck: false, onChange: handleTextInput, style: { fontSize: `${fontSize}%` }, disabled: !editMode, value: (visibleFile ? (typeof visibleFile.edited === 'string') ? visibleFile.edited : visibleFile.src : '') }}></textarea>
+      }
     </div>
   );
 };

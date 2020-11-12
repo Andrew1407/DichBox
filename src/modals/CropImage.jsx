@@ -44,6 +44,7 @@ const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited }) => {
     );
     const base64Image = canvas.toDataURL('image/png');
     setLogoEdited(base64Image);
+    document.removeChild(canvas);
   };
   
   return (

@@ -35,14 +35,17 @@ const SearchList = () => {
   return (
     <div className="menu-form">
       <h1 id="search-list-header">Found users</h1>
-      { usersList && usersList.map(person => 
-        <div  className="search-list-display search-list-person" >
-          <div onClick={ handlePersonClick(person.name) } key={ person.name } className="search-list-data search-list-display">
-            <img src={ person.logo || logoDefault }/>
-            <span style={{ color: person.name_color }}>{ shortenName(person.name) }</span>
+      { usersList && usersList.filter(x => x).length ? 
+        usersList.map(person => 
+          <div className="search-list-display search-list-person" key={ person.name }>
+            <div onClick={ handlePersonClick(person.name) } className="search-list-data search-list-display">
+              <img src={ person.logo || logoDefault }/>
+              <span style={{ color: person.name_color }}>{ shortenName(person.name) }</span>
+            </div>
           </div>
-        </div>
-      )}
+        ) :
+        <h1 id="search-list-none">No users were found</h1>
+      }
     </div>
   );
 };

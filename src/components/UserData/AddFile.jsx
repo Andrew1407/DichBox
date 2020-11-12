@@ -10,6 +10,7 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
   const { username, userData } = useContext(UserContext);
   const { dispatchOpenedFiles } = useContext(MenuContext);
   const [nameInput, setNameInput] = useState('');
+  const [imageInput, setImageInput] = useState(null);
   const getInputWarningClb = () => {
     const inputValid = /^[^\s/]{1,40}$/;
     const nameExists = pathEntries
@@ -29,7 +30,7 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
   const correctColor = !warning && nameInput ? 'rgb(0, 255, 76)' : 'rgb(0, 217, 255)';
 
   const addNewFileClb = async () => {
-    const createBody = {
+    let createBody = {
       fileName: nameInput,
       type: addFileVisible,
       follower: userData.follower,
@@ -37,40 +38,72 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
       boxPath: [boxDetails.owner_name, ...pathName],
       editor: userData.editor
     };
+    createBody = addFileVisible === 'image' ?
+      { ...createBody, fileName: imageInput.name, src: imageInput.src } :
+      { ...createBody, fileName: nameInput };
+    
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/create`, createBody);
     const { created, last_edited } = data;
     if (!created) return;
     const { type, dir, file } = created;
-    const isFile = type === 'file';
-      setPathEntries(isFile ? file.src : dir.src);
+    const isFile = type === 'file' || type === 'image';
+    setPathEntries(isFile ? file.src : dir.src);
     if (isFile)
       dispatchOpenedFiles({ 
         type: 'FILE_APPEND',
         file: {
           name: file.name,
-          src: '',
+          src: type === 'image' ? imageInput.src : '',
           filePath: `/${userData.name}/${pathName.join('/')}`,
-          opened: true
+          opened: true,
+          type
         }
       });
     setBoxDetails({ ...boxDetails, last_edited });
     setNameInput('');
     setAddFileVisible('');
+    setImageInput(null);
   };
-  const addNewFile = useCallback(addNewFileClb, [nameInput, addFileVisible]);
+  const addNewFile = useCallback(
+    addNewFileClb,
+    [nameInput, addFileVisible, imageInput]
+  );
+
+  const writeImageClb = e => {
+    e.preventDefault();
+    const image = e.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(image);
+    reader.onloadend = () => setImageInput({
+      name: image.name,
+      src: reader.result
+    });
+  };
+  const writeImage = useCallback(writeImageClb, []);
 
   useEffect(() => {
-    if (fileManipulation || !addFileVisible)
-      setNameInput('')
+    if (fileManipulation || !addFileVisible) {
+      setNameInput('');
+      setImageInput(null);
+    } else if (addFileVisible !== 'image') {
+      setImageInput(null);
+    }
   }, [fileManipulation, addFileVisible]);
 
   return ( addFileVisible &&
-    <div id="be-add-file">
-      <label htmlFor="addFile">{addFileVisible} name:</label>
-      <input spellCheck="false" type="text" name="addFile" value={ nameInput } onChange={ e => setNameInput(e.target.value) } />
-      <input type="button" value="add" disabled={ warning || !nameInput } style={{ borderColor: correctColor, color: correctColor }} onClick={ addNewFile } />
-      { warning && !!nameInput && <i id="be-add-file-warning">{ warning }</i> }
-    </div>
+    ( addFileVisible === 'image' ?
+      <div id="be-add-file">
+        <label htmlFor="addFile">Select image: </label>
+        <input type="file" accept="image/*" onChange={ writeImage }/>
+        <input type="button" value="add" onClick={ addNewFile }/>
+      </div> :
+      <div id="be-add-file">
+        <label htmlFor="addFile">{ addFileVisible } name:</label>
+        <input spellCheck="false" type="text" name="addFile" value={ nameInput } onChange={ e => setNameInput(e.target.value) } />
+        <input type="button" value="add" disabled={ warning || !nameInput } style={{ borderColor: correctColor, color: correctColor }} onClick={ addNewFile } />
+        { warning && !!nameInput && <i id="be-add-file-warning">{ warning }</i> }
+      </div>
+    )
   );
 };
 

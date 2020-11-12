@@ -143,3 +143,28 @@
   font-family: "Driodc sans";
   src: url("./fonts/3947.ttf");
 }
+
+#show-image {
+  overflow: scroll;
+  margin-top: 0.5%;
+  border: 3px double grey;
+  height: 96%;
+}
+
+#show-image > img {
+  margin: 0.5%;
+}
+
+#show-image::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+#show-image::-webkit-scrollbar-thumb {
+  background: grey;
+}
+
+#show-image::-webkit-scrollbar-thumb:hover {
+  background: rgb(0, 217, 255);
+}
+

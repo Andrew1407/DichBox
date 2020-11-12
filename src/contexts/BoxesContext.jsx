@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
+import React, { createContext, useState, useContext, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { MenuContext } from './MenuContext';
@@ -42,7 +42,7 @@ const BoxesContextProvider = props => {
         dispatchOpenedFiles({ type: 'FILE_APPEND', file });
   };
   const fetchEntries = useCallback(fetchEntriesClb, [userData, history.location]);
-
+  
   return (
     <BoxesContext.Provider value={{ fetchEntries, boxErr, setBoxErr, pathEntries, setPathEntries, boxesList, setBoxesList, listOption, setListOption, boxInfoHidden, setBoxHiddenState, boxDetails, setBoxDetails, editBox, setEditBoxState }} >
       { props.children }

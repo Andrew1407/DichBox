@@ -49,7 +49,8 @@ const PathEntries = ({ entriesSearch, setFileManupulation, addFileVisible, setAd
       name: unit.name,
       src: foundData,
       filePath,
-      opened: true
+      opened: true,
+      type: unit.type
     };
     dispatchOpenedFiles({ type: 'FILE_APPEND', file });
   };

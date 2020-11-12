@@ -14,6 +14,7 @@ import addFileLogo from '../../styles/imgs/add-file.png';
 import addFolderLogo from '../../styles/imgs/add-folder.png';
 import boxMoreLogo from '../../styles/imgs/box-more.png';
 import boxEditLogo from '../../styles/imgs/box-edit.png';
+import addImage from '../../styles/imgs/add-image.png';
 import '../../styles/box-entries.css';
 
 
@@ -152,6 +153,7 @@ const BoxEntries = () => {
             <div id="entries-user-menu">
               <div id="entries-editor">
                 <div id="entries-options" style={{ justifyContent: userData.ownPage ? 'space-between' : boxDetails.editor ? 'space-around' : 'center' }} >
+                  { boxDetails.editor && <img src={ addImage } className="entries-imgs" onClick={ handleAddFile('image') } />}
                   { boxDetails.editor && <img src={ addFileLogo } className="entries-imgs" onClick={ handleAddFile('file') } />}
                   { boxDetails.editor && <img src={ addFolderLogo } className="entries-imgs" onClick={ handleAddFile('dir') } />}
                   { userData.ownPage && <img src={ boxEditLogo } className="entries-imgs" onClick={ () => setEditBoxState(true) } />}

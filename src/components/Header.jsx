@@ -22,22 +22,19 @@ const Header = () => {
   const [searchInput, setSearchInput] = useState('');
   const handleSearchClick = () => {
     if (searchInput)
-      setSearchStr(searchInput)
+      setSearchStr(searchInput);
   };
 
   const handleSearchInput = e => {
+    e.preventDefault();
     const input = e.target.value;
     setSearchInput(input);
-    if (searchStr)
-      setSearchStr(input)
-    else
-      setUsersList(null);
+    setSearchStr(searchStr || null);
   };
 
   const handleMenuClickClb = () => {
     const currentUsername = username || '';
     const currentPathName = pathName || '';
-    console.log(searchInput)
     if (searchInput)
       setSearchInput('');
     if (searchStr) {
@@ -47,8 +44,7 @@ const Header = () => {
     }
     if (currentPathName === currentUsername) {
       setMenuVisible(!menuVisible);
-    }
-    else {
+    } else {
       setMenuVisible(true);
       setPathName(username);
       dispatchUserData({ type: 'CLEAN_DATA' });
@@ -72,12 +68,12 @@ const Header = () => {
         <h1>DichBox</h1>
       </div>
       <div id="header-menu">
-        <img src={defaultLogo} onClick={ handleMenuClick } style={{ backgroundColor }} /> 
+        <img src={ defaultLogo } onClick={ handleMenuClick } style={{ backgroundColor }} /> 
       </div>
-      <div id="header-search">
+      <form id="header-search" onSubmit={ e => (e.preventDefault(), handleSearchClick()) }>
         <input value={ searchInput } type="text" placeholder="search users" onChange={ handleSearchInput } />
         <img src={ searchLogo } onClick={ handleSearchClick } />
-      </div>
+      </form>
     </div>
   );
 };
