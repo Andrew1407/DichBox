@@ -145,7 +145,7 @@ const ShowArea = () => {
 
   return ( visibleFile &&
     <div id="show-area">
-      <div id="edit-menu">
+      <div id="edit-menu" style={ visibleFile.type === 'image' ? { width: '10%', marginLeft: '88%' }: {} }>
         { visibleFile.type !== 'image' && userData.editor && (editMode ?
           <img title="Set view mode" src={ cancelEditLogo } onClick={ () => (handleCancelEdit(), setEditMode(false)) } /> :
           <img title="Set edit mode" src={ editLogo } onClick={ () => setEditMode(true) } />
@@ -154,7 +154,7 @@ const ShowArea = () => {
         { visibleFile.type !== 'image' && userData.editor && <img onClick={ handleFilesSaveAll } title="Save changes into all opened files" src={ saveAllLogo } /> }
         <img title="Zoom in" src={ zoomInLogo } onClick={ handleZoom('in') }  />
         <img title="Zoom out" src={ zoomOutLogo } onClick={ handleZoom('out') } />
-        <img title={ `Download "${visibleFile.name}"` } src={ downloadLogo } onClick={ handleDownload } />
+        { visibleFile.type !== 'image' && <img title={ `Download "${visibleFile.name}"` } src={ downloadLogo } onClick={ handleDownload } /> }
       </div>
       { visibleFile.type === 'image' ?
         <div id="show-image">

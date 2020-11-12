@@ -1,6 +1,7 @@
 #menu {
   padding: 1%;
   border-right: 4px solid rgb(75, 73, 73);
+  border-top: 2px solid rgb(75, 73, 73);
   min-width: 30%;
   max-width: 30%;
   flex-grow: 1;
