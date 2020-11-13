@@ -2,6 +2,7 @@
   flex-grow: 2;
   max-height: 1000px;
   border-left: 5px solid rgb(75, 73, 73);
+  border-top: 2px solid rgb(75, 73, 73);
   overflow: hidden;
   padding-bottom: 5%;
 }

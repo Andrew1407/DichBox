@@ -17,14 +17,22 @@ const Header = () => {
     pathName,
     dispatchUserData
   } = useContext(UserContext);
-  const { menuVisible, setMenuVisible, setSearchStr, searchStr, setUsersList } = useContext(MenuContext);
+  const {
+    menuVisible,
+    setMenuVisible,
+    setSearchStr,
+    searchStr,
+    setUsersList,
+    setFoundErr,
+    foundErr
+  } = useContext(MenuContext);
   const { dispatchDataInput, cleanWarnings } = useContext(VerifiersContext);
   const { setBoxesList, setBoxHiddenState, setBoxDetails } = useContext(BoxesContext);
   const [searchInput, setSearchInput] = useState('');
   const [hidden, setHidden] = useState(false);
   const handleSearchClick = () => {
-    if (searchInput)
-      setSearchStr(searchInput);
+    if (foundErr) setFoundErr(null);
+    if (searchInput) setSearchStr(searchInput);
   };
 
   const handleSearchInput = e => {
@@ -37,8 +45,7 @@ const Header = () => {
   const handleMenuClickClb = () => {
     const currentUsername = username || '';
     const currentPathName = pathName || '';
-    if (searchInput)
-      setSearchInput('');
+    if (searchInput) setSearchInput('');
     if (searchStr) {
       setUsersList(null);
       setSearchStr('');
@@ -53,6 +60,7 @@ const Header = () => {
       setBoxDetails({});
       setBoxesList([]);
       setBoxHiddenState(false);
+      if (foundErr) setFoundErr(null);
       history.push('/');
     }
     dispatchDataInput({ type: 'CLEAN_DATA' });
@@ -60,7 +68,7 @@ const Header = () => {
   };
   const handleMenuClick = useCallback(
     handleMenuClickClb,
-    [username, menuVisible, pathName, searchStr, searchInput]
+    [username, menuVisible, pathName, searchStr, searchInput, foundErr]
   );
   const backgroundColor = username ? 'rgb(50, 211, 240)' : 'grey';       //for image state
 

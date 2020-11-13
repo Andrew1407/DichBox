@@ -9,10 +9,11 @@ import BoxForm from './BoxForm';
 import BoxEntries from './BoxEntries';
 import Subscriptions from './Subscriptions';
 import Notifications from './Notifications';
+import Errors from '../Errors/Errors';
 
 const UserData = () => {
   const { setPathName, pathName } = useContext(UserContext);
-  const { menuOption } = useContext(MenuContext);
+  const { menuOption, foundErr } = useContext(MenuContext);
   const { username } = useParams();
   useEffect(() => {
     if (username !== pathName)
@@ -34,7 +35,7 @@ const UserData = () => {
         { menuChioces.boxEntries }
       </Route>
       <Route expact path="/:username">
-        { menuChioces[menuOption] }
+        { foundErr ? <Errors /> : menuChioces[menuOption] }
       </Route>
     </Switch>
   );

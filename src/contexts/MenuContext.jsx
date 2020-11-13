@@ -9,6 +9,7 @@ const MenuContextProvider = props => {
   const [openedFiles, dispatchOpenedFiles] = useReducer(filesReducer, []);
   const [usersList, setUsersList] = useState(null);
   const [searchStr, setSearchStr] = useState(null);
+  const [foundErr, setFoundErr] = useState(null);
 
   const searchFileInOpenedListClb = (searchName, searchPath) => {
     for (const index in openedFiles) {
@@ -23,7 +24,7 @@ const MenuContextProvider = props => {
   const searchFileInOpenedList = useCallback(searchFileInOpenedListClb, [openedFiles]);
 
   return (
-    <MenuContext.Provider value={{ searchStr, setSearchStr, usersList, setUsersList, searchFileInOpenedList, openedFiles, dispatchOpenedFiles, menuVisible, setMenuVisible, menuOption, setMenuOption }}>
+    <MenuContext.Provider value={{ foundErr, setFoundErr, searchStr, setSearchStr, usersList, setUsersList, searchFileInOpenedList, openedFiles, dispatchOpenedFiles, menuVisible, setMenuVisible, menuOption, setMenuOption }}>
       { props.children }
     </MenuContext.Provider>
   );

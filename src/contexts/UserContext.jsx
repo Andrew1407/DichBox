@@ -1,6 +1,7 @@
-import React, { createContext, useState, useEffect, useReducer } from 'react';
+import React, { createContext, useState, useEffect, useReducer, useContext } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import { MenuContext } from './MenuContext';
 import  userDataReducer from '../reducers/userDataReducer';
 import  usernameReducer from '../reducers/usernameReducer';
 
@@ -8,6 +9,7 @@ export const UserContext = createContext();
 
 const UserContextProvider = props => {
   const history = useHistory();
+  const { setFoundErr, foundErr } = useContext(MenuContext);
   const getPathName = () => history
     .location
     .pathname
@@ -20,8 +22,14 @@ const UserContextProvider = props => {
     const fetchUserData = async () => {
       if (pathName && pathName.length) {
         const findBody = { username, pathName };
-        const { data } = await axios.post(`${process.env.APP_ADDR}/users/find`, findBody);
-        dispatchUserData({ type: 'REFRESH_DATA', data });
+        try {
+          const { data } = await axios.post(`${process.env.APP_ADDR}/users/find`, findBody);
+          dispatchUserData({ type: 'REFRESH_DATA', data });
+        } catch (e) {
+          const { status, data } = e.response;
+          const errType = status === 404 ? 'user' : 'server'; 
+          setFoundErr([errType, data.msg]);
+        }
       }
     };
     

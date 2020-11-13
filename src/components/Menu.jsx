@@ -29,7 +29,9 @@ const Menu = () => {
     setMenuVisible,
     searchStr,
     setSearchStr,
-    setUsersList
+    setUsersList,
+    setFoundErr,
+    foundErr
   } = useContext(MenuContext);
   const history = useHistory();
   const handleArrowClick = modifier => e => {
@@ -50,15 +52,15 @@ const Menu = () => {
     setBoxDetails({});
     setBoxHiddenState(false);
     setPathEntries([]);
-    setUsersList(null)
-    if (searchStr)
-      setSearchStr('');
+    setUsersList(null);
+    if (foundErr) setFoundErr(null);
+    if (searchStr) setSearchStr('');
     if (`/${pathName}` !== currentPath)
       history.push('/' + pathName);
   };
   const handleHomeClick = useCallback(
     handleHomeClickClb,
-    [userData, username, pathName, searchStr]
+    [userData, username, pathName, searchStr, foundErr]
   );
   const homeIconVisible = (menuOption !== 'default') && username || 
     history.location.pathname.split('/').length > 2 || searchStr;
