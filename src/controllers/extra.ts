@@ -68,7 +68,7 @@ export const getMiddlewares = (handlers: boxesRouters|userRouters): any => {
         const result: responseTuple = await handler(req);
         sendResponse(res, ...result);
       } catch {
-        const msg: string = 'It\'s a sercet, but something terrible happened on the DichBox server...';
+        const msg: string = 'It\'s a secret, but something terrible happened on the DichBox server...';
         sendResponse(res, 500, { msg });
       }
     };
