@@ -32,7 +32,7 @@ const UserData = () => {
   return (
     <Switch>
       <Route path="/:username/:box">
-        { menuChioces.boxEntries }
+        { foundErr ? <Errors /> : menuChioces.boxEntries }
       </Route>
       <Route expact path="/:username">
         { foundErr ? <Errors /> : menuChioces[menuOption] }

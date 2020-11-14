@@ -146,57 +146,52 @@ const BoxEntries = () => {
   }, [userData]);
 
 
-  return (
-    foundErr ?
-      <Errors /> :
-      ( editBox ? 
-        <BoxForm editParametrs={{ setEditBoxState, boxDetails, edit: true }} /> :
-        <div className="menu-form">
-          <div>
-            { !boxInfoHidden && boxDetails.logo && <img id="entries-logo" src={ boxDetails.logo }/> }
-            <div className="name-desc">
-              { !boxInfoHidden &&
-                <div>
-                  <p className="nd-name" style={{ color: boxDetails.name_color }} >{ boxDetails.name }</p>
-                  <p className="nd-desc" style={{ color: boxDetails.description_color }} >{ boxDetails.description }</p>
-                  <p id="nd-owner">Creator: <span style={{ color: boxDetails.owner_nc }}>{ boxDetails.owner_name }</span></p>
-                  <p id="nd-box-type" >Type: <span>{ boxDetails.access_level }</span></p>
-                  <p className="nd-box-info" >Created: <span>{ boxDetails.reg_date }</span></p>
-                  <p className="nd-box-info" id="last-edited" >Last edited: <span>{ boxDetails.last_edited }</span></p>
-                </div>
-              }
-              <div id="entries-user-menu">
-                <div id="entries-editor">
-                  <div id="entries-options" style={{ justifyContent: userData.ownPage ? 'space-between' : boxDetails.editor ? 'space-around' : 'center' }} >
-                    { boxDetails.editor && <img src={ addImage } className="entries-imgs" onClick={ handleAddFile('image') } />}
-                    { boxDetails.editor && <img src={ addFileLogo } className="entries-imgs" onClick={ handleAddFile('file') } />}
-                    { boxDetails.editor && <img src={ addFolderLogo } className="entries-imgs" onClick={ handleAddFile('dir') } />}
-                    { userData.ownPage && <img src={ boxEditLogo } className="entries-imgs" onClick={ () => setEditBoxState(true) } />}
-                    { userData.ownPage && <img src={ trashBin } className="entries-imgs" onClick={ handleBoxRemove } />}
-                    <img src={ boxMoreLogo } className="entries-imgs" onClick={ () => setBoxHiddenState(!boxInfoHidden) } />
-                  </div>
-                  <AddFile {...{ setAddFileVisible, addFileVisible, pathName: boxPath, fileManipulation }} />
-                  <FileManipulator {...{ fileManipulation, pathName: boxPath, setFileManupulation, addFileVisible }} />
-                </div>
-
-                <div id="entries-search">
-                  <label htmlFor="entriesSearch">search:</label>
-                  <input spellCheck="false" type="text" name="entriesSearch" onChange={ handleEntriesSearch } />
-                </div>
-
-                <p id="box-entries-path">
-                  { boxPath.map((x, i) => 
-                    <span {...{ onClick: handleEntriesClick(i), key: i, id: i ? '' : 'be-path-first', style: i ? {} : { color: boxDetails.name_color } }} >{ i ? ` / ${x}` : x }</span>
-                  )}
-                </p>
-              </div>
+  return ( editBox ? 
+    <BoxForm editParametrs={{ setEditBoxState, boxDetails, edit: true }} /> :
+    <div className="menu-form">
+      <div>
+        { !boxInfoHidden && boxDetails.logo && <img id="entries-logo" src={ boxDetails.logo }/> }
+        <div className="name-desc">
+          { !boxInfoHidden &&
+            <div>
+              <p className="nd-name" style={{ color: boxDetails.name_color }} >{ boxDetails.name }</p>
+              <p className="nd-desc" style={{ color: boxDetails.description_color }} >{ boxDetails.description }</p>
+              <p id="nd-owner">Creator: <span style={{ color: boxDetails.owner_nc }}>{ boxDetails.owner_name }</span></p>
+              <p id="nd-box-type" >Type: <span>{ boxDetails.access_level }</span></p>
+              <p className="nd-box-info" >Created: <span>{ boxDetails.reg_date }</span></p>
+              <p className="nd-box-info" id="last-edited" >Last edited: <span>{ boxDetails.last_edited }</span></p>
             </div>
+          }
+          <div id="entries-user-menu">
+            <div id="entries-editor">
+              <div id="entries-options" style={{ justifyContent: userData.ownPage ? 'space-between' : boxDetails.editor ? 'space-around' : 'center' }} >
+                { boxDetails.editor && <img src={ addImage } className="entries-imgs" onClick={ handleAddFile('image') } />}
+                { boxDetails.editor && <img src={ addFileLogo } className="entries-imgs" onClick={ handleAddFile('file') } />}
+                { boxDetails.editor && <img src={ addFolderLogo } className="entries-imgs" onClick={ handleAddFile('dir') } />}
+                { userData.ownPage && <img src={ boxEditLogo } className="entries-imgs" onClick={ () => setEditBoxState(true) } />}
+                { userData.ownPage && <img src={ trashBin } className="entries-imgs" onClick={ handleBoxRemove } />}
+                <img src={ boxMoreLogo } className="entries-imgs" onClick={ () => setBoxHiddenState(!boxInfoHidden) } />
+              </div>
+              <AddFile {...{ setAddFileVisible, addFileVisible, pathName: boxPath, fileManipulation }} />
+              <FileManipulator {...{ fileManipulation, pathName: boxPath, setFileManupulation, addFileVisible }} />
+            </div>
+
+            <div id="entries-search">
+              <label htmlFor="entriesSearch">search:</label>
+              <input spellCheck="false" type="text" name="entriesSearch" onChange={ handleEntriesSearch } />
+            </div>
+            <p id="box-entries-path">
+              { boxPath.map((x, i) => 
+                <span {...{ onClick: handleEntriesClick(i), key: i, id: i ? '' : 'be-path-first', style: i ? {} : { color: boxDetails.name_color } }} >{ i ? ` / ${x}` : x }</span>
+              )}
+            </p>
           </div>
-          <PathEntries  {...{ entriesSearch, setFileManupulation, addFileVisible, setAddFileVisible  }} />
-          <input className="edit-btn" id="box-entries-back-btn" type="button" value="view user boxes" onClick={ handleViewBoxesClick } />
-          <ConfirmModal { ...modalOptions } />
         </div>
-      )
+      </div>
+      <PathEntries  {...{ entriesSearch, setFileManupulation, addFileVisible, setAddFileVisible  }} />
+      <input className="edit-btn" id="box-entries-back-btn" type="button" value="view user boxes" onClick={ handleViewBoxesClick } />
+      <ConfirmModal { ...modalOptions } />
+    </div>  
   );
 };
 
