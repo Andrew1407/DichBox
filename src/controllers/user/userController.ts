@@ -39,7 +39,7 @@ const userController: userRouters = {
     const ownPage: boolean = name === username;
     const user: userData = await clientDB.getUserData({ name });
     if (!user) {
-      const msg: string = 'The searched digital twin wasn\'t found in DichBox system...';
+      const msg: string = 'The searched digital twin wasn\'t found in the DichBox system...';
       return makeTuple(404, { msg });
     }
     let userRes: userData & {
@@ -68,7 +68,7 @@ const userController: userRouters = {
     const name: string|null = user ? user.name : null;
     return name ?
       makeTuple(200, { name }) :
-      makeTuple(404, { msg: 'The searched digital twin wasn\'t found in DichBox system...' });
+      makeTuple(404, { msg: 'The searched digital twin wasn\'t found in the DichBox system...' });
   },
 
   async verifyUserInput(req: Request) {
@@ -171,7 +171,7 @@ const userController: userRouters = {
     const name: string = req.body.name;
     const foundPersons: userData[]|null = await clientDB.getUserSubsciptions(name);
     if (!foundPersons) {
-      const msg: string = 'The searched digital twin wasn\'t found in DichBox system...';
+      const msg: string = 'The searched digital twin wasn\'t found in the DichBox system...';
       return makeTuple(404, { msg });
     }
     const subs: foundUser[] = await Promise.all(
