@@ -81,7 +81,7 @@ const boxesController: boxesRouters = {
       username, boxName, boxData, limitedList, editorsList
     );
     if (!updated) {
-      const msg: string = 'Well, invald data...';
+      const msg: string = 'Well, invalid data...';
       return makeTuple(400, { msg });
     }
     if (logo) await (logo === 'removed') ?
@@ -130,7 +130,7 @@ const boxesController: boxesRouters = {
     } = req.body;
     const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
     const extraPath: string[] = boxPath.slice(2);
-    const msg: string = 'Nothing is here. No fies, no directories...';
+    const msg: string = 'Nothing is here. No files, no directories...';
     if (!checkPathes([extraPath]))
       return makeTuple(404, { msg });
     const checkup: [number, number]|null = await clientDB.checkBoxAccess(
@@ -244,7 +244,7 @@ const boxesController: boxesRouters = {
       ((res, acc) => res && acc), true
     );
     if (!edited) {
-      const msg: string = 'Very big problems with DichBox server.';
+      const msg: string = 'Very big problems with the DichBox server.';
       return makeTuple(500, { msg });
     }
     const editedMark: boxData = await clientDB.updateBox(
