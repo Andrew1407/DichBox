@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { notificationsData, userData } from '../../datatypes';
 import { userRouters, makeTuple } from '../extra';
+import { statuses, errMessages } from '../statusInfo';
 import UserDataConnector from '../../database/UserClientDB/UserDataConnector';
 import UserStotageManager from '../../storageManagers/UserStotageManager';
 
@@ -25,12 +26,12 @@ const userController: userRouters = {
     const clientData: userData = req.body;
     const inserted: userData = await clientDB.insertUser(clientData);
     if (!inserted) {
-      const msg: string = 'We just can\'t sign you up!';
-      return makeTuple(400, { msg });
+      const msg: string = errMessages.USER_INVAID_REQUEST;
+      return makeTuple(statuses.BAD_REQUEST, { msg });
     }
     await userStorage.createUserStorage(inserted.id);
     delete inserted.id;
-    return makeTuple(201, inserted);
+    return makeTuple(statuses.CREATED, inserted);
   },
 
   async findUser(req: Request) {
@@ -39,8 +40,8 @@ const userController: userRouters = {
     const ownPage: boolean = name === username;
     const user: userData = await clientDB.getUserData({ name });
     if (!user) {
-      const msg: string = 'The searched digital twin wasn\'t found in the DichBox system...';
-      return makeTuple(404, { msg });
+      const msg: string = errMessages.USER_NOT_FOUND;
+      return makeTuple(statuses.NOT_FOUND, { msg });
     }
     let userRes: userData & {
       follower?: boolean,
@@ -58,7 +59,7 @@ const userController: userRouters = {
       userRes.follower = follower;
     }
     delete userRes.id;
-    return makeTuple(200, { ...userRes, ownPage });
+    return makeTuple(statuses.OK, { ...userRes, ownPage });
   },
 
   async signInUser(req: Request) {
@@ -67,22 +68,22 @@ const userController: userRouters = {
     const user: userData = await clientDB.signInUser(email, passwd);
     const name: string|null = user ? user.name : null;
     return name ?
-      makeTuple(200, { name }) :
-      makeTuple(404, { msg: 'The searched digital twin wasn\'t found in the DichBox system...' });
+      makeTuple(statuses.OK, { name }) :
+      makeTuple(statuses.NOT_FOUND, { msg: errMessages.USER_NOT_FOUND });
   },
 
   async verifyUserInput(req: Request) {
     const inputValue: string = req.body.inputValue;
     const column: string = req.body.inputField;
     const foundValue: string = await clientDB.checkColumn(column, inputValue);
-    return makeTuple(200, { foundValue });
+    return makeTuple(statuses.OK, { foundValue });
   },
 
   async verifyUserPassword(req: Request) {
     const name: string = req.body.username;
     const passwd: string = req.body.passwd;
     const checked: boolean = await clientDB.checkPasswd(name, passwd);
-    return makeTuple(200, { checked });
+    return makeTuple(statuses.OK, { checked });
   },
 
   async editUser(req: Request) {
@@ -105,22 +106,22 @@ const userController: userRouters = {
         const savedLogo: string = await userStorage.saveLogo(editedLogo, id);
         editedResponse.logo = savedLogo;
       }
-    return makeTuple(200, editedResponse);
+    return makeTuple(statuses.OK, editedResponse);
   },
 
   async removeUser(req: Request) {
     const name: string = req.body.username;
     const rmAccess: string = req.body.confirmation;
     if (rmAccess !== 'permitted') {
-      const msg: string = 'Forbidden for you!!!';
-      return makeTuple(403, { msg });
+      const msg: string = errMessages.FORBIDDEN;
+      return makeTuple(statuses.FORBIDDEN, { msg });
     }
     const id: number = await clientDB.getUserId(name);
     await Promise.all([
       userStorage.removeUser(id),
       clientDB.removeUser(id)
     ]);
-    return makeTuple(200, { removed: true });
+    return makeTuple(statuses.OK, { removed: true });
   },
   
   async findUsernames(req: Request) {
@@ -132,7 +133,7 @@ const userController: userRouters = {
       foundUsers = await Promise.all(
         usernames.map(foundUsersMapper)
       );
-    return makeTuple(200, { foundUsers });
+    return makeTuple(statuses.OK, { foundUsers });
   },
 
   async getAccessLists(req: Request) {
@@ -145,7 +146,7 @@ const userController: userRouters = {
     );
     const [ limitedUsers, editors ]: foundUser[][] =
       await Promise.all(foundLists.map(listsMapper));
-    return makeTuple(200, { limitedUsers, editors });
+    return makeTuple(statuses.OK, { limitedUsers, editors });
   },
 
   async subscription(req: Request) {
@@ -158,26 +159,26 @@ const userController: userRouters = {
     const followers: number|null = 
       await clientDB.subscibe(personName, subscriptionName, action);
     if (followers === null) {
-      const msg: string = 'Nothing was found for you...';
-      return makeTuple(404, { msg });
+      const msg: string = errMessages.SUBSCRIPTIONS_NOT_FOUND;
+      return makeTuple(statuses.NOT_FOUND, { msg });
     }
     if (!responseValues) 
-      return makeTuple(200, { unsubscribed: true });
+      return makeTuple(statuses.OK, { unsubscribed: true });
     const follower: boolean = action === 'subscribe';
-    return makeTuple(200, { follower, followers });
+    return makeTuple(statuses.OK, { follower, followers });
   },
 
   async getSubscriptions(req: Request) {
     const name: string = req.body.name;
     const foundPersons: userData[]|null = await clientDB.getUserSubsciptions(name);
     if (!foundPersons) {
-      const msg: string = 'The searched digital twin wasn\'t found in the DichBox system...';
-      return makeTuple(404, { msg });
+      const msg: string = errMessages.USER_NOT_FOUND;
+      return makeTuple(statuses.NOT_FOUND, { msg });
     }
     const subs: foundUser[] = await Promise.all(
       foundPersons.map(foundUsersMapper)
     );
-    return makeTuple(200, { subs });  
+    return makeTuple(statuses.OK, { subs });  
   },
 
   async searchUsers(req: Request) {
@@ -189,14 +190,14 @@ const userController: userRouters = {
     const searched: foundUser[] = await Promise.all(
       searchedUsers.map(foundUsersMapper)
     );
-    return makeTuple(200, { searched });  
+    return makeTuple(statuses.OK, { searched });  
   },
 
   async getNotifications(req: Request) {
     const name: string = req.body.name;
     const notifications: notificationsData[] = await clientDB.getNotifications(name);
     if (!notifications.length)
-      return makeTuple(200, { notifications });
+      return makeTuple(statuses.OK, { notifications });
     const ntsMapper = async (n: notificationsData): Promise<notificationsData> => {
       const icon: string|null = !n.param || n.param == -1 ?
         null : await userStorage.getLogoIfExists(n.param);
@@ -210,7 +211,7 @@ const userController: userRouters = {
     const ntsRes: notificationsData[] = await Promise.all(
       notifications.map(ntsMapper)
     );
-    return makeTuple(200, { notifications: ntsRes });  
+    return makeTuple(statuses.OK, { notifications: ntsRes });  
   },
 
   async removeNotifications(req: Request) {
@@ -219,7 +220,7 @@ const userController: userRouters = {
       ntsIds: number[]
     } = req.body;
     const removed: boolean = await clientDB.removeNotifications(username, ntsIds);
-    return makeTuple(200, { removed });  
+    return makeTuple(statuses.OK, { removed });  
   }
 };
 

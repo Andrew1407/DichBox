@@ -1,6 +1,7 @@
 import { Request } from 'express';
-import { boxData, pathEntries, entryType } from '../../datatypes';
 import { makeTuple, boxesRouters, formatDate, checkPathes } from '../extra';
+import { statuses, errMessages } from '../statusInfo';
+import { boxData, pathEntries, entryType } from '../../datatypes';
 import BoxesDataConnector from '../../database/BoxesClientDB/BoxesDataConnector';
 import BoxesStorageManager from '../../storageManagers/BoxesStorageManager';
 
@@ -25,7 +26,7 @@ const boxesController: boxesRouters = {
       createdBox.id,
       logo
     );
-    return makeTuple(201, { name: createdBox.name });
+    return makeTuple(statuses.CREATED, { name: createdBox.name });
   },
 
   async findUserBoxes(req: Request) {
@@ -37,7 +38,7 @@ const boxesController: boxesRouters = {
     const boxesList: boxData[]|null = await clientDB.getBoxesList(
       viewerName, boxOwnerName, follower
     );
-    return makeTuple(200, { boxesList });
+    return makeTuple(statuses.OK, { boxesList });
   },
 
   async verifyBoxName(req: Request) {
@@ -45,7 +46,7 @@ const boxesController: boxesRouters = {
     const boxName: string = req.body.boxName;
     const foundBox: boxData|null = await clientDB.findUserBox(username, boxName);
     const foundValue: string|null = foundBox ? foundBox.name : null;
-    return makeTuple(200, { foundValue });
+    return makeTuple(statuses.OK, { foundValue });
   },
 
   async getBoxDetais(req: Request) {
@@ -59,15 +60,15 @@ const boxesController: boxesRouters = {
       boxName, viewerName, ownerName, follower
     );
     if (!boxInfo) {
-      const msg: string = 'No box, no files, no directories... Nothing... Just nothing...';
-      return makeTuple(404, { msg });
+      const msg: string = errMessages.BOXES_NOT_FOUND;
+      return makeTuple(statuses.NOT_FOUND, { msg });
     }
     const logo: string|null =
       await boxesStorage.getLogoIfExists(boxInfo.id, boxInfo.owner_id);
     delete boxInfo.id;
     delete boxInfo.owner_id;
     formatDate(boxInfo);
-    return makeTuple(200, { ...boxInfo, logo });
+    return makeTuple(statuses.OK, { ...boxInfo, logo });
   },
 
   async editBox(req: Request) {
@@ -81,8 +82,8 @@ const boxesController: boxesRouters = {
       username, boxName, boxData, limitedList, editorsList
     );
     if (!updated) {
-      const msg: string = 'Well, invalid data...';
-      return makeTuple(400, { msg });
+      const msg: string = errMessages.BOXES_INVAID_REQUEST;
+      return makeTuple(statuses.BAD_REQUEST, { msg });
     }
     if (logo) await (logo === 'removed') ?
       boxesStorage.removeLogoIfExists(updated.id, updated.owner_id) :
@@ -93,7 +94,7 @@ const boxesController: boxesRouters = {
     const jsonRes: boxData & { logo?: string } = 
       !logo || logo === 'removed' ?
         updated : { ...updated, logo };
-    return makeTuple(200, jsonRes);
+    return makeTuple(statuses.OK, jsonRes);
   },
 
   async removeBox(req: Request) {
@@ -103,21 +104,18 @@ const boxesController: boxesRouters = {
       boxName: string,
       ownPage: boolean
     } = req.body;
-    if (!ownPage && confirmation !== 'permitted') {
-      const msg: string = 'Forbidden for you!!!';
-      return makeTuple(403, { msg });
-    }
+    const msg: string = errMessages.FORBIDDEN;
+    if (!ownPage && confirmation !== 'permitted')
+      return makeTuple(statuses.FORBIDDEN, { msg });
     const ids: [number, number]|null =
       await clientDB.getUserBoxIds(username, boxName);
-    if (!ids)  {
-      const msg: string = 'Forbidden for you!!!';
-      return makeTuple(403, { msg });
-    }
+    if (!ids)
+      return makeTuple(statuses.FORBIDDEN, { msg });
     await Promise.all([
       clientDB.removeBox(ids[1]),
       boxesStorage.removeBox(...ids)
     ]);
-    return makeTuple(200, { removed: true });
+    return makeTuple(statuses.OK, { removed: true });
   },
 
   async getPathFiles(req: Request) {
@@ -130,18 +128,19 @@ const boxesController: boxesRouters = {
     } = req.body;
     const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
     const extraPath: string[] = boxPath.slice(2);
-    const msg: string = 'Nothing is here. No files, no directories...';
+    const msg: string = errMessages.DIR_NOT_FOUND;
     if (!checkPathes([extraPath]))
-      return makeTuple(404, { msg });
+      return makeTuple(statuses.NOT_FOUND, { msg });
     const checkup: [number, number]|null = await clientDB.checkBoxAccess(
       ownerName, viewerName, boxName, follower, editor
     );
-    if (!checkup) return makeTuple(404, { msg });
+    if (!checkup)
+      return makeTuple(statuses.NOT_FOUND, { msg });
     const entries: pathEntries = 
       await boxesStorage.getPathEntries(checkup, initial, extraPath);
     return entries ?
-      makeTuple(200, { entries }) :
-      makeTuple(404, { msg });
+      makeTuple(statuses.OK, { entries }) :
+      makeTuple(statuses.NOT_FOUND, { msg });
   },
 
   async createFile(req: Request) {
@@ -154,11 +153,10 @@ const boxesController: boxesRouters = {
       type: entryType,
       src?: string
     } = req.body;
-    const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
-    const extraPath: string[] = boxPath.slice(2);
+    const [ ownerName, boxName, ...extraPath ]: string[] = boxPath;
     if (!checkPathes([extraPath])) {
-      const msg: string = 'This path has led you to nowhere...';
-      return makeTuple(404, { msg });
+      const msg: string = errMessages.INVALID_PATH;
+      return makeTuple(statuses.NOT_FOUND, { msg });
     }
     const checkup: [number, number]|null = await clientDB.checkBoxAccess(
       ownerName, viewerName, boxName, follower, editor
@@ -171,7 +169,7 @@ const boxesController: boxesRouters = {
     formatDate(edited);
     const created: pathEntries = 
       await boxesStorage.addFile(fileName, type, checkup, extraPath, src);
-    return makeTuple(201, { created, last_edited: edited.last_edited });
+    return makeTuple(statuses.CREATED, { created, last_edited: edited.last_edited });
   },
 
   async getFile(req: Request) {
@@ -185,17 +183,17 @@ const boxesController: boxesRouters = {
     } = req.body;
     const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
     const extraPath: string[] = boxPath.slice(2);
-    if (!checkPathes([extraPath])) {
-      const msg: string = 'This path has led you to nowhere...';
-      return makeTuple(404, { msg });
-    }
+    const msg: string = errMessages.INVALID_PATH;
+    if (!checkPathes([extraPath]))
+      return makeTuple(statuses.NOT_FOUND, { msg });
     const checkup: [number, number]|null = await clientDB.checkBoxAccess(
       ownerName, viewerName, boxName, follower, editor
     );
-    if (!checkup) return makeTuple(404, {});
+    if (!checkup)
+      return makeTuple(statuses.NOT_FOUND, { msg });
     const foundData: string|null =
       await boxesStorage.readFile(name, type, checkup, extraPath);
-    return makeTuple(200, { foundData, found: true });
+    return makeTuple(statuses.OK, { foundData, found: true });
   },
 
   async saveFiles(req: Request) {
@@ -207,12 +205,12 @@ const boxesController: boxesRouters = {
         filePathStr: string
       }[]
     } = req.body;
-    if (!(files.length && editor)) {
-      const msg: string = 'Forbidden for you!!!';
-      return makeTuple(403, { msg });
-    }
+    const msg: string = errMessages.FORBIDDEN;
+    if (!(files.length && editor))
+      return makeTuple(statuses.FORBIDDEN, { msg });
     const editorId: number|null = await clientDB.getUserId(editorName);
-    if (!editorId) return makeTuple(403, {});
+    if (!editorId)
+      return makeTuple(statuses.FORBIDDEN, { msg });
     const filesFormated: {
       src: string,
       filePath: string[]
@@ -223,18 +221,14 @@ const boxesController: boxesRouters = {
         .splice(1)
     }));
     const formatedPathes: string[][] = filesFormated.map(f => f.filePath);
-    if (!checkPathes(formatedPathes)) {
-      const msg: string = 'This path has led you to nowhere...';
-      return makeTuple(404, { msg });
-    }
+    if (!checkPathes(formatedPathes))
+      return makeTuple(statuses.FORBIDDEN, { msg });
     const [ ownerName, boxName ]: string[] = filesFormated[0].filePath.slice(0, 2);
     const checkup: [number, number]|null = await clientDB.checkBoxAccess(
       ownerName, editorName, boxName, true, editor
     );
-    if (!checkup) {
-      const msg: string = 'Forbidden for you!!!';
-      return makeTuple(403, { msg });
-    }
+    if (!checkup)
+      return makeTuple(statuses.FORBIDDEN, { msg });
     const filesWritted: boolean[] = await Promise.all(
       filesFormated.map(f => boxesStorage.editFile(
         checkup, f.filePath.slice(2), f.src
@@ -244,8 +238,8 @@ const boxesController: boxesRouters = {
       ((res, acc) => res && acc), true
     );
     if (!edited) {
-      const msg: string = 'Very big problems with the DichBox server.';
-      return makeTuple(500, { msg });
+      const msg: string = errMessages.BOXES_INTERNAL;
+      return makeTuple(statuses.SERVER_INTERNAL, { msg });
     }
     const editedMark: boxData = await clientDB.updateBox(
       ownerName,
@@ -253,7 +247,7 @@ const boxesController: boxesRouters = {
       { last_edited: 'now()' },
     );
     formatDate(editedMark);
-    return makeTuple(200, { edited, last_edited: editedMark.last_edited });
+    return makeTuple(statuses.OK, { edited, last_edited: editedMark.last_edited });
   },
 
   async removeFile(req: Request) {
@@ -267,22 +261,19 @@ const boxesController: boxesRouters = {
     } = req.body;
     const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
     const extraPath: string[] = boxPath.slice(2);
-    if (!checkPathes([extraPath])) {
-      const msg: string = 'This path has led you to nowhere...';
-      return makeTuple(404, { msg });
-    }
+    const msg: string = errMessages.INVALID_PATH;
+    if (!checkPathes([extraPath]))
+      return makeTuple(statuses.NOT_FOUND, { msg });
     const checkup: [number, number]|null = await clientDB.checkBoxAccess(
       ownerName, viewerName, boxName, follower, editor
     );
-    if (!checkup) {
-      const msg: string = 'Wrong names, no data for you...';
-      return makeTuple(404, { msg });
-    }
+    if (!checkup)
+      return makeTuple(statuses.NOT_FOUND, { msg });
     const removed: boolean = 
       await boxesStorage.removeFile(fileName, type, checkup, extraPath);
     if (!removed) {
-      const msg: string = 'Very big problems with DichBox server.';
-      return makeTuple(500, { msg });
+      const msg: string = errMessages.BOXES_INTERNAL;
+      return makeTuple(statuses.SERVER_INTERNAL, { msg });
     }
     const edited: boxData = await clientDB.updateBox(
       ownerName,
@@ -290,7 +281,7 @@ const boxesController: boxesRouters = {
       { last_edited: 'now()' },
     );
     formatDate(edited);
-    return makeTuple(200, { removed, last_edited: edited.last_edited });
+    return makeTuple(statuses.OK, { removed, last_edited: edited.last_edited });
   },
 
   async renameFile(req: Request) {
@@ -304,17 +295,14 @@ const boxesController: boxesRouters = {
     } = req.body;
     const [ ownerName, boxName ]: string[] = boxPath.slice(0, 2);
     const extraPath: string[] = boxPath.slice(2);
-    if (!checkPathes([extraPath])) {
-      const msg: string = 'Wrong names, no data for you...';
-      return makeTuple(404, { msg });
-    }
+    const msg: string = errMessages.FILES_NOT_FOUND;
+    if (!checkPathes([extraPath]))
+      return makeTuple(statuses.NOT_FOUND, { msg });
     const checkup: [number, number]|null = await clientDB.checkBoxAccess(
       ownerName, viewerName, boxName, follower, editor
     );
-    if (!checkup) {
-      const msg: string = 'Wrong names, no data for you...';
-      return makeTuple(404, { msg });
-    }
+    if (!checkup)
+      return makeTuple(statuses.NOT_FOUND, { msg });
     const edited: boxData = await clientDB.updateBox(
       ownerName,
       boxName,
@@ -323,7 +311,7 @@ const boxesController: boxesRouters = {
     formatDate(edited);
     const renamed: boolean = 
       await boxesStorage.renameFile(newName, fileName, checkup, extraPath);
-    return makeTuple(200, { renamed, last_edited: edited.last_edited });
+    return makeTuple(statuses.OK, { renamed, last_edited: edited.last_edited });
   }
 
 };

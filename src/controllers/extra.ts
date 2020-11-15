@@ -1,4 +1,5 @@
 import { Response, Request } from 'express';
+import { statuses, errMessages } from './statusInfo';
 
 export type responseTuple = [number, any];    // [status, json]
 export type middlewareFn = (req: Request, res: Response) => Promise<void>;
@@ -68,8 +69,8 @@ export const getMiddlewares = (handlers: boxesRouters|userRouters): any => {
         const result: responseTuple = await handler(req);
         sendResponse(res, ...result);
       } catch {
-        const msg: string = 'It\'s a secret, but something terrible happened on the DichBox server...';
-        sendResponse(res, 500, { msg });
+        const msg: string = errMessages.SERVER_INTERNAL;
+        sendResponse(res, statuses.SERVER_INTERNAL, { msg });
       }
     };
     middlewares[fnName] = middleware;
