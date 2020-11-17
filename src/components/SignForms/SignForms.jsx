@@ -4,6 +4,7 @@ import SignUp from './SignUp';
 import SignIn from './SignIn';
 import { UserContext } from '../../contexts/UserContext';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
+import { MenuContext } from '../../contexts/MenuContext';
 import '../../styles/sign-forms.css';
 
 const SingForms = () => {
@@ -18,6 +19,7 @@ const SingForms = () => {
     cleanWarnings,
     setWarningsOnHandle
   } = useContext(VerifiersContext);
+  const { setFoundErr } = useContext(MenuContext);
   const [isSignUp, setSignModifier] = useState(true);
   const setBtnStateStyle = modifier => (
     modifier ? { backgroundColor: 'rgb(0, 217, 255)', color: 'black' } :
@@ -69,10 +71,19 @@ const SingForms = () => {
     e.preventDefault();
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
-    const { data } = await axios.post(`${process.env.APP_ADDR}/users/create`, dataInput);
-    cleanWarnings();
-    dispatchDataInput({ type: 'CLEAN_DATA' });
-    dispatchUsername({ type: 'SET_NAME', value: data.name });
+    try {
+      
+      const { data } = await axios.post(`${process.env.APP_ADDR}/users/create`, dataInput);
+      cleanWarnings();
+      dispatchDataInput({ type: 'CLEAN_DATA' });
+      dispatchUsername({ type: 'SET_NAME', value: data.name });
+    } catch (e) {
+      const { status, data } = e.response;
+      const errType = status === 400 ? 'signUp' : 'server';
+      setFoundErr([errType, data.msg]);
+      cleanWarnings();
+      dispatchDataInput({ type: 'CLEAN_DATA' });
+    }
   };
   const submitSignUp = useCallback(submitSignUpClb, [dataInput]);
   
@@ -80,17 +91,25 @@ const SingForms = () => {
     e.preventDefault();
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
-    const { data } = await axios.post(`${process.env.APP_ADDR}/users/enter`, dataInput );
-    if (data.name) {
+    try {
+      const { data } = await axios.post(`${process.env.APP_ADDR}/users/enter`, dataInput );
+      if (data.name) {
+        cleanWarnings();
+        dispatchDataInput({ type: 'CLEAN_DATA' });
+        dispatchUsername({ type: 'SET_NAME', value: data.name });
+      } else {
+        const passwd = {
+          borderColor: 'crimson',
+          text: 'Wrong password'
+        };
+        setWarningsOnHandle({ passwd }, { passwd: false });
+      }
+    } catch (e) {
+      const { status, data } = e.response;
+      const errType = status === 400 ? 'signIn' : 'server';
+      setFoundErr([errType, data.msg]);
       cleanWarnings();
       dispatchDataInput({ type: 'CLEAN_DATA' });
-      dispatchUsername({ type: 'SET_NAME', value: data.name });
-    } else {
-      const passwd = {
-        borderColor: 'crimson',
-        text: 'Wrong password'
-      };
-      setWarningsOnHandle({ passwd }, { passwd: false });
     }
   };
   const submitSignIn = useCallback(
