@@ -11,6 +11,7 @@ import hideImg from '../styles/imgs/hide-arrow.png';
 import showImg from '../styles/imgs/show-arrow.png';
 import homeLogo from '../styles/imgs/home-icon.png';
 import '../styles/menu.css';
+import Errors from './Errors/Errors';
 
 const Menu = () => {
   const { username, userData, pathName } = useContext(UserContext);
@@ -72,23 +73,28 @@ const Menu = () => {
 
   return (
     menuVisible ? 
-    ( <menu id="menu">
-      <div id="menu-nav-btns">
-        <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
-        <img src={ homeLogo } id="home-logo" onClick={ handleHomeClick } style={{ display: homeIconVisible ? 'block' : 'none' }} />
-      </div>
-      { searchStr ?
-        <SearchList /> :
-        <Switch>
-          <Route exact path="/">
-            { username && userData ? <Redirect to={'/' + username} /> : <SignForms /> }
-          </Route>
-          <Route path="/:username">
-            <UserData />
-          </Route>       
-        </Switch>
+    <menu id="menu">
+      { foundErr ?
+        <Errors /> :
+        <div>
+          <div id="menu-nav-btns">
+            <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
+            <img src={ homeLogo } id="home-logo" onClick={ handleHomeClick } style={{ display: homeIconVisible ? 'block' : 'none' }} />
+          </div>
+          { searchStr ?
+            <SearchList /> :
+            <Switch>
+              <Route exact path="/">
+                { username && userData ? <Redirect to={'/' + username} /> : <SignForms /> }
+              </Route>
+              <Route path="/:username">
+                <UserData />
+              </Route>       
+            </Switch>
+          }
+        </div>
       }
-    </menu> ) :
+    </menu> :
     <img src={ showImg } className="arrow" id="show" onClick={ handleArrowClick(true) } />
   );
 };

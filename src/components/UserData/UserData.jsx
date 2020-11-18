@@ -9,17 +9,16 @@ import BoxForm from './BoxForm';
 import BoxEntries from './BoxEntries';
 import Subscriptions from './Subscriptions';
 import Notifications from './Notifications';
-import Errors from '../Errors/Errors';
 
 const UserData = () => {
   const { setPathName, pathName } = useContext(UserContext);
-  const { menuOption, foundErr } = useContext(MenuContext);
+  const { menuOption } = useContext(MenuContext);
   const { username } = useParams();
   useEffect(() => {
     if (username !== pathName)
       setPathName(username);
   }, [username])
-  const menuChioces = {
+  const menuChoices = {
     default: <Default />,
     boxes: <Boxes />,
     editProfile: <EditProfile />,
@@ -32,10 +31,11 @@ const UserData = () => {
   return (
     <Switch>
       <Route path="/:username/:box">
-        { foundErr ? <Errors /> : menuChioces.boxEntries }
+        { menuChoices.boxEntries }
       </Route>
+      
       <Route expact path="/:username">
-        { foundErr ? <Errors /> : menuChioces[menuOption] }
+        { menuChoices[menuOption] }
       </Route>
     </Switch>
   );
