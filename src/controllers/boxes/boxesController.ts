@@ -1,9 +1,10 @@
 import { Request } from 'express';
-import { makeTuple, boxesRouters, formatDate, checkPathes } from '../extra';
+import { makeTuple, formatDate, checkPathes } from '../extra';
 import { statuses, errMessages } from '../statusInfo';
 import { boxData, pathEntries, entryType } from '../../datatypes';
 import BoxesDataConnector from '../../database/BoxesClientDB/BoxesDataConnector';
 import BoxesStorageManager from '../../storageManagers/BoxesStorageManager';
+import { boxesRouters } from '../routesTypes';
 
 const boxesStorage: BoxesStorageManager = new BoxesStorageManager();
 const clientDB: BoxesDataConnector = new BoxesDataConnector();

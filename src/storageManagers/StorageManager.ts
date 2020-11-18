@@ -50,7 +50,7 @@ export default class StorageManager {
   public async removeLogoIfExists(
     id: number,
     extraId: number = 0
-): Promise<void> {
+  ): Promise<void> {
     const logoPath: string =  extraId ?
       this.generateLogoPath(id, [extraId.toString()]) :
       this.generateLogoPath(id);

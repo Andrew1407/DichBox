@@ -1,9 +1,10 @@
 import { Request } from 'express';
 import { notificationsData, userData } from '../../datatypes';
-import { userRouters, makeTuple } from '../extra';
+import { makeTuple } from '../extra';
 import { statuses, errMessages } from '../statusInfo';
 import UserDataConnector from '../../database/UserClientDB/UserDataConnector';
 import UserStotageManager from '../../storageManagers/UserStotageManager';
+import { userRouters } from '../routesTypes';
 
 type foundUser = {
   name: string,
