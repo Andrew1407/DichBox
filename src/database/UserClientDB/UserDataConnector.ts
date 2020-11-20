@@ -66,7 +66,7 @@ export default class UserBaseConnector extends UserClientDichBoxDB {
     const res: userData|null = await this.getUserData({ email }, ['name', 'passwd']);
     if (!res) return null;
     const passwdCorrect: boolean = await bcrypt.compare(passwd, res.passwd);
-    if (!passwdCorrect) return null;
+    if (!passwdCorrect) return {};
     delete res.passwd;
     return res;
   }

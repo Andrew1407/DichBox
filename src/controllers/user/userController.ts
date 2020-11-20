@@ -67,10 +67,12 @@ const userController: userRouters = {
     const email: string = req.body.email;
     const passwd: string = req.body.passwd;
     const user: userData = await clientDB.signInUser(email, passwd);
+    if (!user)
+      return makeTuple(statuses.NOT_FOUND, { msg: errMessages.USER_NOT_FOUND });
     const name: string|null = user ? user.name : null;
     return name ?
       makeTuple(statuses.OK, { name }) :
-      makeTuple(statuses.NOT_FOUND, { msg: errMessages.USER_NOT_FOUND });
+      makeTuple(statuses.BAD_REQUEST, {});
   },
 
   async verifyUserInput(req: Request) {
