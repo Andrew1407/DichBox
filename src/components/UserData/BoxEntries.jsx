@@ -16,7 +16,6 @@ import boxMoreLogo from '../../styles/imgs/box-more.png';
 import boxEditLogo from '../../styles/imgs/box-edit.png';
 import addImage from '../../styles/imgs/add-image.png';
 import '../../styles/box-entries.css';
-import Errors from '../Errors/Errors';
 
 
 const BoxEntries = () => {
@@ -31,8 +30,7 @@ const BoxEntries = () => {
     setMenuOption,
     openedFiles,
     dispatchOpenedFiles,
-    setFoundErr,
-    foundErr
+    setFoundErr
   } = useContext(MenuContext);
   const { 
     boxInfoHidden,
@@ -136,9 +134,14 @@ const BoxEntries = () => {
           setBoxErr(true);
         }
       } catch (e) {
-        const { status, data } = e.response;
-        const errType = status === 404 ? (boxPath.length > 1 ? 'dir' : 'box') : 'server';
-        setFoundErr([errType, data.msg]);
+        if (!e.response) {
+          const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
+          setFoundErr(['server', msg]);
+        } else {  
+          const { status, data } = e.response;
+          const errType = status === 404 ? (boxPath.length > 1 ? 'dir' : 'box') : 'server';
+          setFoundErr([errType, data.msg]);
+        }
       }
     };
 
@@ -154,7 +157,7 @@ const BoxEntries = () => {
         <div className="name-desc">
           { !boxInfoHidden &&
             <div>
-              <p className="nd-name" style={{ color: boxDetails.name_color }} >{ boxDetails.name }</p>
+              <p className="nd-name" style={{ color: boxDetails.name_color }}>{ boxDetails.name }</p>
               <p className="nd-desc" style={{ color: boxDetails.description_color }} >{ boxDetails.description }</p>
               <p id="nd-owner">Creator: <span style={{ color: boxDetails.owner_nc }}>{ boxDetails.owner_name }</span></p>
               <p id="nd-box-type" >Type: <span>{ boxDetails.access_level }</span></p>
@@ -165,12 +168,12 @@ const BoxEntries = () => {
           <div id="entries-user-menu">
             <div id="entries-editor">
               <div id="entries-options" style={{ justifyContent: userData.ownPage ? 'space-between' : boxDetails.editor ? 'space-around' : 'center' }} >
-                { boxDetails.editor && <img src={ addImage } className="entries-imgs" onClick={ handleAddFile('image') } />}
-                { boxDetails.editor && <img src={ addFileLogo } className="entries-imgs" onClick={ handleAddFile('file') } />}
-                { boxDetails.editor && <img src={ addFolderLogo } className="entries-imgs" onClick={ handleAddFile('dir') } />}
-                { userData.ownPage && <img src={ boxEditLogo } className="entries-imgs" onClick={ () => setEditBoxState(true) } />}
-                { userData.ownPage && <img src={ trashBin } className="entries-imgs" onClick={ handleBoxRemove } />}
-                <img src={ boxMoreLogo } className="entries-imgs" onClick={ () => setBoxHiddenState(!boxInfoHidden) } />
+                { boxDetails.editor && <img src={ addImage } className="entries-imgs" onClick={ handleAddFile('image') } title="Add image"/>}
+                { boxDetails.editor && <img src={ addFileLogo } className="entries-imgs" onClick={ handleAddFile('file') } title="Add file"/>}
+                { boxDetails.editor && <img src={ addFolderLogo } className="entries-imgs" onClick={ handleAddFile('dir') } title="Add directory"/>}
+                { userData.ownPage && <img src={ boxEditLogo } className="entries-imgs" onClick={ () => setEditBoxState(true) } title="Edit box info"/>}
+                { userData.ownPage && <img src={ trashBin } className="entries-imgs" onClick={ handleBoxRemove } title={ `Remove "${boxDetails.name}" box` }/>}
+                <img src={ boxMoreLogo } className="entries-imgs" onClick={ () => setBoxHiddenState(!boxInfoHidden) } title={ (boxInfoHidden ? 'Show' : 'Hide') + ' box description' }/>
               </div>
               <AddFile {...{ setAddFileVisible, addFileVisible, pathName: boxPath, fileManipulation }} />
               <FileManipulator {...{ fileManipulation, pathName: boxPath, setFileManupulation, addFileVisible }} />

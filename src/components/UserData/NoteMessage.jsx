@@ -45,6 +45,16 @@ const NoteMessage = ({ type, userName, userColor, boxName, boxColor, msg }) => {
         </p>
       </div>
     );
+  if (type === 'helloMsg') {
+    console.log(msg)
+    return (
+      <div className="note-msg">
+        <p>
+          <i>{ msg[0] }</i>
+        </p>
+      </div>
+    );
+  }
   return null;
 };
 

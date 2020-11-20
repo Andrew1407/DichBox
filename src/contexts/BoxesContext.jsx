@@ -36,9 +36,14 @@ const BoxesContextProvider = props => {
       if (initial) setBoxErr(true);
       else dispatchOpenedFiles({ type: 'FILE_APPEND', file });
     } catch (e) {
-      const { status, data } = e.response;
-      const errType = status === 404 ? (boxPath.length > 2 ? 'dir' : 'box') : 'server';
-      setFoundErr([errType, data.msg]);
+      if (!e.response) {
+        const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
+        setFoundErr(['server', msg]);
+      } else { 
+        const { status, data } = e.response;
+        const errType = status === 404 ? (boxPath.length > 2 ? 'dir' : 'box') : 'server';
+        setFoundErr([errType, data.msg]);
+      }
     }
   };
   const fetchEntries = useCallback(fetchEntriesClb, [userData, history.location]);

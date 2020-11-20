@@ -49,7 +49,7 @@ const Notifications = () => {
         </div> :
         <div>
           <input id="nts-clear-all" type="button" value="clear all" onClick={ handleRemove(...usersList.map(x => x.id)) }/>
-          {usersList.map((ntf, i) => (
+          { usersList.map((ntf, i) => (
             <div className="nts-msg" key={ i }>
               <div className="head">
                 <div className="head-left">
