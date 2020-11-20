@@ -45,6 +45,7 @@ const Header = () => {
   const handleMenuClickClb = () => {
     const currentUsername = username || '';
     const currentPathName = pathName || '';
+    if (foundErr) setFoundErr(null);
     if (searchInput) setSearchInput('');
     if (searchStr) {
       setUsersList(null);
@@ -60,7 +61,6 @@ const Header = () => {
       setBoxDetails({});
       setBoxesList([]);
       setBoxHiddenState(false);
-      if (foundErr) setFoundErr(null);
       history.push('/');
     }
     dispatchDataInput({ type: 'CLEAN_DATA' });

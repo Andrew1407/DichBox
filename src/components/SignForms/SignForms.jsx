@@ -91,6 +91,13 @@ const SingForms = () => {
     e.preventDefault();
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
+    const setPasswdInvalid = () => {
+      const passwd = {
+        borderColor: 'crimson',
+        text: 'Wrong password'
+      };
+      setWarningsOnHandle({ passwd }, { passwd: false });
+    };
     try {
       const { data } = await axios.post(`${process.env.APP_ADDR}/users/enter`, dataInput );
       if (data.name) {
@@ -98,18 +105,18 @@ const SingForms = () => {
         dispatchDataInput({ type: 'CLEAN_DATA' });
         dispatchUsername({ type: 'SET_NAME', value: data.name });
       } else {
-        const passwd = {
-          borderColor: 'crimson',
-          text: 'Wrong password'
-        };
-        setWarningsOnHandle({ passwd }, { passwd: false });
+        setPasswdInvalid();
       }
     } catch (e) {
       const { status, data } = e.response;
-      const errType = status === 400 ? 'signIn' : 'server';
-      setFoundErr([errType, data.msg]);
-      cleanWarnings();
-      dispatchDataInput({ type: 'CLEAN_DATA' });
+      if (status === 400) {
+        setPasswdInvalid();
+      } else {
+        const errType =  status === 404 ? 'signIn' : 'server';
+        setFoundErr([errType, data.msg]);
+        cleanWarnings();
+        dispatchDataInput({ type: 'CLEAN_DATA' });
+      }
     }
   };
   const submitSignIn = useCallback(
