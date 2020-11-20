@@ -123,6 +123,10 @@ export default class UserBaseConnector extends UserClientDichBoxDB {
         const [ user_name, user_color ]: string[] = n.extra_values;
         delete n.param;
         return { ...n, msgEntries, user_name, user_color };
+      } else if (msgType === 'helloMsg') {
+        const helloMsg = 'Welcome to "DichBox" world. You need to know nothing, just start creating boxes, editing your profile, searching other users etc. Good luck!';
+        msgEntries.push(helloMsg);
+        return { ...n, msgEntries }
       }
       return n;
     };
