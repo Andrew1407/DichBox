@@ -18,7 +18,8 @@ type errorMessages = {
   INVALID_PATH: string,
   BOXES_INTERNAL: string,
   FILES_NOT_FOUND: string,
-  SERVER_INTERNAL: string
+  SERVER_INTERNAL: string,
+  INVALID_PASSWORD: string
 };
 
 export const statuses: statuses = {
@@ -41,5 +42,6 @@ export const errMessages: errorMessages = {
   INVALID_PATH: 'This path has led you to nowhere...',
   BOXES_INTERNAL: 'Very big problems with the DichBox server.',
   FILES_NOT_FOUND: 'Wrong names, no data for you...',
-  SERVER_INTERNAL: 'It\'s a secret, but something terrible happened on the DichBox server...'
+  SERVER_INTERNAL: 'It\'s a secret, but something terrible happened on the DichBox server...',
+  INVALID_PASSWORD: 'Invalid password'
 };

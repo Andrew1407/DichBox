@@ -72,7 +72,7 @@ const userController: userRouters = {
     const name: string|null = user ? user.name : null;
     return name ?
       makeTuple(statuses.OK, { name }) :
-      makeTuple(statuses.BAD_REQUEST, {});
+      makeTuple(statuses.BAD_REQUEST, { msg: errMessages.INVALID_PASSWORD });
   },
 
   async verifyUserInput(req: Request) {
