@@ -11,22 +11,21 @@ import '../../styles/errors.css';
 const Errors = () => {
   const { foundErr } = useContext(MenuContext);
   const [logoKey, errMessage] = foundErr;
-  const errStyles = {
-    dir: [dirErrLogo, '#FB76FF'],
-    box: [boxErrLogo, '#FC00D2'],
-    user: [userErrLogo, '#B9FC00'],
-    signIn: [signInErrLogo, '#FFAB00'],
-    signUp: [signUpErrLogo, '#EFFF00'],
-    server: [serverErrLogo, '#5242E1']
+  const errLogos = {
+    dir: dirErrLogo,
+    box: boxErrLogo,
+    user: userErrLogo,
+    signIn: signInErrLogo,
+    signUp: signUpErrLogo,
+    server: serverErrLogo
   };
-  const [ errLogo, errColor ] = errStyles[logoKey];
 
   return (
     <div className="menu-form">
       <h1 id="error-title"> Error</h1>
-      <p id="error-message" style={{ color: errColor }}>{ errMessage }</p>
+      <p id="error-message">{ errMessage }</p>
       <div id="error-image">
-        <img src={ errLogo }/>
+        <img src={ errLogos[logoKey] }/>
       </div>
     </div>
   );
