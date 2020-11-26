@@ -12,6 +12,7 @@ import showImg from '../styles/imgs/show-arrow.png';
 import homeLogo from '../styles/imgs/home-icon.png';
 import '../styles/menu.css';
 import Errors from './Errors/Errors';
+import Loading from './Loading';
 
 const Menu = () => {
   const { username, userData, pathName } = useContext(UserContext);
@@ -32,7 +33,8 @@ const Menu = () => {
     setSearchStr,
     setUsersList,
     setFoundErr,
-    foundErr
+    foundErr,
+    isLodaing
   } = useContext(MenuContext);
   const history = useHistory();
   const handleArrowClick = modifier => e => {
@@ -76,23 +78,26 @@ const Menu = () => {
     <menu id="menu">
       { foundErr ?
         <Errors /> :
-        <div>
-          <div id="menu-nav-btns">
-            <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
-            <img src={ homeLogo } id="home-logo" onClick={ handleHomeClick } style={{ display: homeIconVisible ? 'block' : 'none' }} />
+        ( isLodaing ?
+          <Loading /> :
+          <div>
+            <div id="menu-nav-btns">
+              <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
+              <img src={ homeLogo } id="home-logo" onClick={ handleHomeClick } style={{ display: homeIconVisible ? 'block' : 'none' }} />
+            </div>
+            { searchStr ?
+              <SearchList /> :
+              <Switch>
+                <Route exact path="/">
+                  { username && userData ? <Redirect to={'/' + username} /> : <SignForms /> }
+                </Route>
+                <Route path="/:username">
+                  <UserData />
+                </Route>       
+              </Switch>
+            }
           </div>
-          { searchStr ?
-            <SearchList /> :
-            <Switch>
-              <Route exact path="/">
-                { username && userData ? <Redirect to={'/' + username} /> : <SignForms /> }
-              </Route>
-              <Route path="/:username">
-                <UserData />
-              </Route>       
-            </Switch>
-          }
-        </div>
+        )
       }
     </menu> :
     <img src={ showImg } className="arrow" id="show" onClick={ handleArrowClick(true) } />

@@ -2,12 +2,10 @@ import React, { useCallback } from 'react';
 import SearchUsers from './SearchUsers'
 import '../../styles/box-privacy.css';
 
-
-
 const BoxPrivacy = ({ privacy, setPrivacy, limitedList, setLimitedList, setChangedList, changedList }) => {
   const radios = [
     ['public', '(everyone can view this box)'],
-    ['private', '(your and editors can view this box)'],
+    ['private', '(you and editors can view this box)'],
     ['followers', '(subscribers can view this box)'],
     ['limited', '(add/remove users who can view this box)']
   ];

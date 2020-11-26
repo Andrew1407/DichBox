@@ -9,7 +9,7 @@ export const UserContext = createContext();
 
 const UserContextProvider = props => {
   const history = useHistory();
-  const { setFoundErr, foundErr } = useContext(MenuContext);
+  const { setFoundErr, setLoading } = useContext(MenuContext);
   const getPathName = () => history
     .location
     .pathname
@@ -21,6 +21,7 @@ const UserContextProvider = props => {
   useEffect(() => {
     const fetchUserData = async () => {
       if (pathName && pathName.length) {
+        setLoading(true);
         const findBody = { username, pathName };
         try {
           const { data } = await axios.post(`${process.env.APP_ADDR}/users/find`, findBody);
@@ -35,6 +36,7 @@ const UserContextProvider = props => {
             setFoundErr([errType, data.msg]);
           }
         }
+        setLoading(false);
       }
     };
     

@@ -7,8 +7,12 @@ import BoxesList from './BoxesList';
 import '../../styles/menu-boxes.css';
 
 const Boxes = () => {
-  const { menuOption, setMenuOption } = useContext(MenuContext);
   const { userData, username } = useContext(UserContext);
+  const {
+    menuOption,
+    setMenuOption,
+    setLoading
+  } = useContext(MenuContext);
   const {
     boxesList,
     setBoxesList,
@@ -27,14 +31,18 @@ const Boxes = () => {
           boxOwnerName: userData.name,
           follower: userData.follower
         };
-        const { data } = await await axios.post(`${process.env.APP_ADDR}/boxes/user_boxes`, boxesBody);
-        if (data.boxesList)
-          setBoxesList(data.boxesList);
+        setLoading(true);
+        const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/user_boxes`, boxesBody);
+        const { boxesList } = data;
+        const boxes = boxesList && boxesList.length ?
+          boxesList : [null]; 
+        setBoxesList(boxes);
+        setLoading(false);
       }
     };
 
     fetchBoxesList();
-  }, [userData]);
+  }, [userData, boxesList]);
 
   return (
     <div className="menu-form">

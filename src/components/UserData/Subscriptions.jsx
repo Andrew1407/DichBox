@@ -9,11 +9,12 @@ import '../../styles/users-list.css';
 
 const Subscriptions = () => {
   const history = useHistory();
-  const { usersList, setUsersList } = useContext(MenuContext);
+  const { usersList, setUsersList, setLoading } = useContext(MenuContext);
   const { userData } = useContext(UserContext);
   const [searchInput, setSearchInput] = useState('');
   const shortenName = str => str.length < 20 ? str : `${str.slice(0, 19)}...`;
   const handleUnsubscribeClb = subscriptionName => async () => {
+    setLoading(true);
     const unsubBody = {
       subscriptionName,
       action: 'unsubscribe',
@@ -25,6 +26,7 @@ const Subscriptions = () => {
       setUsersList(usersList.filter(s => 
         s.name !== subscriptionName
       ));
+    setLoading(false);
   };
   const handleUnsubscribe = useCallback(
     handleUnsubscribeClb,
@@ -42,11 +44,12 @@ const Subscriptions = () => {
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
+      setLoading(true);
       const subsBody = { name: userData.name };
       const { data } =  await axios.post(`${process.env.APP_ADDR}/users/subs_list`, subsBody);
       const { subs } = data;
-      if (subs)
-        setUsersList(subs);
+      if (subs) setUsersList(subs);
+      setLoading(false);
     };
 
     if (!usersList && userData.name)

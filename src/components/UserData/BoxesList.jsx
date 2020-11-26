@@ -27,7 +27,7 @@ const BoxesList = ({ searchInput, setMenuOption }) => {
   };
   const handleBoxClick = useCallback(handleBoxClickClb, [openedFiles]);
 
-  let showBoxes = boxesList;
+  let showBoxes = boxesList.filter(x => x);
   if (!!searchInput || listOption !== 'all')
     showBoxes = showBoxes.filter(box => {
       const nameMatches = box.name.includes(searchInput);

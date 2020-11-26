@@ -11,7 +11,7 @@ import '../../styles/edit-profile.css';
 
 const EditProfile = () => {
   const history = useHistory();
-  const { menuOption, setMenuOption } = useContext(MenuContext);
+  const { menuOption, setMenuOption, setLoading } = useContext(MenuContext);
   const { userData, dispatchUserData, username, dispatchUsername } = useContext(UserContext);
   const { 
     useVerifiers,
@@ -131,6 +131,7 @@ const EditProfile = () => {
     const editedBody = { username, edited };
     if (logoEdited)
       editedBody.logo = logoEdited;
+    setLoading(true);
     const { data } =  await axios.post(`${process.env.APP_ADDR}/users/edit`, editedBody);
     dispatchUserData({ type: 'REFRESH_DATA', data });
     if (data.name) {
@@ -140,6 +141,7 @@ const EditProfile = () => {
     cleanWarnings();
     dispatchDataInput({ type: 'CLEAN_DATA' });
     setMenuOption('default');
+    setLoading(false);
   };
   const submitEditedFields = useCallback(
     submitEditedFieldsClb,

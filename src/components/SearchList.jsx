@@ -11,7 +11,7 @@ const SearchList = () => {
     searchStr,
     setSearchStr,
     usersList,
-    setUsersList
+    setUsersList,
   } = useContext(MenuContext);
   const history = useHistory();
   const shortenName = str => str.length < 20 ? str : `${str.slice(0, 19)}...`;
@@ -25,8 +25,7 @@ const SearchList = () => {
     const fetchUsersSearch = async () => {
       const { data } = await axios.post(`${process.env.APP_ADDR}/users/search`, { searchStr });
       const { searched } = data;
-      if (searched)
-        setUsersList(searched);
+      if (searched) setUsersList(searched);
     };
 
     fetchUsersSearch()

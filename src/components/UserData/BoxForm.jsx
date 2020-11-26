@@ -14,7 +14,7 @@ import '../../styles/box-form.css';
 const BoxForm = ({ editParametrs }) => {
   const history = useHistory();
   const params = useParams();
-  const { setMenuOption } = useContext(MenuContext);
+  const { setMenuOption, setLoading } = useContext(MenuContext);
   const { boxDetails, setBoxDetails, setEditBoxState } = useContext(BoxesContext);
   const { 
     useVerifiers,
@@ -23,7 +23,7 @@ const BoxForm = ({ editParametrs }) => {
     correctInput,
     dataInput,
     dispatchDataInput,
-    cleanWarnings,
+    cleanWarnings
   } = useContext(VerifiersContext);
   const { username, userData } = useContext(UserContext);
   const [logoEdited, setLogoEdited] = useState(null);
@@ -88,6 +88,7 @@ const BoxForm = ({ editParametrs }) => {
         limitedUsers : null,
       editors
     };
+    setLoading(true);
     if (!editParametrs.edit && isCorrect) {
       const createBody = {
         ...submitBody,
@@ -112,6 +113,7 @@ const BoxForm = ({ editParametrs }) => {
         history.push(`/${username}/${data.name}`);
       setEditBoxState(false);
     }
+    setLoading(false);
   };
   const handleSubmit = useCallback(
     handleSubmitClb,

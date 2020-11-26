@@ -1,0 +1,16 @@
+#loading-title {
+  text-align: center;
+  font-size: 310%;
+  margin-bottom: 0;
+}
+
+#loading-img {
+  width: 98%;
+  margin: 0 auto;
+}
+
+#loading-desc {
+  text-align: center;
+  font-size: 200%;
+  font-style: italic
+}

@@ -9,7 +9,11 @@ export const BoxesContext = createContext();
 const BoxesContextProvider = props => {
   const history = useHistory();
   const { userData, username } = useContext(UserContext);
-  const { dispatchOpenedFiles, setFoundErr } = useContext(MenuContext);
+  const {
+    dispatchOpenedFiles,
+    setFoundErr,
+    setLoading
+  } = useContext(MenuContext);
   const [boxesList, setBoxesList] = useState([]);
   const [listOption, setListOption] = useState('all');
   const [boxInfoHidden, setBoxHiddenState] = useState(false);
@@ -18,6 +22,7 @@ const BoxesContextProvider = props => {
   const [pathEntries, setPathEntries] = useState([]);
 
   const fetchEntriesClb = async (boxPath, initial) => {
+    setLoading(true);
     const filesBody = {
       boxPath,
       viewerName: username,
@@ -28,13 +33,14 @@ const BoxesContextProvider = props => {
     try {
       const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/list`, filesBody);
       const { type, dir, file } = data.entries;
+      setLoading(false);
       if (type === 'dir') {
         setPathEntries(dir.src.length ? dir.src : [null]);
         return;
       }
       if (type === 'file')
-      if (initial) setBoxErr(true);
-      else dispatchOpenedFiles({ type: 'FILE_APPEND', file });
+        if (initial) setBoxErr(true);
+        else dispatchOpenedFiles({ type: 'FILE_APPEND', file });
     } catch (e) {
       if (!e.response) {
         const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
@@ -44,6 +50,7 @@ const BoxesContextProvider = props => {
         const errType = status === 404 ? (boxPath.length > 2 ? 'dir' : 'box') : 'server';
         setFoundErr([errType, data.msg]);
       }
+      setLoading(false);
     }
   };
   const fetchEntries = useCallback(fetchEntriesClb, [userData, history.location]);

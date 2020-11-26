@@ -30,7 +30,8 @@ const BoxEntries = () => {
     setMenuOption,
     openedFiles,
     dispatchOpenedFiles,
-    setFoundErr
+    setFoundErr,
+    setLoading
   } = useContext(MenuContext);
   const { 
     boxInfoHidden,
@@ -65,6 +66,7 @@ const BoxEntries = () => {
   const handleViewBoxesClick = useCallback(handleViewBoxesClickClb, [pathName]);
 
   const boxRemoveSubmit = async () => {
+    setLoading(true);
     const rmBody = {
       confirmation: userData.ownPage && 'permitted',
       username,
@@ -76,6 +78,7 @@ const BoxEntries = () => {
       handleViewBoxesClick();
       dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
     }
+    setLoading(false);
   };
 
   const handleBoxRemoveClb = () => setModalOptions({
@@ -121,7 +124,7 @@ const BoxEntries = () => {
         ownerName: userData.name,
         viewerName: username
       };
-
+      setLoading(true);
       try {
         const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/details`, dataBody);
         if (data.name) {
@@ -143,6 +146,7 @@ const BoxEntries = () => {
           setFoundErr([errType, data.msg]);
         }
       }
+      setLoading(false);
     };
 
     fetchBoxData();
