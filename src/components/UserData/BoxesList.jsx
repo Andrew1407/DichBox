@@ -49,7 +49,7 @@ const BoxesList = ({ searchInput, setMenuOption }) => {
     </div> :
     (!userData.ownPage && listOption === 'followers') ?
       <h1 id="boxes-list-empty">Follow
-        <b style={{ color: userData.name_color }} onClick={ () => setMenuOption('default') } > {userData.name} </b>
+        <b style={{ color: userData.name_color }} onClick={ () => setMenuOption('default') }> { userData.name } </b>
         to see the boxes for followers
       </h1> :
       <h1 id="boxes-list-empty">No boxes there</h1>

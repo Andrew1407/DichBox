@@ -6,17 +6,11 @@
 .box-privacy-radio {
   font-size: 160%;
   font-style: italic;
+  margin-bottom: 5%;
+  margin-left: 1%;
 }
 
-.box-privacy-radio {
-  margin-bottom: 3%;
-  margin-left: 2%;
-}
 
-.box-privacy-radio > label {
-  padding-left: 3%;
-}
-
-.box-privacy-radio > input {
+.box-privacy-radio > label > input {
   outline: none;
 }

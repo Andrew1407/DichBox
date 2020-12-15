@@ -11,8 +11,7 @@ const BoxesContextProvider = props => {
   const { userData, username } = useContext(UserContext);
   const {
     dispatchOpenedFiles,
-    setFoundErr,
-    setLoading
+    setFoundErr
   } = useContext(MenuContext);
   const [boxesList, setBoxesList] = useState([]);
   const [listOption, setListOption] = useState('all');
@@ -22,7 +21,6 @@ const BoxesContextProvider = props => {
   const [pathEntries, setPathEntries] = useState([]);
 
   const fetchEntriesClb = async (boxPath, initial) => {
-    setLoading(true);
     const filesBody = {
       boxPath,
       viewerName: username,
@@ -33,7 +31,6 @@ const BoxesContextProvider = props => {
     try {
       const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/list`, filesBody);
       const { type, dir, file } = data.entries;
-      setLoading(false);
       if (type === 'dir') {
         setPathEntries(dir.src.length ? dir.src : [null]);
         return;
@@ -50,7 +47,6 @@ const BoxesContextProvider = props => {
         const errType = status === 404 ? (boxPath.length > 2 ? 'dir' : 'box') : 'server';
         setFoundErr([errType, data.msg]);
       }
-      setLoading(false);
     }
   };
   const fetchEntries = useCallback(fetchEntriesClb, [userData, history.location]);

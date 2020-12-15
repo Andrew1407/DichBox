@@ -1,4 +1,5 @@
-import React, { useContext, useCallback, useState } from 'react';
+import React, { useContext, useCallback, useState, useEffect } from 'react';
+import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import { MenuContext } from '../contexts/MenuContext';
@@ -24,22 +25,30 @@ const Header = () => {
     searchStr,
     setUsersList,
     setFoundErr,
-    foundErr
+    foundErr,
+    setLoading
   } = useContext(MenuContext);
   const { dispatchDataInput, cleanWarnings } = useContext(VerifiersContext);
   const { setBoxesList, setBoxHiddenState, setBoxDetails } = useContext(BoxesContext);
   const [searchInput, setSearchInput] = useState('');
   const [hidden, setHidden] = useState(false);
-  const handleSearchClick = () => {
+
+  const handleSearchClick = async () => {
+    if (!searchInput) return;
     if (foundErr) setFoundErr(null);
-    if (searchInput) setSearchStr(searchInput);
+    setSearchStr(searchInput);
+    const searchBody = { searchStr: searchInput };
+    setLoading(true);
+    const { data } = await axios.post(`${process.env.APP_ADDR}/users/search`, searchBody);
+    setLoading(false);
+    const { searched } = data;
+    if (searched) setUsersList(searched);
   };
 
   const handleSearchInput = e => {
     e.preventDefault();
     const input = e.target.value;
     setSearchInput(input);
-    setSearchStr(searchStr || null);
   };
 
   const handleMenuClickClb = () => {
@@ -70,7 +79,15 @@ const Header = () => {
     handleMenuClickClb,
     [username, menuVisible, pathName, searchStr, searchInput, foundErr]
   );
+  
   const backgroundColor = username ? 'rgb(50, 211, 240)' : 'grey';       //for image state
+
+  useEffect(() => {
+    if (searchStr && searchInput)
+      handleSearchClick();
+    else if (!searchInput)
+      setSearchStr(null);
+  }, [searchInput]);
 
   return (
     !hidden ?

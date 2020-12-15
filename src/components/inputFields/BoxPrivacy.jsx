@@ -24,8 +24,10 @@ const BoxPrivacy = ({ privacy, setPrivacy, limitedList, setLimitedList, setChang
       <p>*box privacy:</p>
       { radios.map(val =>
         <div className="box-privacy-radio" key={ val[0] } >
-          <input type="radio" {...{ value: val[0], name: val[0] + 'Radio', checked: privacy === val[0], onChange: handleRadioChange }} />
-          <label htmlFor={ val[0] + 'Radio' }>{ val.join(' ') }</label>
+          <label>
+            <input type="radio" {...{ value: val[0], name: val[0] + 'Radio', checked: privacy === val[0], onChange: handleRadioChange }} />
+            { ' ' + val.join(' ') }
+          </label>
         </div>
       )}
       { (privacy === 'limited') && 
