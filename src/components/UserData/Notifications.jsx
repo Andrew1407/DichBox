@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 import { MenuContext } from '../../contexts/MenuContext';
 import { UserContext } from '../../contexts/UserContext';
 import NoteMessage from './NoteMessage';
@@ -41,7 +42,13 @@ const Notifications = () => {
   }, [userData]);
 
   return (
-    <div className="menu-form">
+    <motion.div
+      className="menu-form"
+      initial={{ x: -800 }}
+      animate={{ x: 0 }}
+      exit={{ x: -800 }}
+      transition={{ duration: 0.3, type: 'tween' }}
+    >
       <h1 id="nts-header">Notifications{ 
         !!(+userData.notifications) &&  <span> ({ userData.notifications })</span> 
       }</h1>
@@ -65,7 +72,7 @@ const Notifications = () => {
           ))}
         </div>
       }
-    </div>
+    </motion.div>
   );
 };
 

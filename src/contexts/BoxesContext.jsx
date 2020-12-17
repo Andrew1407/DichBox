@@ -21,6 +21,7 @@ const BoxesContextProvider = props => {
   const [pathEntries, setPathEntries] = useState([]);
 
   const fetchEntriesClb = async (boxPath, initial) => {
+    if (boxPath.length < 2) return;
     const filesBody = {
       boxPath,
       viewerName: username,

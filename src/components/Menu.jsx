@@ -1,5 +1,6 @@
 import React, { useContext, useCallback, useEffect } from 'react';
 import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { VerifiersContext } from '../contexts/VerifiersContext';
 import { UserContext } from '../contexts/UserContext';
 import { MenuContext } from '../contexts/MenuContext';
@@ -74,8 +75,24 @@ const Menu = () => {
   }, [pathName]);
 
   return (
-    menuVisible ? 
-    <menu id="menu">
+  <div id="menu"
+    style={ menuVisible ?
+      { 
+        maxWidth: '30%',
+        minWidth: '30%',
+        borderTop: '2px solid rgb(75, 73, 73)',
+        borderRight: '4px solid rgb(75, 73, 73)'
+      } : { }
+    }
+  >
+  <AnimatePresence>
+  { menuVisible && 
+    <motion.menu
+      initial={{ x: -600 }}       
+      animate={{ x: 0 }}
+      exit={{ x: -600, opacity: 0 }}
+      transition={{ duration: 0.3, delay: 0.1, type: 'spring' }}       
+    >
       { foundErr ?
         <Errors /> :
         ( isLodaing ?
@@ -99,8 +116,18 @@ const Menu = () => {
           </div>
         )
       }
-    </menu> :
-    <img src={ showImg } className="arrow" id="show" onClick={ handleArrowClick(true) } />
+    </motion.menu>
+  }
+  </AnimatePresence>
+  { !menuVisible &&      
+    <motion.img
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.1 }}
+      src={ showImg } className="arrow" id="show" onClick={ handleArrowClick(true) }
+    />
+  }
+  </div>
   );
 };
 

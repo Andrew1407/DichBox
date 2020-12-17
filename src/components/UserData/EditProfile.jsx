@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { UserContext } from '../../contexts/UserContext';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
 import { MenuContext } from '../../contexts/MenuContext';
@@ -166,7 +167,13 @@ const EditProfile = () => {
   }, []);
 
   return (
-    <form id="edit-profile" className="menu-form" onSubmit={ submitEditedFields } >
+    <motion.form
+      id="edit-profile" className="menu-form" onSubmit={ submitEditedFields }
+      initial={{ x: -800 }}
+      animate={{ x: 0 }}
+      exit={{ x: -800 }}
+      transition={{ duration: 0.3, type: 'tween' }}
+    >
       <div className="menu-form edit-field">
           <img id="edit-logo" src={ logoEdited ? logoEdited === 'removed' ? logoDefault : logoEdited : logo } />
           <CropImage {...{ cropModalHidden, setCropModalHidden, setLogoEdited }} />
@@ -200,7 +207,7 @@ const EditProfile = () => {
       </div>
 
       <input className="edit-btn" id="edit-submit" type="submit" value="edit profile" disabled={ submitButton.disabled } style={ submitButton.style } />
-    </form>
+    </motion.form>
   );
 };
 

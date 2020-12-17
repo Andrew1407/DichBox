@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useHistory, useParams } from 'react-router-dom';
 import { UserContext } from '../../contexts/UserContext';
 import { BoxesContext } from '../../contexts/BoxesContext';
@@ -16,7 +17,6 @@ import boxMoreLogo from '../../styles/imgs/box-more.png';
 import boxEditLogo from '../../styles/imgs/box-edit.png';
 import addImage from '../../styles/imgs/add-image.png';
 import '../../styles/box-entries.css';
-
 
 const BoxEntries = () => {
   const history = useHistory();
@@ -155,20 +155,33 @@ const BoxEntries = () => {
 
   return ( editBox ? 
     <BoxForm editParametrs={{ setEditBoxState, boxDetails, edit: true }} /> :
-    <div className="menu-form">
+    <motion.div
+      className="menu-form"
+      initial={{ x: -800 }}
+      animate={{ x: 0 }}
+      exit={{ x: -800 }}
+      transition={{ duration: 0.3, type: 'tween' }}
+    >
       <div>
         { !boxInfoHidden && boxDetails.logo && <img id="entries-logo" src={ boxDetails.logo }/> }
         <div className="name-desc">
+          <AnimatePresence>
           { !boxInfoHidden &&
-            <div>
+            <motion.div
+              initial={{ y: -400 }}
+              animate={{ y: 0 }}
+              exit={{ y: -400 }}
+              transition={{ duration: 0.3 }}
+            >
               <p className="nd-name" style={{ color: boxDetails.name_color }}>{ boxDetails.name }</p>
               <p className="nd-desc" style={{ color: boxDetails.description_color }} >{ boxDetails.description }</p>
               <p id="nd-owner">Creator: <span style={{ color: boxDetails.owner_nc }}>{ boxDetails.owner_name }</span></p>
               <p id="nd-box-type" >Type: <span>{ boxDetails.access_level }</span></p>
               <p className="nd-box-info" >Created: <span>{ boxDetails.reg_date }</span></p>
               <p className="nd-box-info" id="last-edited" >Last edited: <span>{ boxDetails.last_edited }</span></p>
-            </div>
+            </motion.div>
           }
+          </AnimatePresence>
           <div id="entries-user-menu">
             <div id="entries-editor">
               <div id="entries-options" style={{ justifyContent: userData.ownPage ? 'space-between' : boxDetails.editor ? 'space-around' : 'center' }} >
@@ -198,7 +211,7 @@ const BoxEntries = () => {
       <PathEntries  {...{ entriesSearch, setFileManupulation, addFileVisible, setAddFileVisible  }} />
       <input className="edit-btn" id="box-entries-back-btn" type="button" value="view user boxes" onClick={ handleViewBoxesClick } />
       <ConfirmModal { ...modalOptions } />
-    </div>  
+    </motion.div>  
   );
 };
 

@@ -1,7 +1,8 @@
 import React, { useContext, useEffect } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 import { MenuContext } from '../../contexts/MenuContext';
-import { useParams, Route, Switch } from 'react-router-dom';
+import { useParams, Route, Switch, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import Boxes from './Boxes';
 import Default from './Default';
 import EditProfile from './EditProfile';
@@ -14,6 +15,7 @@ const UserData = () => {
   const { setPathName, pathName } = useContext(UserContext);
   const { menuOption } = useContext(MenuContext);
   const { username } = useParams();
+  const location = useLocation();
   useEffect(() => {
     if (username !== pathName)
       setPathName(username);
@@ -29,7 +31,8 @@ const UserData = () => {
   };
 
   return (
-    <Switch>
+    <AnimatePresence exitBeforeEnter>
+    <Switch location={location} key={location.key}>
       <Route path="/:username/:box">
         { menuChoices.boxEntries }
       </Route>
@@ -38,6 +41,7 @@ const UserData = () => {
         { menuChoices[menuOption] }
       </Route>
     </Switch>
+    </AnimatePresence>
   );
 };
 

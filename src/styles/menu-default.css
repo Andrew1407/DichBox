@@ -19,6 +19,8 @@
   font-style: italic;
   margin-top: 8%;
   border-top: 3px solid grey;
+  padding-left: 1%;
+  padding-right: 1%;
 }
 
 .default-extra {
@@ -26,7 +28,7 @@
   font-style: italic;
   margin: 0;
   margin-bottom: 3%;
-  margin-left: 1%;
+  margin-left: 2%;
 }
 
 #extra-reg-date {

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 import { MenuContext } from '../../contexts/MenuContext';
 import { UserContext } from '../../contexts/UserContext';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
@@ -57,7 +58,13 @@ const Subscriptions = () => {
   }, [userData]);
 
   return (
-    <div className="menu-form">
+    <motion.div
+      className="menu-form"
+      initial={{ x: -800 }}
+      animate={{ x: 0 }}
+      exit={{ x: -800 }}
+      transition={{ duration: 0.3, type: 'tween' }}
+    >
       <h1 id="subs-header">Subscriptions</h1>
       <div id="subs-search">
         <label>search: </label>
@@ -79,7 +86,7 @@ const Subscriptions = () => {
           )}
         </div>
       }
-    </div>
+    </motion.div>
   );
 };
 

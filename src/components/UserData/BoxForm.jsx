@@ -1,6 +1,7 @@
 import React, { useContext, useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { useHistory, useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
 import { UserContext } from '../../contexts/UserContext';
 import { BoxesContext } from '../../contexts/BoxesContext';
@@ -163,7 +164,13 @@ const BoxForm = ({ editParametrs }) => {
   }, []);
 
   return (
-    <form className="menu-form" onSubmit={ handleSubmit } >
+    <motion.form
+      className="menu-form" onSubmit={ handleSubmit }
+      initial={{ x: -800 }}
+      animate={{ x: 0 }}
+      exit={{ x: -800 }}
+      transition={{ duration: 0.3, type: 'tween' }}
+    >
       <h1 id="create-box-title">{ editParametrs.edit ? 'Edit box' : 'Create new box'}</h1>
       <div className="edit-field">
         { (logoEdited || editParametrs.boxDetails.logo) && logoEdited !== 'removed' &&
@@ -196,7 +203,7 @@ const BoxForm = ({ editParametrs }) => {
       
       <input className="edit-btn" type="submit" value={ editParametrs.edit ? 'edit box' : 'create box'} { ...submitButton } />
       <input className="edit-btn" type="button" id="create-box-cancel" value="cancel" onClick={ handleCanelClick } />
-    </form>
+    </motion.form>
   )
 };
 

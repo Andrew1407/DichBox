@@ -1,13 +1,16 @@
 #menu {
-  padding: 1%;
-  border-right: 4px solid rgb(75, 73, 73);
-  border-top: 2px solid rgb(75, 73, 73);
-  min-width: 30%;
-  max-width: 30%;
-  flex-grow: 1;
-  margin: 0;
-  max-height: 1000px;
   overflow-y: scroll;
+  max-height: 1000px;
+}
+
+#menu > menu {
+  flex-grow: 1;
+  padding: 1%;
+  margin: 0;
+}
+
+#menu::-webkit-scrollbar {
+  width: 0;
 }
 
 .arrow {
@@ -18,8 +21,8 @@
 }
 
 #show {
-  margin-top: 1%;
-  margin-left: 1%;
+  margin-top: 10px;
+  margin-left: 5px;
 }
 
 #home-logo {

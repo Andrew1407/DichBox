@@ -1,5 +1,6 @@
 import React, { useContext, useCallback, useState, useEffect } from 'react';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useHistory } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import { MenuContext } from '../contexts/MenuContext';
@@ -90,20 +91,46 @@ const Header = () => {
   }, [searchInput]);
 
   return (
-    !hidden ?
-      <div id="header">
-        <div id="header-name">
-          <h1>DichBox</h1>
-        </div>
-        <div id="header-menu">
-          <img src={ defaultLogo } onClick={ handleMenuClick } style={{ backgroundColor }} onDoubleClick={ () => setHidden(true) } /> 
-        </div>
-        <form id="header-search" onSubmit={ e => (e.preventDefault(), handleSearchClick()) }>
-          <input value={ searchInput } type="text" placeholder="search users" onChange={ handleSearchInput } />
-          <img src={ searchLogo } onClick={ handleSearchClick } />
-        </form>
-      </div> :
-      <img id="header-hidden" src={ showArrow } onClick={ () => setHidden(false) } />
+    <div>
+      <AnimatePresence>
+      { !hidden && 
+        <motion.div
+          initial={{ y: -150 }}
+          animate={{ y: 0 }}
+          exit={{ y: -150 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          id="header"
+        >
+          <div id="header-name">
+            <h1 onClick={ () => setHidden(true) }>DichBox</h1>
+          </div>
+          <div id="header-menu">
+            <img src={ defaultLogo } onClick={ handleMenuClick } style={{ backgroundColor }} /> 
+          </div>
+          <form id="header-search" onSubmit={ e => (e.preventDefault(), handleSearchClick()) }>
+            <input value={ searchInput } type="text" placeholder="search users" onChange={ handleSearchInput } />
+            <motion.img
+              whileHover={{
+                y: [0, -10, 0, -8, 0, -6, 0, -3, 0],
+                x: [0, -3, 0, -3, 0, -3, 0, -1, 0]
+              }}
+              transition={{ duration: 1.1 }}
+              style={{ skewX: 25 }}
+              src={ searchLogo } onClick={ handleSearchClick }
+            />
+          </form>
+        </motion.div>
+      }
+      </AnimatePresence>
+      { hidden &&
+        <motion.img
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35 }}
+          id="header-hidden" src={ showArrow } onClick={ () => setHidden(false) }
+        />
+      }
+    </div>
   );
 };
 

@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 import { useHistory } from 'react-router-dom';
 import { BoxesContext } from '../../contexts/BoxesContext';
 import { MenuContext } from '../../contexts/MenuContext';
@@ -73,7 +74,13 @@ const PathEntries = ({ entriesSearch, setFileManupulation, addFileVisible, setAd
   }, [userData, boxDetails, history.location]);
 
   return (
-    <div className="menu-options-list" id="mol-units-list">
+    <motion.div
+      className="menu-options-list" id="mol-units-list"
+      initial={{ x: -800 }}
+      animate={{ x: 0 }}
+      exit={{ x: -800, opacity: 0 }}
+      transition={{ delay: 0.1, duration: 0.2, type: 'tween' }}
+    >
       { (pathDepth.length > 2) && 
         <div className="box-entries-item" onClick={ hadnleHistoryMove(pathDepth.slice(0, -1)) } >
           <img src={ dirLogo } />
@@ -99,7 +106,7 @@ const PathEntries = ({ entriesSearch, setFileManupulation, addFileVisible, setAd
         <p className="entries-empty">No files or directories were found</p> 
       }
       { !filteredSearch.length && !entriesSearch && <p className="entries-empty">This directory is empty</p> }
-    </div>
+    </motion.div>
   );
 };
 

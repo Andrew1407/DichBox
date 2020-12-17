@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 import { UserContext } from '../../contexts/UserContext';
 import { BoxesContext } from '../../contexts/BoxesContext';
 import { MenuContext } from '../../contexts/MenuContext';
@@ -45,7 +46,13 @@ const Boxes = () => {
   }, [userData, boxesList]);
 
   return (
-    <div className="menu-form">
+    <motion.div
+      className="menu-form"
+      initial={{ x: -800 }}
+      animate={{ x: 0 }}
+      exit={{ x: -800 }}
+      transition={{ duration: 0.3, type: 'tween' }}
+    >
       <div id="boxes-header" className="menu-form">
         <h1 id="boxes-title">Boxes</h1>
         <div id="boxes-search">
@@ -65,7 +72,7 @@ const Boxes = () => {
         { userData.ownPage && <input id="boxes-header-btn" type="button" value="[ + new box ]" onClick={ () => (setBoxesList([]), setMenuOption('createBox')) } /> }
       </div>
       <BoxesList {...{ searchInput, setMenuOption }}/>
-    </div>
+    </motion.div>
   );
 };
 

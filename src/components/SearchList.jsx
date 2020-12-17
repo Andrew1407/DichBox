@@ -1,10 +1,9 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MenuContext } from '../contexts/MenuContext';
 import logoDefault from '../styles/imgs/default-user-logo.png'
 import '../styles/users-list.css';
-
 
 const SearchList = () => {
   const {
@@ -21,7 +20,14 @@ const SearchList = () => {
   };
 
   return (
-    <div className="menu-form">
+    <AnimatePresence>
+    <motion.div
+      id="search-list" className="menu-form"
+      initial={{ x: -800 }}
+      animate={{ x: 0 }}
+      exit={{ x: -800 }}
+      transition={{ duration: 0.3, type: 'tween' }}
+    >
       <h1 id="search-list-header">Found users</h1>
       { usersList && usersList.filter(x => x).length ? 
         usersList.map(person => 
@@ -34,7 +40,8 @@ const SearchList = () => {
         ) :
         <h1 id="search-list-none">No users were found</h1>
       }
-    </div>
+    </motion.div>
+    </AnimatePresence>
   );
 };
 

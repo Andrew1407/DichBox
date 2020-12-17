@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 import { UserContext } from '../../contexts/UserContext';
 import { MenuContext } from '../../contexts/MenuContext';
 import ConfirmModal from '../../modals/ConfirmModal';
@@ -52,7 +53,13 @@ const Default = () => {
   };
 
   return (
-    <div className="menu-form">
+    <motion.div
+      className="menu-form"
+      initial={{ x: -800 }}
+      animate={{ x: 0 }}
+      exit={{ x: -800 }}
+      transition={{ duration: 0.3, type: 'tween' }}
+    >
       <img src={ userData.logo || logoDefault } id="default-logo" />
       <div className="name-desc">
         <p className="nd-name" style={{ color: userData.name_color }} >{ userData.name }</p>
@@ -91,7 +98,7 @@ const Default = () => {
         <p onClick={ handleSignOptions('Sign out', signOutOkClb) } >sign out</p>
         <ConfirmModal { ...modalOptions } />
       </div> }
-    </div>
+    </motion.div>
   );
 };
 
