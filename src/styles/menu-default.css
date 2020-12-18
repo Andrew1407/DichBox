@@ -42,3 +42,11 @@
 #extra-followers {
   color: grey
 }
+
+#default-options > p:hover, #sign-options > p:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+}
+
+.box-limited-input > button:hover {
+  box-shadow: 0 0 20px rgb(50, 211, 240);
+}

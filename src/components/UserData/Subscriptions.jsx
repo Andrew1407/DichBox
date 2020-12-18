@@ -4,6 +4,9 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { MenuContext } from '../../contexts/MenuContext';
 import { UserContext } from '../../contexts/UserContext';
+import { bouncingMotion } from '../../styles/motions/bouncing-icons'
+import { componentMotion } from '../../styles/motions/menu-components';
+import { itemMotion } from '../../styles/motions/list-items'
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import logoUnsubscribe from '../../styles/imgs/unsubscribe.png';
 import '../../styles/users-list.css';
@@ -58,13 +61,7 @@ const Subscriptions = () => {
   }, [userData]);
 
   return (
-    <motion.div
-      className="menu-form"
-      initial={{ x: -800 }}
-      animate={{ x: 0 }}
-      exit={{ x: -800 }}
-      transition={{ duration: 0.3, type: 'tween' }}
-    >
+    <motion.div { ...componentMotion } className="menu-form">
       <h1 id="subs-header">Subscriptions</h1>
       <div id="subs-search">
         <label>search: </label>
@@ -79,9 +76,15 @@ const Subscriptions = () => {
             <div key={ person.name } className="subs-display sub-person" onClick={ handlePersonClick(person.name) }>
               <div className="subs-data subs-display">
                 <img src={ person.logo || logoDefault }/>
-                <span style={{ color: person.name_color }}>{ shortenName(person.name) }</span>
+                <motion.span
+                  { ...itemMotion }
+                  style={{ color: person.name_color }}
+                >{ shortenName(person.name) }</motion.span>
               </div>
-              <img title={`Unsubscribe from "${person.name}"`} src={ logoUnsubscribe } onClick={ handleUnsubscribe(person.name) }/>
+              <motion.img
+                { ...bouncingMotion }
+                title={`Unsubscribe from "${person.name}"`} src={ logoUnsubscribe } onClick={ handleUnsubscribe(person.name) }
+              />
             </div>
           )}
         </div>

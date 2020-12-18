@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MenuContext } from '../../contexts/MenuContext';
+import { componentMotion } from '../../styles/motions/menu-components';
 import boxErrLogo from '../../styles/imgs/errors/box.png';
 import dirErrLogo from '../../styles/imgs/errors/dir.png';
 import serverErrLogo from '../../styles/imgs/errors/server.png';
@@ -24,11 +25,8 @@ const Errors = () => {
   return (
     <AnimatePresence>
     <motion.div
+      { ...componentMotion }
       id="errors-container" className="menu-form"
-      initial={{ x: -800 }}
-      animate={{ x: 0 }}
-      exit={{ x: -800 }}
-      transition={{ duration: 0.3, type: 'tween' }}
     >
       <h1 id="error-title"> Error</h1>
       <p id="error-message">{ errMessage }</p>

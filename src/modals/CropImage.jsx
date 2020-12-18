@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import ReactModal from 'react-modal';
 import ReactCrop from 'react-image-crop';
+import { motion } from 'framer-motion';
+import { buttonsMotion } from '../styles/motions/modal-buttons';
 import 'react-image-crop/dist/ReactCrop.css';
 import '../styles/crop-image.css';
 
@@ -57,8 +59,14 @@ const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited }) => {
         </div>
 
       <div id="crop-apply-btns">
-        <input type="button" value="apply" onClick={ applyCrop } />
-        <input type="button" value="cancel" onClick={ handleCancel } />
+        <motion.input
+          { ...buttonsMotion }
+          type="button" value="apply" onClick={ applyCrop }
+        />
+        <motion.input
+          { ...buttonsMotion }
+          type="button" value="cancel" onClick={ handleCancel }
+        />
       </div>
     </ReactModal>
   );

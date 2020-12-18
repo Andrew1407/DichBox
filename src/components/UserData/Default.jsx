@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { UserContext } from '../../contexts/UserContext';
 import { MenuContext } from '../../contexts/MenuContext';
 import ConfirmModal from '../../modals/ConfirmModal';
+import { itemMotion, signOutMotion } from  '../../styles/motions/list-items';
+import { componentMotion } from '../../styles/motions/menu-components';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import '../../styles/menu-default.css';
 
@@ -53,32 +55,45 @@ const Default = () => {
   };
 
   return (
-    <motion.div
-      className="menu-form"
-      initial={{ x: -800 }}
-      animate={{ x: 0 }}
-      exit={{ x: -800 }}
-      transition={{ duration: 0.3, type: 'tween' }}
-    >
+    <motion.div { ...componentMotion } className="menu-form">
       <img src={ userData.logo || logoDefault } id="default-logo" />
       <div className="name-desc">
         <p className="nd-name" style={{ color: userData.name_color }} >{ userData.name }</p>
         <p className="nd-desc" style={{ color: userData.description_color }} >{ userData.description }</p>
       </div>
-      <div className="menu-options-list">
+      <div id="default-options" className="menu-options-list">
         { !userData.ownPage && !!username &&
           ( userData.follower ?
-            <p style={{ color: 'rgb(204, 0, 255)' }} onClick={ handleSubscribtion('unsubscribe') } >unsubscribe</p> :
-            <p style={{ color: 'rgb(0, 255, 76)' }} onClick={ handleSubscribtion('subscribe') } >subscribe</p>
+            <motion.p
+              { ...itemMotion }
+              style={{ color: 'rgb(204, 0, 255)' }} onClick={ handleSubscribtion('unsubscribe') }
+            >unsubscribe</motion.p> :
+            <motion.p
+              { ...itemMotion }
+              style={{ color: 'rgb(0, 255, 76)' }} onClick={ handleSubscribtion('subscribe') }
+            >subscribe</motion.p>
           )
         }
-        { userData.ownPage && <p id="default-edit" onClick={ handeMenuChoice('editProfile') }>edit profile</p> }
-        <p id="default-boxes" onClick={ handeMenuChoice('boxes') }>boxes</p>
-        { userData.ownPage && <p onClick={ handeMenuChoice('subscriptions') }>subscriptions</p> }
-        { userData.ownPage && 
-          <p onClick={ handeMenuChoice('notifications') }>notifications
-            { !!(+userData.notifications) && <span style={{ color: 'orange' }}> ({ userData.notifications })</span> }
-          </p>
+        { userData.ownPage &&
+          <motion.p
+            { ...itemMotion }
+            id="default-edit" onClick={ handeMenuChoice('editProfile') }
+          >edit profile</motion.p>
+        }
+        <motion.p
+          { ...itemMotion }
+          id="default-boxes" onClick={ handeMenuChoice('boxes') }
+        >boxes</motion.p>
+        { userData.ownPage && <motion.p
+            { ...itemMotion }
+            onClick={ handeMenuChoice('subscriptions') }
+          >subscriptions</motion.p>
+        }
+        { userData.ownPage && <motion.p
+            { ...itemMotion }
+            onClick={ handeMenuChoice('notifications') }
+            >notifications{ !!(+userData.notifications) && <span style={{ color: 'orange' }}
+          > ({ userData.notifications })</span> }</motion.p>
         }
       </div>
       <p className="default-extra" >
@@ -94,8 +109,14 @@ const Default = () => {
         <span id="extra-reg-date"> { userData.reg_date }</span>
       </p>
       { userData.ownPage && <div id="sign-options">
-        <p onClick={ handleSignOptions('Remove this account inevitably', removeOkClb) } >remove account</p>
-        <p onClick={ handleSignOptions('Sign out', signOutOkClb) } >sign out</p>
+        <motion.p
+          { ...itemMotion }
+          onClick={ handleSignOptions('Remove this account inevitably', removeOkClb) }
+        >remove account</motion.p>
+        <motion.p
+          { ...signOutMotion }
+          onClick={ handleSignOptions('Sign out', signOutOkClb) }
+        >sign out</motion.p>
         <ConfirmModal { ...modalOptions } />
       </div> }
     </motion.div>

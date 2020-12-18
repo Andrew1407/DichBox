@@ -1,8 +1,10 @@
 import React, { useContext, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { UserContext } from '../../contexts/UserContext';
 import { BoxesContext } from '../../contexts/BoxesContext';
 import { MenuContext } from '../../contexts/MenuContext';
+import { itemMotion } from  '../../styles/motions/list-items';
 
 const BoxesList = ({ searchInput, setMenuOption }) => {
   const history = useHistory();
@@ -40,10 +42,10 @@ const BoxesList = ({ searchInput, setMenuOption }) => {
     <div id="boxes-list">
       { showBoxes.map(box => 
         <div className="boxes-items" key={ `${box.name}, ${box.access_level}` } onClick={ handleBoxClick(box) } >
-          <p>
+          <motion.p { ...itemMotion }>
             <span style={{ color: box.name_color }} >{ box.name }</span>
             <span className="item-access">({ box.access_level })</span>
-          </p>
+          </motion.p>
         </div>  
       )}
     </div> :

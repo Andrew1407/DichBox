@@ -114,3 +114,8 @@
   margin-left: 1%;
   width: 33px;
 }
+
+.found-user > span:hover,
+.limited-user-data > span:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+}

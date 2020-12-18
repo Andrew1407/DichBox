@@ -10,6 +10,8 @@ import BoxForm from './BoxForm';
 import AddFile from './AddFile';
 import FileManipulator from './FileManipulator';
 import PathEntries from './PathEntries';
+import { bouncingMotion } from '../../styles/motions/bouncing-icons';
+import { componentMotion, descriptionMotion } from '../../styles/motions/menu-components';
 import trashBin from '../../styles/imgs/trash-bin.png';
 import addFileLogo from '../../styles/imgs/add-file.png';
 import addFolderLogo from '../../styles/imgs/add-folder.png';
@@ -155,24 +157,13 @@ const BoxEntries = () => {
 
   return ( editBox ? 
     <BoxForm editParametrs={{ setEditBoxState, boxDetails, edit: true }} /> :
-    <motion.div
-      className="menu-form"
-      initial={{ x: -800 }}
-      animate={{ x: 0 }}
-      exit={{ x: -800 }}
-      transition={{ duration: 0.3, type: 'tween' }}
-    >
+    <motion.div { ...componentMotion } className="menu-form">
       <div>
         { !boxInfoHidden && boxDetails.logo && <img id="entries-logo" src={ boxDetails.logo }/> }
         <div className="name-desc">
           <AnimatePresence>
           { !boxInfoHidden &&
-            <motion.div
-              initial={{ y: -400 }}
-              animate={{ y: 0 }}
-              exit={{ y: -400 }}
-              transition={{ duration: 0.3 }}
-            >
+            <motion.div { ...descriptionMotion } >
               <p className="nd-name" style={{ color: boxDetails.name_color }}>{ boxDetails.name }</p>
               <p className="nd-desc" style={{ color: boxDetails.description_color }} >{ boxDetails.description }</p>
               <p id="nd-owner">Creator: <span style={{ color: boxDetails.owner_nc }}>{ boxDetails.owner_name }</span></p>
@@ -185,12 +176,30 @@ const BoxEntries = () => {
           <div id="entries-user-menu">
             <div id="entries-editor">
               <div id="entries-options" style={{ justifyContent: userData.ownPage ? 'space-between' : boxDetails.editor ? 'space-around' : 'center' }} >
-                { boxDetails.editor && <img src={ addImage } className="entries-imgs" onClick={ handleAddFile('image') } title="Add image"/>}
-                { boxDetails.editor && <img src={ addFileLogo } className="entries-imgs" onClick={ handleAddFile('file') } title="Add file"/>}
-                { boxDetails.editor && <img src={ addFolderLogo } className="entries-imgs" onClick={ handleAddFile('dir') } title="Add directory"/>}
-                { userData.ownPage && <img src={ boxEditLogo } className="entries-imgs" onClick={ () => setEditBoxState(true) } title="Edit box info"/>}
-                { userData.ownPage && <img src={ trashBin } className="entries-imgs" onClick={ handleBoxRemove } title={ `Remove "${boxDetails.name}" box` }/>}
-                <img src={ boxMoreLogo } className="entries-imgs" onClick={ () => setBoxHiddenState(!boxInfoHidden) } title={ (boxInfoHidden ? 'Show' : 'Hide') + ' box description' }/>
+                { boxDetails.editor && <motion.img
+                  { ...bouncingMotion }
+                  src={ addImage } className="entries-imgs" onClick={ handleAddFile('image') } title="Add image"
+                />}
+                { boxDetails.editor && <motion.img
+                  { ...bouncingMotion }
+                  src={ addFileLogo } className="entries-imgs" onClick={ handleAddFile('file') } title="Add file"
+                />}
+                { boxDetails.editor && <motion.img
+                  { ...bouncingMotion }
+                  src={ addFolderLogo } className="entries-imgs" onClick={ handleAddFile('dir') } title="Add directory"
+                />}
+                { userData.ownPage && <motion.img
+                  { ...bouncingMotion }
+                  src={ boxEditLogo } className="entries-imgs" onClick={ () => setEditBoxState(true) } title="Edit box info"
+                />}
+                { userData.ownPage && <motion.img
+                  { ...bouncingMotion }
+                  src={ trashBin } className="entries-imgs" onClick={ handleBoxRemove } title={ `Remove "${boxDetails.name}" box` }
+                />}
+                <motion.img
+                  { ...bouncingMotion }
+                  src={ boxMoreLogo } className="entries-imgs" onClick={ () => setBoxHiddenState(!boxInfoHidden) } title={ (boxInfoHidden ? 'Show' : 'Hide') + ' box description' }
+                />
               </div>
               <AddFile {...{ setAddFileVisible, addFileVisible, pathName: boxPath, fileManipulation }} />
               <FileManipulator {...{ fileManipulation, pathName: boxPath, setFileManupulation, addFileVisible }} />
@@ -202,7 +211,7 @@ const BoxEntries = () => {
             </div>
             <p id="box-entries-path">
               { boxPath.map((x, i) => 
-                <span {...{ onClick: handleEntriesClick(i), key: i, id: i ? '' : 'be-path-first', style: i ? {} : { color: boxDetails.name_color } }} >{ i ? ` / ${x}` : x }</span>
+                <span {...{ onClick: handleEntriesClick(i), key: i, className: 'be-path', style: i ? {} : { color: boxDetails.name_color } }} >{ i ? ` / ${x}` : x }</span>
               )}
             </p>
           </div>

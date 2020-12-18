@@ -1,5 +1,6 @@
 #menu {
   overflow-y: scroll;
+  overflow-x: hidden;
   max-height: 1000px;
 }
 
@@ -34,3 +35,20 @@
   flex-direction: row;
   justify-content: space-between;
 }
+
+.edit-name > p {
+  margin-left: 1%;
+}
+
+.edit-name > textarea {
+  margin-left: 2%;
+}
+
+.edit-name > input:hover {
+  border-bottom: 7px solid rgb(0, 217, 255);
+}
+
+.edit-name > textarea:hover {
+  border: 3px solid rgb(0, 217, 255);
+}
+

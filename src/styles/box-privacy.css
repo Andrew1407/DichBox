@@ -10,7 +10,11 @@
   margin-left: 1%;
 }
 
-
 .box-privacy-radio > label > input {
   outline: none;
+}
+
+.box-privacy-radio > label:hover {
+  text-decoration: underline;
+  text-shadow: 0 0 7px rgb(50, 211, 240);
 }

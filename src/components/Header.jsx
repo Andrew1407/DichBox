@@ -6,6 +6,9 @@ import { UserContext } from '../contexts/UserContext';
 import { MenuContext } from '../contexts/MenuContext';
 import { BoxesContext } from '../contexts/BoxesContext';
 import { VerifiersContext } from '../contexts/VerifiersContext';
+import { bouncingMotion, searchIconMotion } from '../styles/motions/bouncing-icons'
+import { bounceDownMotion } from '../styles/motions/switch-icons';
+import { headerMotion } from '../styles/motions/menu-components';
 import defaultLogo from '../styles/imgs/default-user-logo.png';
 import searchLogo from '../styles/imgs/search.png';
 import showArrow from '../styles/imgs/menu-show.png';
@@ -94,28 +97,17 @@ const Header = () => {
     <div>
       <AnimatePresence>
       { !hidden && 
-        <motion.div
-          initial={{ y: -150 }}
-          animate={{ y: 0 }}
-          exit={{ y: -150 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          id="header"
-        >
-          <div id="header-name">
-            <h1 onClick={ () => setHidden(true) }>DichBox</h1>
+        <motion.div { ...headerMotion } id="header">
+          <div  onClick={ () => setHidden(true) } id="header-name" className="highlight">
+            <h1>DichBox</h1>
           </div>
-          <div id="header-menu">
-            <img src={ defaultLogo } onClick={ handleMenuClick } style={{ backgroundColor }} /> 
-          </div>
-          <form id="header-search" onSubmit={ e => (e.preventDefault(), handleSearchClick()) }>
+          <motion.div { ...bouncingMotion } id="header-menu">
+            <img src={ defaultLogo } className="highlight" onClick={ handleMenuClick } style={{ backgroundColor }} /> 
+          </motion.div>
+          <form id="header-search" className="highlight" onSubmit={ e => (e.preventDefault(), handleSearchClick()) }>
             <input value={ searchInput } type="text" placeholder="search users" onChange={ handleSearchInput } />
             <motion.img
-              whileHover={{
-                y: [0, -10, 0, -8, 0, -6, 0, -3, 0],
-                x: [0, -3, 0, -3, 0, -3, 0, -1, 0]
-              }}
-              transition={{ duration: 1.1 }}
-              style={{ skewX: 25 }}
+              { ...searchIconMotion }
               src={ searchLogo } onClick={ handleSearchClick }
             />
           </form>
@@ -124,9 +116,7 @@ const Header = () => {
       </AnimatePresence>
       { hidden &&
         <motion.img
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.35 }}
+          { ...bounceDownMotion }
           id="header-hidden" src={ showArrow } onClick={ () => setHidden(false) }
         />
       }

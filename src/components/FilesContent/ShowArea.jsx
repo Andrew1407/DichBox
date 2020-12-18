@@ -1,8 +1,10 @@
 import React, { useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 import { MenuContext } from '../../contexts/MenuContext';
 import { UserContext } from '../../contexts/UserContext';
 import { BoxesContext } from '../../contexts/BoxesContext';
+import { bouncingMotion } from '../../styles/motions/bouncing-icons';
 import editLogo from '../../styles/imgs/file-edit.png';
 import cancelEditLogo from '../../styles/imgs/file-edit-cancel.png';
 import saveLogo from '../../styles/imgs/file-save.png';
@@ -150,14 +152,35 @@ const ShowArea = () => {
     <div id="show-area">
       <div id="edit-menu" style={ visibleFile.type === 'image' ? { width: '10%', marginLeft: '88%' }: {} }>
         { visibleFile.type !== 'image' && userData.editor && (editMode ?
-          <img title="Set view mode" src={ cancelEditLogo } onClick={ () => (handleCancelEdit(), setEditMode(false)) } /> :
-          <img title="Set edit mode" src={ editLogo } onClick={ () => setEditMode(true) } />
+          <motion.img
+            { ...bouncingMotion }
+            title="Set view mode" src={ cancelEditLogo } onClick={ () => (handleCancelEdit(), setEditMode(false)) }
+          /> :
+          <motion.img
+            { ...bouncingMotion }
+            title="Set edit mode" src={ editLogo } onClick={ () => setEditMode(true) }
+          />
         )}
-        { visibleFile.type !== 'image' && userData.editor && <img onClick={ handleFileSave } title={`Save changes into "${visibleFile.name}"`} src={ saveLogo } /> }
-        { visibleFile.type !== 'image' && userData.editor && <img onClick={ handleFilesSaveAll } title="Save changes into all opened files" src={ saveAllLogo } /> }
-        <img title="Zoom in" src={ zoomInLogo } onClick={ handleZoom('in') }  />
-        <img title="Zoom out" src={ zoomOutLogo } onClick={ handleZoom('out') } />
-        { visibleFile.type !== 'image' && <img title={ `Download "${visibleFile.name}"` } src={ downloadLogo } onClick={ handleDownload } /> }
+        { visibleFile.type !== 'image' && userData.editor && <motion.img
+          { ...bouncingMotion }
+          onClick={ handleFileSave } title={`Save changes into "${visibleFile.name}"`} src={ saveLogo }
+        /> }
+        { visibleFile.type !== 'image' && userData.editor && <motion.img
+          { ...bouncingMotion }
+          onClick={ handleFilesSaveAll } title="Save changes into all opened files" src={ saveAllLogo }
+        /> }
+        <motion.img
+          { ...bouncingMotion }
+          title="Zoom in" src={ zoomInLogo } onClick={ handleZoom('in') }
+        />
+        <motion.img
+          { ...bouncingMotion }
+          title="Zoom out" src={ zoomOutLogo } onClick={ handleZoom('out') }
+        />
+        { visibleFile.type !== 'image' && <motion.img
+          { ...bouncingMotion }
+          title={ `Download "${visibleFile.name}"` } src={ downloadLogo } onClick={ handleDownload }
+        /> }
       </div>
       { visibleFile.type === 'image' ?
         <div id="show-image">

@@ -72,3 +72,17 @@
   margin-left: 1%;
   font-style: italic;
 }
+ 
+#nts-clear-all:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+  box-shadow: 0 0 10px rgb(50, 211, 240);
+}
+
+.nts-msg:hover {
+  background-color: rgb(24, 24, 24);
+}
+
+.head-left > p:hover, .note-msg > p:hover {
+  text-decoration: underline;
+  text-shadow: 0 0 7px rgb(50, 211, 240);
+}

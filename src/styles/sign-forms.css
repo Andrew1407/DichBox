@@ -1,8 +1,5 @@
 #sign {
   margin-bottom: 10%;
-}
-
-#sign {
   overflow-y: scroll;
 }
 
@@ -40,4 +37,17 @@
   margin-top: 20%;
   background-color: black;
   color: rgb(0, 217, 255);
+}
+
+.sign-field > p {
+  margin-left: 2%
+}
+
+.form-submit:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+  box-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+}
+
+#sign-switch > p:hover {
+  box-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
 }

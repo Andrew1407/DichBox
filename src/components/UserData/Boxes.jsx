@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { componentMotion } from '../../styles/motions/menu-components';
 import { UserContext } from '../../contexts/UserContext';
 import { BoxesContext } from '../../contexts/BoxesContext';
 import { MenuContext } from '../../contexts/MenuContext';
@@ -46,20 +47,12 @@ const Boxes = () => {
   }, [userData, boxesList]);
 
   return (
-    <motion.div
-      className="menu-form"
-      initial={{ x: -800 }}
-      animate={{ x: 0 }}
-      exit={{ x: -800 }}
-      transition={{ duration: 0.3, type: 'tween' }}
-    >
+    <motion.div { ...componentMotion } className="menu-form">
       <div id="boxes-header" className="menu-form">
         <h1 id="boxes-title">Boxes</h1>
         <div id="boxes-search">
-          <div>
-          </div>
-            <label htmlFor="search">search:  </label>
-            <input type="text" name="search" onChange={ e => setSearchInput(e.target.value) } />
+          <label htmlFor="search">search:  </label>
+          <input id="boxes-search-line" type="text" name="search" onChange={ e => setSearchInput(e.target.value) } />
           <select id="boxes-select" onChange={ e => setListOption(e.target.value) } defaultValue={ listOption } >
             <option value="all">all</option>
             <option value="public">public</option>

@@ -1,6 +1,9 @@
 import React, { useState, useCallback, useContext } from 'react';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 import { UserContext } from '../../contexts/UserContext';
+import { itemMotion } from '../../styles/motions/list-items';
+import { bouncingMotion } from '../../styles/motions/bouncing-icons';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import trashBin from '../../styles/imgs/trash-bin.png';
 import '../../styles/search-box.css';
@@ -66,7 +69,10 @@ const SearchUsers = ({ changedList, setChangedList, inputList, setInputList }) =
             { foundUsers.map(user => 
               <div title={ user.name } className="found-user" key={ user.name } onClick={ handleFoundUserClick(user) } >
                 <img src={ user.logo || logoDefault } />
-                <span style={{ color: user.name_color }}>{ shortenName(user.name) }</span>
+                <motion.span
+                  { ...itemMotion }
+                  style={{ color: user.name_color }}
+                >{ shortenName(user.name) }</motion.span>
               </div>
           )}
           </div>
@@ -77,9 +83,15 @@ const SearchUsers = ({ changedList, setChangedList, inputList, setInputList }) =
           <div className="limited-user" key={ user.name }>
             <div title={ user.name } className="limited-user-data" >
               <img src={ user.logo || logoDefault } />
-              <span style={{ color: user.name_color }} >{ shortenName(user.name) }</span>
+              <motion.span
+                { ...itemMotion }
+                style={{ color: user.name_color }}
+              >{ shortenName(user.name) }</motion.span>
             </div>           
-            <img src={ trashBin } className="limited-user-rm" onClick={ handleUserRemove(user) } />
+            <motion.img
+              { ...bouncingMotion }
+              src={ trashBin } className="limited-user-rm" onClick={ handleUserRemove(user) }
+            />
           </div>
         )}
       </div>

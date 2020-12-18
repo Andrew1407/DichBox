@@ -1,10 +1,12 @@
 import React, { useState, useContext, useCallback } from 'react';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
 import { UserContext } from '../../contexts/UserContext';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
 import { MenuContext } from '../../contexts/MenuContext';
+import { bouncingMotion } from '../../styles/motions/bouncing-icons';
 import '../../styles/sign-forms.css';
 
 const SingForms = () => {
@@ -139,13 +141,21 @@ const SingForms = () => {
   return (
     <div id="sign">
       <div id="sign-switch">
-        <p onClick={ handleSignForm(true) } style={ setBtnStateStyle(isSignUp) }>sing up</p>
-        <p onClick={ handleSignForm(false) } style={ setBtnStateStyle(!isSignUp) }>sing in</p>
+        <motion.p
+          { ...bouncingMotion }
+          onClick={ handleSignForm(true) } style={ setBtnStateStyle(isSignUp) }
+        >sing up</motion.p>
+        <motion.p
+          { ...bouncingMotion }
+          onClick={ handleSignForm(false) } style={ setBtnStateStyle(!isSignUp) }
+        >sing in</motion.p>
       </div>
+      <AnimatePresence>
       { isSignUp ? 
         <SignUp {...{ submitSignUp, getOnChangeVerifier, submitButton, warnings }} /> :
         <SignIn {...{ submitSignIn, getOnChangeVerifier, submitButton, warnings }} /> 
       }
+      </AnimatePresence>
     </div>
   );
 };

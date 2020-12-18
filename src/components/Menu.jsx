@@ -5,6 +5,8 @@ import { VerifiersContext } from '../contexts/VerifiersContext';
 import { UserContext } from '../contexts/UserContext';
 import { MenuContext } from '../contexts/MenuContext';
 import { BoxesContext } from '../contexts/BoxesContext';
+import { hideMenuMotion, showMenuMotion, bounceDownMotion } from '../styles/motions/switch-icons';
+import { menuMotion } from '../styles/motions/menu-components';
 import SignForms from './SignForms/SignForms';
 import UserData from './UserData/UserData';
 import SearchList from './SearchList';
@@ -87,20 +89,21 @@ const Menu = () => {
   >
   <AnimatePresence>
   { menuVisible && 
-    <motion.menu
-      initial={{ x: -600 }}       
-      animate={{ x: 0 }}
-      exit={{ x: -600, opacity: 0 }}
-      transition={{ duration: 0.3, delay: 0.1, type: 'spring' }}       
-    >
+    <motion.menu { ...menuMotion }>
       { foundErr ?
         <Errors /> :
         ( isLodaing ?
           <Loading /> :
           <div>
             <div id="menu-nav-btns">
-              <img src={ hideImg } className="arrow" onClick={ handleArrowClick(false) } />
-              <img src={ homeLogo } id="home-logo" onClick={ handleHomeClick } style={{ display: homeIconVisible ? 'block' : 'none' }} />
+              <motion.img
+                { ...hideMenuMotion }
+                src={ hideImg } className="arrow" onClick={ handleArrowClick(false) }
+              />
+              <motion.img
+                { ...bounceDownMotion }
+                src={ homeLogo } id="home-logo" onClick={ handleHomeClick } style={{ display: homeIconVisible ? 'block' : 'none' }}
+              />
             </div>
             { searchStr ?
               <SearchList /> :
@@ -121,9 +124,7 @@ const Menu = () => {
   </AnimatePresence>
   { !menuVisible &&      
     <motion.img
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.1 }}
+      { ...showMenuMotion }
       src={ showImg } className="arrow" id="show" onClick={ handleArrowClick(true) }
     />
   }

@@ -6,6 +6,7 @@ import { VerifiersContext } from '../../contexts/VerifiersContext';
 import { UserContext } from '../../contexts/UserContext';
 import { BoxesContext } from '../../contexts/BoxesContext';
 import { MenuContext } from '../../contexts/MenuContext';
+import { componentMotion } from '../../styles/motions/menu-components';
 import CropImage from '../../modals/CropImage';
 import EditField from '../inputFields/EditField';
 import BoxPrivacy from '../inputFields/BoxPrivacy';
@@ -165,11 +166,8 @@ const BoxForm = ({ editParametrs }) => {
 
   return (
     <motion.form
+      { ...componentMotion }
       className="menu-form" onSubmit={ handleSubmit }
-      initial={{ x: -800 }}
-      animate={{ x: 0 }}
-      exit={{ x: -800 }}
-      transition={{ duration: 0.3, type: 'tween' }}
     >
       <h1 id="create-box-title">{ editParametrs.edit ? 'Edit box' : 'Create new box'}</h1>
       <div className="edit-field">

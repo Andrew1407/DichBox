@@ -84,3 +84,15 @@
   font-size: 75%;
   padding-left: 2%;
 }
+
+.boxes-items > p:hover, #boxes-header-btn:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+}
+
+#boxes-header-btn:hover, #boxes-select:hover {
+  box-shadow: 0 0 10px rgb(50, 211, 240);
+}
+
+#boxes-search-line:hover {
+  border-bottom: 5px solid rgb(0, 217, 255);
+}

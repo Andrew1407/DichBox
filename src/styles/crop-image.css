@@ -42,6 +42,11 @@ img.ReactCrop__image{
   padding: 0.5% 2%;
 }
 
+#crop-apply-btns > input:hover {
+  text-shadow: 0 0 10px rgb(209, 135, 228), 0 0 20px rgb(204, 0, 255);
+  box-shadow: 0 0 20px rgb(204, 0, 255);
+}
+
 .crop-input-field {
   margin-bottom: 5%;
 }

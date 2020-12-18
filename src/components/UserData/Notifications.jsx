@@ -3,6 +3,8 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { MenuContext } from '../../contexts/MenuContext';
 import { UserContext } from '../../contexts/UserContext';
+import { bouncingMotion } from '../../styles/motions/bouncing-icons'
+import { componentMotion } from '../../styles/motions/menu-components';
 import NoteMessage from './NoteMessage';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import trashBin from '../../styles/imgs/trash-bin.png';
@@ -42,13 +44,7 @@ const Notifications = () => {
   }, [userData]);
 
   return (
-    <motion.div
-      className="menu-form"
-      initial={{ x: -800 }}
-      animate={{ x: 0 }}
-      exit={{ x: -800 }}
-      transition={{ duration: 0.3, type: 'tween' }}
-    >
+    <motion.div { ...componentMotion } className="menu-form">
       <h1 id="nts-header">Notifications{ 
         !!(+userData.notifications) &&  <span> ({ userData.notifications })</span> 
       }</h1>
@@ -65,7 +61,10 @@ const Notifications = () => {
                   <img src={ ntf.icon || logoDefault }/>
                   <p>{ ntf.note_date }</p>
                 </div>
-                <img src={ trashBin } className="ntf-remove" onClick={ handleRemove(ntf.id) }/>
+                <motion.img
+                  src={ trashBin } className="ntf-remove" onClick={ handleRemove(ntf.id) }
+                  { ...bouncingMotion }
+                />
               </div>
               <NoteMessage {...{ type: ntf.type, userName: ntf.user_name, userColor: ntf.user_color, boxName: ntf.box_name, boxColor: ntf.box_color, msg: ntf.msgEntries }} />
             </div>

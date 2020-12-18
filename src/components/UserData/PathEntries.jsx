@@ -5,6 +5,9 @@ import { useHistory } from 'react-router-dom';
 import { BoxesContext } from '../../contexts/BoxesContext';
 import { MenuContext } from '../../contexts/MenuContext';
 import { UserContext } from '../../contexts/UserContext';
+import { filenameMotion } from '../../styles/motions/path-entries'
+import { bouncingMotion } from '../../styles/motions/bouncing-icons'
+import { pathEntriesMotion } from '../../styles/motions/menu-components';
 import fileLogo from '../../styles/imgs/file-icon.png';
 import dirLogo from '../../styles/imgs/folder-icon.png';
 import removeEntry from '../../styles/imgs/entry-remove.png';
@@ -75,11 +78,8 @@ const PathEntries = ({ entriesSearch, setFileManupulation, addFileVisible, setAd
 
   return (
     <motion.div
+      { ...pathEntriesMotion }
       className="menu-options-list" id="mol-units-list"
-      initial={{ x: -800 }}
-      animate={{ x: 0 }}
-      exit={{ x: -800, opacity: 0 }}
-      transition={{ delay: 0.1, duration: 0.2, type: 'tween' }}
     >
       { (pathDepth.length > 2) && 
         <div className="box-entries-item" onClick={ hadnleHistoryMove(pathDepth.slice(0, -1)) } >
@@ -92,12 +92,18 @@ const PathEntries = ({ entriesSearch, setFileManupulation, addFileVisible, setAd
         <div className="be-item-wrap" key={ unit.name }>
           <div title={ unit.name } className="box-entries-item" onClick={ unit.type === 'dir' ? hadnleHistoryMove([...pathDepth, unit.name]) : handleClickFile(unit) } >
             <img src={ unit.type === 'dir' ? dirLogo : fileLogo } />
-            <p>{ shortenName(unit.name) }</p>
+            <motion.p { ...filenameMotion }>{ shortenName(unit.name) }</motion.p>
           </div>
           { userData.editor &&
             <div className="be-item-icons">
-              <img src={ renameEntry } onClick={ handleFileManipulation('rename', unit) }/>
-              <img src={ removeEntry } onClick={ handleFileManipulation('remove', unit) }/>
+              <motion.img
+                { ...bouncingMotion }
+                title={ `Rename: "${unit.name}"` } src={ renameEntry } onClick={ handleFileManipulation('rename', unit) }
+              />
+              <motion.img
+                { ...bouncingMotion }
+                title={ `Remove: "${unit.name}"` } src={ removeEntry } onClick={ handleFileManipulation('remove', unit) }
+              />
             </div>
           }
         </div>

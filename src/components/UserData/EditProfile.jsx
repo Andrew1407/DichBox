@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { UserContext } from '../../contexts/UserContext';
 import { VerifiersContext } from '../../contexts/VerifiersContext';
 import { MenuContext } from '../../contexts/MenuContext';
+import { componentMotion } from '../../styles/motions/menu-components';
 import CropImage from '../../modals/CropImage';
 import EditField from '../inputFields/EditField';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
@@ -168,11 +169,8 @@ const EditProfile = () => {
 
   return (
     <motion.form
+      { ...componentMotion }
       id="edit-profile" className="menu-form" onSubmit={ submitEditedFields }
-      initial={{ x: -800 }}
-      animate={{ x: 0 }}
-      exit={{ x: -800 }}
-      transition={{ duration: 0.3, type: 'tween' }}
     >
       <div className="menu-form edit-field">
           <img id="edit-logo" src={ logoEdited ? logoEdited === 'removed' ? logoDefault : logoEdited : logo } />

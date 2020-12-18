@@ -123,8 +123,8 @@ const FileManipulator = ({ setFileManupulation, fileManipulation, addFileVisible
         </div>
       }
       <div id="fm-btns">
-        <input type="button" value="ok" style={ fileManipulation.action === 'rename' ? OkBtnStyle : {} } onClick={ fileManipulation.action === 'rename' ? handleRename : handleRemove }/>
-        <input type="button" value="cancel" onClick={ () => setFileManupulation(null) } />
+        <input type="button" className="files-btn" value="ok" style={ fileManipulation.action === 'rename' ? OkBtnStyle : {} } onClick={ fileManipulation.action === 'rename' ? handleRename : handleRemove }/>
+        <input type="button" className="files-btn" value="cancel" onClick={ () => setFileManupulation(null) } />
       </div>
     </div> 
   );

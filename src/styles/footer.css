@@ -17,6 +17,12 @@
   text-decoration: none;
 }
 
+#repo-ref:hover {
+  text-decoration: underline;
+  font-size: 110%;
+  text-shadow: 0 0 10px rgb(211, 103, 238), 0 0 20px rgb(204, 0, 255);
+}
+
 #version b {
   color: rgb(0, 255, 76);
 }

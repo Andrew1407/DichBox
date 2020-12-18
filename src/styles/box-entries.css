@@ -87,7 +87,8 @@
   color: rgb(0, 217, 255);
 }
 
-#be-add-file > input[type="text"]:focus {
+#be-add-file > input[type="text"]:focus,
+#be-add-file > input[type="text"]:hover {
   border-bottom: 4px solid rgb(0, 217, 255);
 }
 
@@ -138,7 +139,27 @@
   font-size: 170%;
 }
 
-#be-path-first {
+.be-path:first-child {
   font-size: 110%;
   font-weight: bold;
+}
+
+.be-path:hover {
+  font-weight: bold;
+  text-shadow: 0 0 20px rgb(50, 211, 240);
+}
+
+.edit-btn:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+  box-shadow: 0 0 10px rgb(50, 211, 240);
+}
+
+.files-btn:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+  box-shadow: 0 0 10px rgb(50, 211, 240);
+}
+
+#entries-search > input:hover,
+#entries-search > input:focus {
+  border-bottom: 5px solid rgb(0, 217, 255);
 }

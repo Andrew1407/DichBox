@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MenuContext } from '../contexts/MenuContext';
+import { itemMotion } from '../styles/motions/list-items';
+import { componentMotion } from '../styles/motions/menu-components';
 import logoDefault from '../styles/imgs/default-user-logo.png'
 import '../styles/users-list.css';
 
@@ -21,20 +23,17 @@ const SearchList = () => {
 
   return (
     <AnimatePresence>
-    <motion.div
-      id="search-list" className="menu-form"
-      initial={{ x: -800 }}
-      animate={{ x: 0 }}
-      exit={{ x: -800 }}
-      transition={{ duration: 0.3, type: 'tween' }}
-    >
+    <motion.div { ...componentMotion } id="search-list" className="menu-form">
       <h1 id="search-list-header">Found users</h1>
       { usersList && usersList.filter(x => x).length ? 
         usersList.map(person => 
           <div className="search-list-display search-list-person" key={ person.name }>
             <div onClick={ handlePersonClick(person.name) } className="search-list-data search-list-display">
               <img src={ person.logo || logoDefault }/>
-              <span style={{ color: person.name_color }}>{ shortenName(person.name) }</span>
+              <motion.span
+                { ...itemMotion }
+                style={{ color: person.name_color }}
+              >{ shortenName(person.name) }</motion.span>
             </div>
           </div>
         ) :

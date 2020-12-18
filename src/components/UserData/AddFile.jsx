@@ -1,6 +1,7 @@
 import React, { useContext, useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { boxToolMotion } from '../../styles/motions/menu-components';
 import { BoxesContext } from '../../contexts/BoxesContext';
 import { UserContext } from '../../contexts/UserContext';
 import { MenuContext } from '../../contexts/MenuContext';
@@ -95,25 +96,15 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
     <AnimatePresence>
     { addFileVisible &&
       ( addFileVisible === 'image' ?
-        <motion.div
-          id="be-add-file"
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -50, opacity: 0 }}
-        >
+        <motion.div { ...boxToolMotion } id="be-add-file">
           <label htmlFor="addFile">Select image: </label>
           <input type="file" accept="image/*" onChange={ writeImage }/>
-          <input type="button" value="add" onClick={ addNewFile }/>
+          <input className="files-btn" type="button" value="add" onClick={ addNewFile }/>
         </motion.div> :
-        <motion.div
-          id="be-add-file"
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -50, opacity: 0 }}
-        >
+        <motion.div { ...boxToolMotion } id="be-add-file">
           <label htmlFor="addFile">{ addFileVisible } name:</label>
           <input spellCheck="false" type="text" name="addFile" value={ nameInput } onChange={ e => setNameInput(e.target.value) } />
-          <input type="button" value="add" disabled={ warning || !nameInput } style={{ borderColor: correctColor, color: correctColor }} onClick={ addNewFile } />
+          <input className="files-btn" type="button" value="add" disabled={ warning || !nameInput } style={{ borderColor: correctColor, color: correctColor }} onClick={ addNewFile } />
           { warning && !!nameInput && <i id="be-add-file-warning">{ warning }</i> }
         </motion.div>
       )
