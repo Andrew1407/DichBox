@@ -21,7 +21,7 @@ const SingForms = () => {
     cleanWarnings,
     setWarningsOnHandle
   } = useContext(VerifiersContext);
-  const { setFoundErr, setLoading } = useContext(MenuContext);
+  const { setFoundErr } = useContext(MenuContext);
   const [isSignUp, setSignModifier] = useState(true);
   const setBtnStateStyle = modifier => (
     modifier ? { backgroundColor: 'rgb(0, 217, 255)', color: 'black' } :
@@ -71,7 +71,6 @@ const SingForms = () => {
   // submit handlers
   const submitSignUpClb = async e => {
     e.preventDefault();
-    setLoading(true);
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
     try {
@@ -86,13 +85,11 @@ const SingForms = () => {
       cleanWarnings();
       dispatchDataInput({ type: 'CLEAN_DATA' });
     }
-    setLoading(false);
   };
   const submitSignUp = useCallback(submitSignUpClb, [dataInput]);
   
   const submitSignInClb = async e => {
     e.preventDefault();
-    setLoading(true);
     const isCorrect = getVerifiersState();
     if (!isCorrect) return;
     const setPasswdInvalid = () => {
@@ -122,7 +119,6 @@ const SingForms = () => {
         dispatchDataInput({ type: 'CLEAN_DATA' });
       }
     }
-    setLoading(false);
   };
   const submitSignIn = useCallback(
     submitSignInClb, 

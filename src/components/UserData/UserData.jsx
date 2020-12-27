@@ -6,8 +6,8 @@ import { AnimatePresence } from 'framer-motion';
 import Boxes from './Boxes';
 import Default from './Default';
 import EditProfile from './EditProfile';
-import BoxForm from './BoxForm';
-import BoxEntries from './BoxEntries';
+import BoxForm from '../BoxData/BoxForm';
+import BoxEntries from '../BoxData/BoxEntries';
 import Subscriptions from './Subscriptions';
 import Notifications from './Notifications';
 
@@ -32,7 +32,7 @@ const UserData = () => {
 
   return (
     <AnimatePresence exitBeforeEnter>
-    <Switch location={location} key={location.key}>
+    <Switch location={ location } key={ location.key }>
       <Route path="/:username/:box">
         { menuChoices.boxEntries }
       </Route>

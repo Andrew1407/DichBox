@@ -39,6 +39,7 @@ const BoxEntries = () => {
     boxInfoHidden,
     setBoxHiddenState,
     boxDetails,
+    setBoxesList,
     setBoxDetails,
     editBox,
     setEditBoxState,
@@ -79,6 +80,16 @@ const BoxEntries = () => {
     if (data.removed) {
       handleViewBoxesClick();
       dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
+      const boxesBody = {
+        viewerName: username,
+        boxOwnerName: userData.name,
+        follower: userData.follower
+      };
+      const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/user_boxes`, boxesBody);
+      const { boxesList } = data;
+      const boxes = boxesList && boxesList.length ?
+        boxesList : [null]; 
+      setBoxesList(boxes);
     }
     setLoading(false);
   };
