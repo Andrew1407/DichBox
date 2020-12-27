@@ -8,7 +8,7 @@ create table users (
   name varchar(40) not null,
   name_color varchar(8) default '#00d9ff',
   email varchar(50) not null,
-  passwd varchar(16) not null,
+  passwd varchar(65) not null,
   followers int default 0,
   reg_date timestamp default now(),
   subscriptions int[] default '{}',
