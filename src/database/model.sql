@@ -11,7 +11,6 @@ create table users (
   passwd varchar(65) not null,
   followers int default 0,
   reg_date timestamp default now(),
-  subscriptions int[] default '{}',
   description varchar(100) default '',
   description_color varchar(8) default '#00d9ff'
 );
