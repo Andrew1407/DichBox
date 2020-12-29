@@ -110,7 +110,10 @@ const BoxForm = ({ editParametrs }) => {
         boxName: params.box,
       };
       const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/edit`, editBody);
-      setBoxDetails({ ...boxDetails, ...data });
+      const boxDetailsEdited = { ...boxDetails, ...data };
+      if (logoEdited === 'removed')
+        boxDetailsEdited.logo = null;
+      setBoxDetails(boxDetailsEdited);
       if (data.name)
         history.push(`/${username}/${data.name}`);
       setEditBoxState(false);

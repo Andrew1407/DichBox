@@ -68,6 +68,7 @@
   padding-left: 26px;
   padding-right: 26px;
   box-shadow: 0 0 30px rgb(50, 211, 240);
+  transition-duration: 200ms;
 }
 
 .opened-file-name {

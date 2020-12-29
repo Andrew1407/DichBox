@@ -17,7 +17,6 @@ const ShowArea = () => {
   const { openedFiles, dispatchOpenedFiles } = useContext(MenuContext);
   const { userData, username } = useContext(UserContext);
   const { boxDetails, setBoxDetails } = useContext(BoxesContext);
-  const { setLoading } = useContext(MenuContext);
   const [visibleFile, setVisibleFile] = useState(null);
   const [fontSize, setFontSize] = useState(140);
   const [editMode, setEditMode] = useState(false);
@@ -80,7 +79,6 @@ const ShowArea = () => {
       editorName: username,
       editor: userData.editor,
     };
-    setLoading(true);
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/save`, saveBody );
     const { last_edited } = data;
     if (!data.edited) return;
@@ -90,7 +88,6 @@ const ShowArea = () => {
     file.src = edited;
     setVisibleFile(file);
     dispatchOpenedFiles({ type: 'FILE_WRITE', file });
-    setLoading(false);
   };
   const handleFileSave = useCallback(
     handleFileSaveClb,
@@ -98,7 +95,6 @@ const ShowArea = () => {
   );
 
   const handleFilesSaveAll = async () => {
-    setLoading(true);
     if (!editMode) return;
     const editedFiles = openedFiles.reduce((arr, f) => (
       (f && f.edited === f.src || f.edited === undefined) ? 
@@ -127,7 +123,6 @@ const ShowArea = () => {
     );
     if (visibleCopy) setVisibleFile(visibleCopy);
     dispatchOpenedFiles({ type: 'FILES_WRITE_ALL', files });
-    setLoading(false);
   }
 
   useEffect(() => {

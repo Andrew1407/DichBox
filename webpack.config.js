@@ -1,9 +1,7 @@
 const path = require('path');
-const autoprefixer = require('autoprefixer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 require('dotenv').config();
-
 
 module.exports = {
   entry: './src/index.jsx',
@@ -34,40 +32,23 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        // exclude: /node_modules/,
         use: [
           { loader: 'style-loader' },
           { 
             loader: 'css-loader',
             options: {
-                modules: {
-                  localIdentName: "[local]"
-                  // localIdentName: "[name]__[local]___[hash:base64:5]",
-                },														
                 sourceMap: true 
             }
           },
-          { 
-            loader: 'postcss-loader',
-            options: {
-              ident: 'postcss',
-              plugins: () => [
-                autoprefixer({})
-              ]
-            }
-          }
         ]
       },
       {
         test: /\.(png|jpe?g|gif)$/,
-        loader: 'url-loader?limit=1000000&name=img/[name].[ext]'
+        loader: 'file-loader?name=img/[name].[ext]'
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|otf)$/,
-        loader: 'file-loader',
-        options: {
-          name: './fonts/[name].[ext]',
-        },
+        loader: 'file-loader'
       }
     ]
   },
@@ -83,5 +64,10 @@ module.exports = {
     port: process.env.DEV_SERVER_PORT || 7042,
     host: process.env.DEV_SERVER_HOST || 'localhost',
     historyApiFallback: true,
+  },
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000
   }
 }
