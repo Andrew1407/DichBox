@@ -22,11 +22,11 @@ module.exports = {
         exclude: /node_modules/,
         options: {
           presets: [
-              '@babel/preset-env',
-              '@babel/preset-react'
+            '@babel/preset-env',
+            '@babel/preset-react'
           ],
           plugins: [
-              '@babel/transform-runtime'
+            '@babel/transform-runtime'
           ]
         } 
       },
@@ -37,18 +37,18 @@ module.exports = {
           { 
             loader: 'css-loader',
             options: {
-                sourceMap: true 
+              sourceMap: true 
             }
-          },
+          }
         ]
       },
       {
         test: /\.(png|jpe?g|gif)$/,
-        loader: 'file-loader?name=img/[name].[ext]'
+        loader: 'file-loader?name=imgs/[name].[ext]'
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|otf)$/,
-        loader: 'file-loader'
+        loader: 'file-loader?name=fonts/[name].[ext]'
       }
     ]
   },
@@ -63,7 +63,7 @@ module.exports = {
   devServer: {
     port: process.env.DEV_SERVER_PORT || 7042,
     host: process.env.DEV_SERVER_HOST || 'localhost',
-    historyApiFallback: true,
+    historyApiFallback: true
   },
   performance: {
     hints: false,
