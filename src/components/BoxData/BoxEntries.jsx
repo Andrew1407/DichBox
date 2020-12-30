@@ -44,8 +44,6 @@ const BoxEntries = () => {
     editBox,
     setEditBoxState,
     setPathEntries,
-    setBoxErr,
-    boxErr,
     fetchEntries
   } = useContext(BoxesContext);
   const boxPath = history.location.pathname
@@ -128,7 +126,7 @@ const BoxEntries = () => {
 
   useEffect(() => {
     const fetchBoxData = async () => {
-      const equalAddress = pathName === params.username;
+      const equalAddress = userData.name === params.username;
       if (!(equalAddress && userData.name && !boxDetails.name))
         return;
       const dataBody = {
@@ -140,15 +138,9 @@ const BoxEntries = () => {
       setLoading(true);
       try {
         const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/details`, dataBody);
-        if (data.name) {
-          setBoxDetails(data);
-          const editor = data.editor
-          dispatchUserData({ type: 'REFRESH_DATA', data: { editor } });
-          if (boxErr)
-          setBoxErr(false);
-        } else {
-          setBoxErr(true);
-        }
+        setBoxDetails(data);
+        const editor = data.editor
+        dispatchUserData({ type: 'REFRESH_DATA', data: { editor } });        
       } catch (e) {
         if (!e.response) {
           const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';

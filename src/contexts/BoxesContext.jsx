@@ -37,8 +37,8 @@ const BoxesContextProvider = props => {
         return;
       }
       if (type === 'file')
-        if (initial) setBoxErr(true);
-        else dispatchOpenedFiles({ type: 'FILE_APPEND', file });
+        if (!initial)
+          dispatchOpenedFiles({ type: 'FILE_APPEND', file });
     } catch (e) {
       if (!e.response) {
         const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
