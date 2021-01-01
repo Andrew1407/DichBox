@@ -38,7 +38,8 @@ const Header = () => {
   const [hidden, setHidden] = useState(false);
 
   const handleSearchClick = async () => {
-    if (!searchInput) return;
+    const inputValid = /\S+/.test(searchInput);
+    if (!inputValid || foundErr) return;
     if (foundErr) setFoundErr(null);
     setSearchStr(searchInput);
     const searchBody = { searchStr: searchInput };
@@ -56,6 +57,7 @@ const Header = () => {
   };
 
   const handleMenuClickClb = () => {
+    if (foundErr) return;
     const currentUsername = username || '';
     const currentPathName = pathName || '';
     if (foundErr) setFoundErr(null);

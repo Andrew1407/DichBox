@@ -16,7 +16,7 @@ app.use(bodyparser.urlencoded({
   limit: '100mb',
   extended: true
 }));
-app.use(express.static(viewPath))
+app.use(express.static(viewPath));
 
 app.use('/users', usersRouter);
 app.use('/boxes', boxesRouter);
