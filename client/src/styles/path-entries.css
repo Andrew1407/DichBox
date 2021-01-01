@@ -1,0 +1,49 @@
+.entries-empty {
+  text-align: center;
+  font-weight: bold;
+  font-size: 120%;
+}
+
+.box-entries-item {
+  display: flex;
+  align-items: center;
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+
+.box-entries-item > p {
+  margin: 0;
+}
+
+.box-entries-item > p:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+}
+
+.box-entries-item > img {
+  margin-right: 6px;
+  height: 25px;
+}
+
+#mol-units-list {
+  padding-bottom: 4%;
+  padding-top: 4%;
+}
+
+.be-item-wrap, .be-item-icons {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+}
+
+.be-item-wrap {
+  padding-right: 8%;
+}
+
+.be-item-icons > img {
+  height: 28px;
+}
+
+.be-item-icons > img:first-child {
+  margin-right: 40%;
+}

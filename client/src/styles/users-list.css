@@ -1,0 +1,87 @@
+#subs-header, #search-list-header {
+  text-align: center;
+  font-size: 340%;
+  padding-bottom: 10%;
+  border-bottom: 5px solid grey;
+}
+
+#subs-search {
+  font-size: 150%;
+  padding-left: 3%;
+  border-bottom: 5px solid grey;
+  padding-bottom: 8%;
+  margin-bottom: 3%;
+}
+
+#subs-search > label {
+  font-style: italic;
+}
+
+#subs-search > input {
+  font-size: 100%;
+  min-width: 70%;
+  margin-left: 3%;
+  outline: none;
+  border-color: black;
+  border-bottom: 3px solid rgb(0, 217, 255);
+  padding: 2%;
+  margin-bottom: 4%;
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+#subs-search > input:focus {
+  border-bottom: 5px solid rgb(0, 217, 255);
+}
+
+.subs-display, .search-list-display {
+  font-size: 126%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.sub-person, .search-list-person {
+  padding: 4.5% 3%;
+  border-bottom: 3px solid orange;
+  justify-content: space-between;
+}
+
+.sub-person > img {
+  height: 45px;
+  margin-right: 2%;
+}
+
+.subs-data > img, .search-list-data > img {
+  background-color: rgb(0, 217, 255);
+  padding: 1.5%;
+  width: 70px;
+  margin-right: 8%;
+  margin-top: 3%;
+  border-radius: 50%;
+  margin-right: 15%;
+}
+
+.subs-data > span:hover,
+.search-list-data.search-list-display > span:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+}
+
+#subs-empty, #search-list-empty {
+  text-align: center;
+  margin-top: 7%;
+}
+
+#search-list-none { 
+  text-align: center;
+  font-size: 230%;
+}
+
+.subs-display.sub-person:hover,
+.search-list-display.search-list-person:hover {
+  background-color: rgb(24, 24, 24);
+}
+
+#subs-search > input:hover {
+  border-bottom: 5px solid rgb(0, 217, 255);
+}

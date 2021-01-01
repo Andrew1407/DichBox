@@ -1,0 +1,8 @@
+#main-content {
+  height: 900px;
+  display: flex;
+  flex-direction: row;
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+

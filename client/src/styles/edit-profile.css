@@ -1,0 +1,53 @@
+#edit-profile, .edit-field {
+  margin: 0
+}
+
+#edit-logo {
+  background-color: rgb(0, 217, 255);
+  border: 3px solid rgb(0, 217, 255);
+  border-radius: 50%;
+  padding: 0.5%;
+  display: block;
+  margin: 0 auto;
+  width: 55%;
+  margin-bottom: 10%;
+}
+
+.edit-logo-input {
+  margin-top: 6%;
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+.edit-field p {
+  font-size: 180%;
+  display: block;
+  color: orange;
+}
+
+.edit-logo-input > p {
+  display: inline-block;
+}
+
+.edit-logo-input > input[type="file"] {
+  font-size: 120%;
+  display: block;
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+#edit-uname {
+  margin-top: 5%;
+}
+
+#edit-email {
+  padding-bottom: 10%
+}
+
+#edit-submit {
+  margin-bottom: 6%;
+}
+
+#edit-user-passwd-btn {
+  margin-left: 18%;
+}

@@ -1,0 +1,28 @@
+#footer {
+  grid-column: 1 / 5;
+  font-size: 150%;
+  background-color: black;
+  color: rgb(0, 217, 255);
+  display: flex;
+  justify-content: space-between;
+  padding-left: 1%;
+  padding-right: 2%;
+  border-top: 7px solid rgb(75, 73, 73);
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+#repo-ref {
+  color: rgb(204, 0, 255);
+  text-decoration: none;
+}
+
+#repo-ref:hover {
+  text-decoration: underline;
+  font-size: 110%;
+  text-shadow: 0 0 10px rgb(211, 103, 238), 0 0 20px rgb(204, 0, 255);
+}
+
+#version b {
+  color: rgb(0, 255, 76);
+}

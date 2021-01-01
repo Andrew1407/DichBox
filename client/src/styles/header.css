@@ -1,0 +1,112 @@
+body {
+  margin: 0;
+}
+
+#header {
+  display: flex;
+  justify-content: space-between;
+  background-color: black;
+  font-family: "DynarShadowC";
+  border-bottom: 7px solid rgb(75, 73, 73);
+}
+
+#header-name {
+  color: black;
+  background-color: rgb(50, 211, 240);
+  -webkit-transform: skewX(-25deg); 
+	-moz-transform: skewX(-25deg); 
+	-ms-transform: skewX(-25deg); 
+	-o-transform: skewX(-25deg); 
+  transform: skewX(-25deg);
+  margin-left: 2%;
+  padding-left: 2%;
+  padding-right: 3%;
+  padding-top: 1%;
+  border-left: 7px solid rgb(75, 73, 73);
+  border-right: 7px solid rgb(75, 73, 73);
+  font-size: 250%;
+}
+
+.highlight:hover {
+  box-shadow: 0 0 25px rgb(50, 211, 240);
+}
+
+#header-name > h1 {
+  color: black;
+  background: rgb(50, 211, 240);
+  margin: auto;
+  -webkit-transform: skewX(25deg); 
+	-moz-transform: skewX(25deg); 
+	-ms-transform: skewX(25deg); 
+	-o-transform: skewX(25deg); 
+	transform: skewX(25deg); 
+}
+
+#header-search {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: rgb(50, 211, 240);
+  margin-right: 2%; 
+  padding-left: 2.2%;
+  padding-right: 2.5%;
+  font-size: 230%;
+  -webkit-transform: skewX(-25deg); 
+	-moz-transform: skewX(-25deg); 
+	-ms-transform: skewX(-25deg); 
+	-o-transform: skewX(-25deg); 
+  transform: skewX(-25deg);
+  border-left: 7px solid rgb(75, 73, 73);
+  border-right: 7px solid rgb(75, 73, 73);
+}
+
+#header-search > input {
+  padding-left: 1%;
+  border: solid 4px;
+  border-color: black;
+  color: black;
+  outline: none;
+  background-color: rgb(153, 237, 251);
+  font-size: 80%;
+  -webkit-transform: skewX(25deg); 
+	-moz-transform: skewX(25deg); 
+	-ms-transform: skewX(25deg); 
+	-o-transform: skewX(25deg); 
+	transform: skewX(25deg); 
+}
+
+#header-search > img {
+  -webkit-transform: skewX(25deg); 
+	-moz-transform: skewX(25deg); 
+	-ms-transform: skewX(25deg); 
+	-o-transform: skewX(25deg); 
+  transform: skewX(25deg);
+  height: 45px;
+  margin-left: 3%;
+  margin-right: 2%;
+}
+
+#header-menu {
+  display: block;
+  margin: auto
+}
+
+#header-menu > img {
+  display: block;
+  margin: 0 auto;
+  padding: 7%;
+  /* width: 15%; */
+  width: 75px;
+  border-radius: 50%;
+  background-color: grey;
+}
+
+@font-face {
+  font-family: "DynarShadowC";
+  src: url("./fonts/15294.otf");
+}
+
+#header-hidden {
+  margin-left: 49%;
+  height: 25px;
+}

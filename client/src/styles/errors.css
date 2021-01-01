@@ -1,0 +1,22 @@
+#error-title {
+  text-align: center;
+  font-size: 350%;
+  margin-top: 5%;
+  margin-bottom: 1%;
+  color: crimson;
+}
+
+#error-image {
+  margin-left: 0 auto;
+}
+
+#error-image > img {
+  width: 100%;
+}
+
+#error-message {
+  text-align: center;
+  font-size: 170%;
+  font-style: italic;
+  color: aliceblue;
+}

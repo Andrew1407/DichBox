@@ -1,0 +1,165 @@
+#entries-logo {
+  background-color: rgb(0, 217, 255);
+  border: 3px solid rgb(0, 217, 255);
+  border-radius: 50%;
+  padding: 0.5%;
+  width: 50%;
+  height: 10%;
+  margin-bottom: 1%;
+  display: block;
+  margin: 0 auto;
+  width: 53%;
+}
+
+#nd-owner {
+  border-top: 5px solid grey;
+  font-size: 200%;
+  padding-top: 5%;
+}
+
+#nd-box-type {
+  font-size: 165%;
+}
+
+#nd-box-type > span {
+  color: orange;
+}
+
+.nd-box-info {
+  font-size: 126%;
+}
+
+.nd-box-info > span {
+  color: rgb(204, 0, 255);
+}
+
+#last-edited {
+  margin-bottom: 6%;
+}
+
+.entries-imgs {
+  height: 30px;
+}
+
+#entries-user-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#entries-editor {
+  border-top: 5px solid grey;
+  border-bottom: 5px solid grey;
+  padding: 5%;
+}
+
+#entries-options {
+  display: flex;
+  flex-direction: row;
+}
+
+#be-add-file {
+  text-align: left;
+  font-size: 130%;
+  margin-top: 10%;
+  margin-bottom: 2%;
+  justify-content: space-evenly;
+}
+
+#be-add-file > * {
+  margin-right: 1%;
+  display: inline-block;
+}
+
+#be-add-file > label {
+  font-size: 120%;
+  font-style: italic;
+}
+
+#be-add-file > input[type="text"] {
+  font-size: 110%;
+  padding: 1% 2%;
+  min-width: 45%;
+  outline: none;
+  border-color: black;
+  border-bottom: 2px solid rgb(0, 217, 255);
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+#be-add-file > input[type="text"]:focus,
+#be-add-file > input[type="text"]:hover {
+  border-bottom: 4px solid rgb(0, 217, 255);
+}
+
+#be-add-file > input[type="button"] {
+  font-size: 90%;
+  outline: none;
+  padding: 1% 2%;
+  background-color: black;
+  color: rgb(0, 217, 255);
+  border: 2px solid rgb(0, 217, 255);
+}
+
+#be-add-file-warning {
+  margin-top: 3%;
+  color: crimson;
+  font-size: 100%;
+}
+
+#entries-search {
+  padding-top: 6%;
+  text-align: left;
+  margin-bottom: 4%;
+}
+
+#entries-search > label {
+  font-size: 170%;
+  font-style: italic;
+}
+
+#entries-search > input {
+  min-width: 70%;
+  font-size: 150%;
+  margin-left: 3%;
+  outline: none;
+  border-color: black;
+  border-bottom: 3px solid rgb(0, 217, 255);
+  padding: 2%;
+  margin-bottom: 4%;
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+#box-entries-back-btn {
+  margin-bottom: 8%;
+}
+
+#box-entries-path {
+  font-size: 170%;
+}
+
+.be-path:first-child {
+  font-size: 110%;
+  font-weight: bold;
+}
+
+.be-path:hover {
+  font-weight: bold;
+  text-shadow: 0 0 20px rgb(50, 211, 240);
+}
+
+.edit-btn:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+  box-shadow: 0 0 10px rgb(50, 211, 240);
+}
+
+.files-btn:hover {
+  text-shadow: 0 0 10px rgb(149, 237, 243), 0 0 20px rgb(50, 211, 240);
+  box-shadow: 0 0 10px rgb(50, 211, 240);
+}
+
+#entries-search > input:hover,
+#entries-search > input:focus {
+  border-bottom: 5px solid rgb(0, 217, 255);
+}

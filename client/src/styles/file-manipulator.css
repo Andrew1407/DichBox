@@ -1,0 +1,52 @@
+#fm-btns {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#fm-header {
+  font-size: 180%;
+}
+
+#fm-btns > input {
+  min-width: 28%;
+  font-style: italic;
+  font-size: 130%;
+  outline: none;
+  padding: 1% 2%;
+  background-color: black;
+  color: rgb(0, 217, 255);
+  border: 2px solid rgb(0, 217, 255);
+}
+
+#fm-btns > input:first-child {
+  margin-right: 10%;
+}
+
+#fm-rename {
+  margin-bottom: 3%;
+  text-align: left;
+}
+
+#fm-rename > input {
+  display: block;
+  font-size: 140%;
+  padding: 1% 2%;
+  width: 90%;
+  outline: none;
+  border-color: black;
+  border-bottom: 2px solid rgb(0, 217, 255);
+  background-color: black;
+  color: rgb(0, 217, 255);
+}
+
+#fm-rename > input:focus,
+#fm-rename > input:hover {
+  border-bottom: 4px solid rgb(0, 217, 255);
+}
+
+#fm-rename > i {
+  font-size: 130%;
+  color: crimson;
+  text-align: left;
+}
