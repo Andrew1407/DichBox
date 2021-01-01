@@ -1,11 +1,11 @@
 {
   "name": "dichbox_client",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "DichBox browser app",
   "main": "webpack.config.js",
   "scripts": {
-    "start": "webpack-dev-server --mode development --open --hot --history-api-fallback",
-    "build": "webpack --mode production"
+    "start": "webpack-dev-server",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",

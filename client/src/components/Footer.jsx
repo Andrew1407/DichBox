@@ -5,7 +5,7 @@ const Footer = () => (
   <div id="footer">
     <p id="version">
       <small>
-       <b>version: 0.5.2</b>
+       <b>version: 0.5.3</b>
       </small>
       </p>
     <p>

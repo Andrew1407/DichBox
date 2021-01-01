@@ -4,9 +4,10 @@ const Dotenv = require('dotenv-webpack');
 require('dotenv').config();
 
 module.exports = {
+  mode: 'production',
   entry: './src/index.jsx',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, '..', 'server', 'dist', 'view'),
     filename: 'bundle.js',
     chunkFilename: '[id].js',
     publicPath: '/'
@@ -63,7 +64,9 @@ module.exports = {
   devServer: {
     port: process.env.DEV_SERVER_PORT || 7042,
     host: process.env.DEV_SERVER_HOST || 'localhost',
-    historyApiFallback: true
+    historyApiFallback: true,
+    hot: true,
+    open: true
   },
   performance: {
     hints: false,
