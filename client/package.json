@@ -1,7 +1,7 @@
 {
-  "name": "dichbox",
-  "version": "1.0.0",
-  "description": "",
+  "name": "dichbox_client",
+  "version": "0.5.2",
+  "description": "DichBox browser app",
   "main": "webpack.config.js",
   "scripts": {
     "start": "webpack-dev-server --mode development --open --hot --history-api-fallback",
@@ -12,8 +12,8 @@
     "url": "git+ssh://git@github.com/Andrew1407/DichBox.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Andrew1407, dgomilko",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Andrew1407/DichBox/issues"
   },
