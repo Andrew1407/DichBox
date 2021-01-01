@@ -1,0 +1,44 @@
+{
+  "name": "dichbox_server",
+  "version": "1.0.1",
+  "description": "DichBox API",
+  "main": "webpack.config.js",
+  "scripts": {
+    "start": "nodemon -x ts-node src/index.ts",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Andrew1407/DichBox.git"
+  },
+  "author": "Andrew1407, dgomilko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Andrew1407/DichBox/issues"
+  },
+  "homepage": "https://github.com/Andrew1407/DichBox#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "pg": "^8.2.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.6"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.6",
+    "@types/node": "^14.0.14",
+    "@types/pg": "^7.14.3",
+    "dotenv-webpack": "^6.0.0",
+    "nodemon": "^2.0.4",
+    "ts-loader": "^8.0.12",
+    "webpack": "^5.11.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.1",
+    "webpack-node-externals": "^2.5.2"
+  }
+}
