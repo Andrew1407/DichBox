@@ -4,14 +4,6 @@ import { statuses, errMessages } from './statusInfo';
 
 export const makeTuple = (st: number, obj: any): responseTuple => [st, obj];
 
-export const formatDate = (obj: any): void => {
-  for (const key in obj)
-    if (/^(reg_date|last_edited)$/.test(key))
-      obj[key] = new Date(obj[key])
-        .toLocaleString()
-        .replace(/\//g, '.');
-};
-
 export const checkPathes = (pathes: string[][]): boolean => {
   for (const p of pathes)
     for (const dir of p) {
@@ -23,12 +15,12 @@ export const checkPathes = (pathes: string[][]): boolean => {
   return true;
 };
 
-const sendResponse = (res: Response, status: number, json: any): void => {
+const sendResponse = (res: Response, status: number, json: unknown): void => {
   res.status(status).json(json).end();
 };
 
 export const getMiddlewares = (handlers: any): any => {
-  const middlewares: any = {};
+  const middlewares: unknown = {};
   for (const fnName in handlers) {
     const handler: requestHandler = handlers[fnName];
     const middleware: middlewareFn = async (req: Request, res: Response) => {

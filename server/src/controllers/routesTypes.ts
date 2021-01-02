@@ -6,7 +6,7 @@ export type middlewareFn = (req: Request, res: Response) => Promise<void>;
 
 export type requestHandler = (req: Request) => Promise<responseTuple>;
 
-export type boxesRouters = {
+export type boxesRoutes = {
   createBox: middlewareFn|requestHandler,
   findUserBoxes: middlewareFn|requestHandler,
   verifyBoxName: middlewareFn|requestHandler,
@@ -21,7 +21,7 @@ export type boxesRouters = {
   renameFile: middlewareFn|requestHandler
 };
 
-export type userRouters = {
+export type userRoutes = {
   findUser: middlewareFn|requestHandler,
   signUpUser: middlewareFn|requestHandler,
   signInUser: middlewareFn|requestHandler,

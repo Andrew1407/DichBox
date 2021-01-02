@@ -1,16 +1,25 @@
 import { Request } from 'express';
-import { makeTuple, formatDate, checkPathes } from '../extra';
+import { makeTuple, checkPathes } from '../extra';
+import { formatDateTime } from '../dateFormatters';
 import { statuses, errMessages } from '../statusInfo';
 import { boxData, pathEntries, entryType } from '../../datatypes';
 import BoxesDataConnector from '../../database/BoxesClientDB/BoxesDataConnector';
 import BoxesStorageManager from '../../storageManagers/BoxesStorageManager';
-import { boxesRouters } from '../routesTypes';
+import { boxesRoutes } from '../routesTypes';
 
 const boxesStorage: BoxesStorageManager = new BoxesStorageManager();
 const clientDB: BoxesDataConnector = new BoxesDataConnector();
 clientDB.clientConnection();
 
-const boxesController: boxesRouters = {
+const formatDateAll = (obj: boxData): void => {
+  for (const key in obj) {
+    const isDateField: RegExp = /^(reg_date|last_edited)$/;
+    if (isDateField.test(key))
+      obj[key] = formatDateTime(obj[key]);
+  }
+};
+
+const boxesController: boxesRoutes = {
   async createBox(req: Request) {
     const { boxData, logo, limitedUsers, editors, username }: {
       boxData: boxData,
@@ -68,7 +77,7 @@ const boxesController: boxesRouters = {
       await boxesStorage.getLogoIfExists(boxInfo.id, boxInfo.owner_id);
     delete boxInfo.id;
     delete boxInfo.owner_id;
-    formatDate(boxInfo);
+    formatDateAll(boxInfo);
     return makeTuple(statuses.OK, { ...boxInfo, logo });
   },
 
@@ -91,7 +100,7 @@ const boxesController: boxesRouters = {
       boxesStorage.saveLogo(logo, updated.id, updated.owner_id);
     delete updated.id;
     delete updated.owner_id;
-    formatDate(updated)
+    formatDateAll(updated)
     const jsonRes: boxData & { logo?: string } = 
       !logo || logo === 'removed' ?
         updated : { ...updated, logo };
@@ -167,7 +176,7 @@ const boxesController: boxesRouters = {
       boxName,
       { last_edited: 'now()' },
     );
-    formatDate(edited);
+    formatDateAll(edited);
     const created: pathEntries = 
       await boxesStorage.addFile(fileName, type, checkup, extraPath, src);
     return makeTuple(statuses.CREATED, { created, last_edited: edited.last_edited });
@@ -247,7 +256,7 @@ const boxesController: boxesRouters = {
       boxName,
       { last_edited: 'now()' },
     );
-    formatDate(editedMark);
+    formatDateAll(editedMark);
     return makeTuple(statuses.OK, { edited, last_edited: editedMark.last_edited });
   },
 
@@ -281,7 +290,7 @@ const boxesController: boxesRouters = {
       boxName,
       { last_edited: 'now()' },
     );
-    formatDate(edited);
+    formatDateAll(edited);
     return makeTuple(statuses.OK, { removed, last_edited: edited.last_edited });
   },
 
@@ -309,7 +318,7 @@ const boxesController: boxesRouters = {
       boxName,
       { last_edited: 'now()' },
     );
-    formatDate(edited);
+    formatDateAll(edited);
     const renamed: boolean = 
       await boxesStorage.renameFile(newName, fileName, checkup, extraPath);
     return makeTuple(statuses.OK, { renamed, last_edited: edited.last_edited });
