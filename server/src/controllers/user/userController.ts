@@ -1,10 +1,11 @@
 import { Request } from 'express';
 import { notificationsData, userData } from '../../datatypes';
 import { makeTuple } from '../extra';
+import { formatDate, formatDateTime } from '../dateFormatters';
 import { statuses, errMessages } from '../statusInfo';
 import UserDataConnector from '../../database/UserClientDB/UserDataConnector';
 import UserStotageManager from '../../storageManagers/UserStotageManager';
-import { userRouters } from '../routesTypes';
+import { userRoutes } from '../routesTypes';
 
 type foundUser = {
   name: string,
@@ -22,7 +23,7 @@ const userStorage: UserStotageManager = new UserStotageManager;
 const clientDB: UserDataConnector = new UserDataConnector();
 clientDB.clientConnection();
 
-const userController: userRouters = {
+const userController: userRoutes = {
   async signUpUser(req: Request) {
     const clientData: userData = req.body;
     const inserted: userData = await clientDB.insertUser(clientData);
@@ -48,9 +49,7 @@ const userController: userRouters = {
       follower?: boolean,
       logo?: string
     };
-    user.reg_date = new Date(user.reg_date)
-      .toLocaleDateString()
-      .replace(/\//g, '.');
+    user.reg_date = formatDate(String(user.reg_date));
     const logo: string|null = await userStorage.getLogoIfExists(user.id);
     userRes = { ...user, logo, follower: false };
     if (!ownPage) {
@@ -204,12 +203,10 @@ const userController: userRouters = {
     const ntsMapper = async (n: notificationsData): Promise<notificationsData> => {
       const icon: string|null = !n.param || n.param == -1 ?
         null : await userStorage.getLogoIfExists(n.param);
-      const note_date: string = new Date(n.note_date)
-        .toLocaleString()
-        .replace(/\//g, '.');
+      n.note_date = formatDateTime(String(n.note_date));
       delete n.extra_values;
       delete n.param;
-      return { ...n, icon, note_date };
+      return { ...n, icon };
     };
     const ntsRes: notificationsData[] = await Promise.all(
       notifications.map(ntsMapper)

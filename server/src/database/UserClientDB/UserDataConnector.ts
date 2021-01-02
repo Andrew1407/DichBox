@@ -119,7 +119,7 @@ export default class UserBaseConnector extends UserClientDichBoxDB {
         msgEntries.push('User', 'has created a new box:');
         return { ...n, ...params, msgEntries };
       } else if (msgType === 'userRm') {
-        msgEntries.push('Account you followed', 'has been removed');
+        msgEntries.push('Thr account you followed', 'has been removed');
         const [ user_name, user_color ]: string[] = n.extra_values;
         delete n.param;
         return { ...n, msgEntries, user_name, user_color };

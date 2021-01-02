@@ -1,6 +1,6 @@
 import boxesController from './boxesController';
 import { getMiddlewares } from '../extra';
-import { boxesRouters } from '../routesTypes';
+import { boxesRoutes } from '../routesTypes';
 
-const boxesMiddlewares: boxesRouters = getMiddlewares(boxesController);
+const boxesMiddlewares: boxesRoutes = getMiddlewares(boxesController);
 export default boxesMiddlewares;

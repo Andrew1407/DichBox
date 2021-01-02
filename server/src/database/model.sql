@@ -88,12 +88,12 @@ create function rm_user_subs_fn()
 $$
 begin
   insert into notifications (person_id, type, extra_values)
-    select subscription, 'userRm', array[
+    select person_id, 'userRm', array[
       (select name from users where users.id = old.id limit 1),
       (select name_color from users where users.id = old.id limit 1)
-    ] from subscribers where person_id = old.id;
+    ] from subscribers where subscription = old.id;
   update users set followers = (followers - 1) where id in (
-    select person_id from subscribers where subscription = old.id
+    select subscription from subscribers where person_id = old.id
   );
   return old;
 end;
