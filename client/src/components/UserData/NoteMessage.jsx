@@ -42,7 +42,7 @@ const NoteMessage = ({ type, userName, userColor, boxName, boxColor, msg }) => {
     </div>
   );
   msgTemplates['helloMsg'] = (
-    <div className="note-msg helo-note-msg">
+    <div className="note-msg">
       <p><i>{ msg[0] }</i></p>
     </div>
   );

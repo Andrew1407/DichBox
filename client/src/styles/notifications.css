@@ -86,15 +86,3 @@
   text-decoration: underline;
   text-shadow: 0 0 7px rgb(50, 211, 240);
 }
-
-.helo-note-msg {
-  animation-name: helloMsgShining;
-  animation-duration: 7s;
-  animation-iteration-count: infinite;
-  animation-fill-mode: both;
-}
-
-@keyframes helloMsgShining {
-  0%, 100% { color: rgb(182, 250, 25); }
-  50% { color: rgb(243, 17, 104); }
-}
