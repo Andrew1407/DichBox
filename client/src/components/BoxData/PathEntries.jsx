@@ -108,7 +108,7 @@ const PathEntries = ({ entriesSearch, setFileManupulation, addFileVisible, setAd
           }
         </div>
       )}
-      {  !!entriesSearch && !!pathEntries.length && !filteredSearch.length && 
+      { !!entriesSearch && !!pathEntries.length && !filteredSearch.length && 
         <p className="entries-empty">No files or directories were found</p> 
       }
       { !filteredSearch.length && !entriesSearch && <p className="entries-empty">This directory is empty</p> }

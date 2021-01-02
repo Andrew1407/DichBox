@@ -9,7 +9,7 @@ export const UserContext = createContext();
 
 const UserContextProvider = props => {
   const history = useHistory();
-  const { setFoundErr, setLoading } = useContext(MenuContext);
+  const { setFoundErr, setLoading, setUsersList } = useContext(MenuContext);
   const getPathName = () => history
     .location
     .pathname
@@ -20,6 +20,7 @@ const UserContextProvider = props => {
   
   useEffect(() => {
     const fetchUserData = async () => {
+      setUsersList(null);
       if (pathName && pathName.length) {
         setLoading(true);
         const findBody = { username, pathName };

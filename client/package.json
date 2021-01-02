@@ -1,6 +1,6 @@
 {
   "name": "dichbox_client",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "DichBox browser app",
   "main": "webpack.config.js",
   "scripts": {
