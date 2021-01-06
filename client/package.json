@@ -1,6 +1,6 @@
 {
   "name": "dichbox_client",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "DichBox browser app",
   "main": "webpack.config.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "framer-motion": "^2.9.5",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

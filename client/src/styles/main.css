@@ -82,7 +82,8 @@ body {
   color: rgb(0, 217, 255);
 }
 
-.sign-field > input:focus {
+.sign-field > input:focus,
+.sign-field > input:hover {
   border-bottom: 7px solid rgb(0, 217, 255);
 }
 

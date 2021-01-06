@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
 
-export type responseTuple = [number, any];    // [status, json]
+export type responseTuple = [number, unknown];    // [status, json]
 
 export type middlewareFn = (req: Request, res: Response) => Promise<void>;
 

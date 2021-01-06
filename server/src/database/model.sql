@@ -1,6 +1,15 @@
+drop database if exists dich_box;
 create database dich_box;
+
 -- enter the database
 \c dich_box 
+
+drop table if exists users;
+drop table if exists subscribers;
+drop table if exists notifications;
+drop table if exists boxes;
+drop table if exists limited_viewers;
+drop table if exists box_editors;
 
 -- users' data
 create table users (
@@ -81,7 +90,7 @@ create table box_editors (
 );
 
 -- remove user as subscription (trigger)
-create function rm_user_subs_fn()
+create or replace function rm_user_subs_fn()
   returns trigger
   language plpgsql
   as
@@ -99,7 +108,7 @@ begin
 end;
 $$;
 
-create trigger rm_user_subs
+create or replace trigger rm_user_subs
   before delete on users
   for each row
   execute procedure rm_user_subs_fn();
@@ -107,7 +116,7 @@ create trigger rm_user_subs
 -- NOTIFICATIONS TRIGGERS
 
 -- box creating (for followers)
-create function notify_box_add_fn()
+create or replace function notify_box_add_fn()
   returns trigger
   language plpgsql
   as
@@ -121,13 +130,13 @@ begin
 end;
 $$;
 
-create trigger notify_box_add
+create or replace trigger notify_box_add
   after insert on boxes
   for each row
   execute procedure notify_box_add_fn();
 
 -- adding box viewer
-create function notify_viewer_add_fn()
+create or replace function notify_viewer_add_fn()
   returns trigger
   language plpgsql
   as
@@ -138,13 +147,13 @@ begin
 end;
 $$;
 
-create trigger notify_viewer_add
+create or replace trigger notify_viewer_add
   after insert on limited_viewers
   for each row
   execute procedure notify_viewer_add_fn();
 
 -- removing box viewer
-create  or replace function notify_viewer_rm_fn()
+create or replace function notify_viewer_rm_fn()
   returns trigger
   language plpgsql
   as
@@ -155,13 +164,13 @@ begin
 end;
 $$;
 
-create trigger notify_viewer_rm
+create or replace trigger notify_viewer_rm
   before delete on limited_viewers
   for each row
   execute procedure notify_viewer_rm_fn();
 
 -- adding box editor
-create function notify_editor_add_fn()
+create or replace function notify_editor_add_fn()
   returns trigger
   language plpgsql
   as
@@ -172,13 +181,13 @@ begin
 end;
 $$;
 
-create trigger notify_editor_add
+create or replace trigger notify_editor_add
   after insert on box_editors
   for each row
   execute procedure notify_editor_add_fn();
 
 -- removing box editor
-create function notify_editor_rm_fn()
+create or replace function notify_editor_rm_fn()
   returns trigger
   language plpgsql
   as
@@ -189,13 +198,13 @@ begin
 end;
 $$;
 
-create trigger notify_editor_rm
+create or replace trigger notify_editor_rm
   before delete on box_editors
   for each row
   execute procedure notify_editor_rm_fn();
 
 -- hello message for signed user
-create function hello_msg_signed_fn()
+create or replace function hello_msg_signed_fn()
   returns trigger
   language plpgsql
   as
@@ -206,13 +215,13 @@ begin
 end;
 $$;
 
-create trigger hello_msg_signed_fn
+create or replace trigger hello_msg_signed_fn
   after insert on users
   for each row
   execute procedure hello_msg_signed_fn();
 
 -- removing notifications if user was deleted
-create function user_msgs_rm_fn()
+create or replace function user_msgs_rm_fn()
   returns trigger
   language plpgsql
   as
@@ -225,13 +234,13 @@ begin
 end;
 $$;
 
-create trigger user_msgs_rm
+create or replace trigger user_msgs_rm
   before delete on users
   for each row
   execute procedure user_msgs_rm_fn();
 
 -- removing notifications if box was deleted
-create function box_msgs_rm_fn()
+create or replace function box_msgs_rm_fn()
   returns trigger
   language plpgsql
   as
@@ -243,7 +252,7 @@ begin
 end;
 $$;
 
-create trigger box_msgs_rm
+create or replace trigger box_msgs_rm
   before delete on boxes
   for each row
   execute procedure box_msgs_rm_fn();

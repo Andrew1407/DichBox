@@ -13,6 +13,7 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
   const { dispatchOpenedFiles } = useContext(MenuContext);
   const [nameInput, setNameInput] = useState('');
   const [imageInput, setImageInput] = useState(null);
+  const [imageChosen, setImageChosen] = useState(false);
   const getInputWarningClb = () => {
     const inputValid = /^[^\s/]{1,40}$/;
     const nameExists = pathEntries
@@ -28,8 +29,11 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
     getInputWarningClb,
     [pathName, nameInput, pathEntries]
   );
+
   const warning = getInputWarning();
-  const correctColor = !warning && nameInput ? 'rgb(0, 255, 76)' : 'rgb(0, 217, 255)';
+  const isCollorCorrect = (!warning && nameInput) ||
+    (addFileVisible === 'image' && imageChosen);
+  const correctColor = isCollorCorrect ? 'rgb(0, 255, 76)' : 'rgb(0, 217, 255)';
 
   const addNewFileClb = async () => {
     let createBody = {
@@ -73,6 +77,7 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
 
   const writeImageClb = e => {
     e.preventDefault();
+    if (!imageChosen) setImageChosen(true);
     const image = e.target.files[0];
     const reader = new FileReader();
     reader.readAsDataURL(image);
@@ -81,15 +86,20 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
       src: reader.result
     });
   };
-  const writeImage = useCallback(writeImageClb, []);
+  const writeImage = useCallback(writeImageClb, [imageChosen]);
 
   useEffect(() => {
     if (fileManipulation || !addFileVisible) {
       setNameInput('');
       setImageInput(null);
+      setImageChosen(false);
     } else if (addFileVisible !== 'image') {
+      setImageChosen(false);
       setImageInput(null);
+    } else if (addFileVisible === 'image') {
+      setNameInput('');
     }
+
   }, [fileManipulation, addFileVisible]);
 
   return (
@@ -99,7 +109,7 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
         <motion.div { ...boxToolMotion } id="be-add-file">
           <label htmlFor="addFile">Select image: </label>
           <input type="file" accept="image/*" onChange={ writeImage }/>
-          <input className="files-btn" type="button" value="add" onClick={ addNewFile }/>
+          <input className="files-btn" type="button" value="add" onClick={ addNewFile } style={{ borderColor: correctColor, color: correctColor }}/>
         </motion.div> :
         <motion.div { ...boxToolMotion } id="be-add-file">
           <label htmlFor="addFile">{ addFileVisible } name:</label>

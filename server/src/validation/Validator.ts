@@ -1,6 +1,4 @@
 import { boxData, userData } from '../datatypes';
-import BoxValidator from './BoxValidator';
-import UserValidator from './UserValidator';
 
 export default abstract class Validator {
   protected patterns: {
@@ -21,9 +19,9 @@ export default abstract class Validator {
 
   protected checkFields(
     data: userData|boxData,
-    specificFields: any
+    specificFields: Object
   ): boolean {
-    const fieldsCheck: any = {
+    const fieldsCheck: Object = {
       ...specificFields,
       name: x => this.patterns.name.test(x),
       name_color: x => this.patterns.color.test(x),

@@ -9,7 +9,7 @@ import { boxesRoutes } from '../routesTypes';
 
 const boxesStorage: BoxesStorageManager = new BoxesStorageManager();
 const clientDB: BoxesDataConnector = new BoxesDataConnector();
-clientDB.clientConnection();
+clientDB.clientConnect();
 
 const formatDateAll = (obj: boxData): void => {
   for (const key in obj) {

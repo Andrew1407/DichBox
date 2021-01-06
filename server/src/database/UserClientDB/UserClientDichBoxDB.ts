@@ -69,7 +69,7 @@ export default abstract class UserClientDichBoxDB extends ClientDichBoxDB {
     );
     if (!person_id || !subscription)
       return null;
-    const getQueries = (): Promise<any>[] => {
+    const getQueries = (): Promise<unknown>[] => {
       const args: ['subscribers', subscribersData] = [
         'subscribers',
         { person_id, subscription }

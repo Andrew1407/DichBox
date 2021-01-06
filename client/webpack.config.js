@@ -55,7 +55,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: __dirname + '/src/index.html',
+      template: path.resolve(__dirname, 'src/index.html'),
       filename: 'index.html',
       inject: 'body',
       favicon: './src/styles/imgs/dich-icon.png'

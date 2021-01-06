@@ -2,24 +2,29 @@ import { Response, Request } from 'express';
 import { middlewareFn, requestHandler, responseTuple } from './routesTypes';
 import { statuses, errMessages } from './statusInfo';
 
-export const makeTuple = (st: number, obj: any): responseTuple => [st, obj];
+const sendResponse = (res: Response, status: number, json: Object): void => {
+  res.status(status).json(json).end();
+};
+
+const checkInvalidPath = (dirPath: string): boolean => {
+  const isDots: RegExp = /^(\.)+$/;
+  if (isDots.test(dirPath)) return true;
+  const hasSlashesDots: RegExp = /((\/)|((\/)(\.)+)|((\.)+)(\/))/;
+  return hasSlashesDots.test(dirPath);
+};
+
+export const makeTuple = (st: number, obj: Object): responseTuple => [st, obj];
 
 export const checkPathes = (pathes: string[][]): boolean => {
   for (const p of pathes)
     for (const dir of p) {
-      const invalid: boolean =  /^(\.)+$/.test(dir) ||
-        /((\/)|((\/)(\.)+)|((\.)+)(\/))/.test(dir);
-      if (invalid)
-        return false;
+      const invalidPath: boolean = checkInvalidPath(dir);
+      if (invalidPath) return false;
     }
   return true;
 };
 
-const sendResponse = (res: Response, status: number, json: unknown): void => {
-  res.status(status).json(json).end();
-};
-
-export const getMiddlewares = (handlers: any): any => {
+export const getMiddlewares = (handlers: Object): any => {
   const middlewares: unknown = {};
   for (const fnName in handlers) {
     const handler: requestHandler = handlers[fnName];

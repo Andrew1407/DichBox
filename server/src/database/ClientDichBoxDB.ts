@@ -1,10 +1,11 @@
-import { Pool, PoolClient, QueryResult } from 'pg';
 import * as dotenv from 'dotenv';
+import { Pool, PoolClient, QueryResult } from 'pg';
 import {
   userData,
   boxData,
   dataElement,
-  subscribersData, notificationsData 
+  subscribersData,
+  notificationsData 
 } from '../datatypes';
 
 dotenv.config();
@@ -22,8 +23,12 @@ export default class ClientDichBoxDB {
     });
   }
 
-  public async clientConnection(): Promise<void> {
+  public async clientConnect(): Promise<void> {
     this.poolClient = await this.pool.connect();
+  }
+
+  public clientClose(): void {
+    this.poolClient.release();
   }
 
   private formatData(data: userData|boxData|subscribersData): 
@@ -107,7 +112,7 @@ export default class ClientDichBoxDB {
     id: number,
     data: boxData|userData,
     returning: string[] = ['*']
-  ): Promise<any> {
+  ): Promise<Object> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(data);
     const updated: string[] = [];
@@ -124,7 +129,7 @@ export default class ClientDichBoxDB {
     table: string,
     data: boxData|userData|subscribersData,
     returning: string[] = ['*']
-  ): Promise<any> {
+  ): Promise<Object> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(data);
     const res: QueryResult = await this.poolClient.query(
@@ -136,7 +141,7 @@ export default class ClientDichBoxDB {
 
   protected async removeValue(
     table: string,
-    searchParams: any,
+    searchParams: Object,
   ): Promise<void> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(searchParams);

@@ -21,7 +21,7 @@ const foundUsersMapper = async (user: userData): Promise<foundUser> => ({
 
 const userStorage: UserStotageManager = new UserStotageManager;
 const clientDB: UserDataConnector = new UserDataConnector();
-clientDB.clientConnection();
+clientDB.clientConnect();
 
 const userController: userRoutes = {
   async signUpUser(req: Request) {

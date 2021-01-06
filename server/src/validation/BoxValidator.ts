@@ -1,7 +1,7 @@
 import Validator from './Validator';
 import { boxData } from '../datatypes';
 
-class BoxValidator extends Validator {
+export default class BoxValidator extends Validator {
   public checkDataCreated(data: boxData): boolean {
     if (!this.patterns.name.test(data.name))
       return false;
@@ -17,5 +17,3 @@ class BoxValidator extends Validator {
     return super.checkFields(data, specificFileds);
   }
 }
-
-export default BoxValidator;
