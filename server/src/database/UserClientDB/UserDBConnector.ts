@@ -1,15 +1,16 @@
 import * as bcrypt from 'bcrypt';
-import UserClientDichBoxDB from './UserClientDichBoxDB';
+import IUserClientDB from './IUserClientDB';
+import IClientDB from '../IClientDB';
 import UserValidator from '../../validation/UserValidator';
-import { notificationsData, userData } from '../../datatypes';
-import { QueryResult } from 'pg';
+import UserClienDB from './UserClientDB';
+import { NotificationsData, UserData } from '../../datatypes';
 
-export default class UserBaseConnector extends UserClientDichBoxDB {
+export default class UserDBConnector extends UserClienDB implements IUserClientDB {
   private validator: UserValidator;
 
-  constructor() {
-    super();
-    this.validator = new UserValidator();
+  constructor(dao: IClientDB, validator: UserValidator) {
+    super(dao);
+    this.validator = validator;
   }
 
   private async hashPasswd(passwd: string): Promise<string> {
@@ -23,47 +24,47 @@ export default class UserBaseConnector extends UserClientDichBoxDB {
     name: string,
     email: string
   ): Promise<boolean> {
-    const foundColumns: QueryResult = await this.poolClient.query(
+    const foundColumns: UserData[] = await this.daoClient.rawQuery(
       'select id from users where name = $1 or email = $2;',
       [name, email]
     );
-    return !!foundColumns.rowCount;
+    return foundColumns.length == 0;
   }
 
-  public async insertUser(userData: userData|null): Promise<userData|null> {
-    if (!userData) return null;
-    const correctData: boolean = this.validator.checkDataEdited(userData);
+  public async insertUser(UserData: UserData|null): Promise<UserData|null> {
+    if (!UserData) return null;
+    const correctData: boolean = this.validator.checkDataEdited(UserData);
     if (!correctData) return null;
     const fieldsTaken: boolean =
-      await this.checkTakenFields(userData.name, userData.email)
+      await this.checkTakenFields(UserData.name, UserData.email)
     if (fieldsTaken) return null;
-    userData.passwd = await this.hashPasswd(userData.passwd);
-    return await super.insertUser(userData);
+    UserData.passwd = await this.hashPasswd(UserData.passwd);
+    return await super.insertUser(UserData);
   }
 
   public async updateUser(
     id: number,
-    userData: userData
-  ): Promise<userData|null> {
-    if (!userData) return null;
-    const correctData: boolean = this.validator.checkDataEdited(userData);
+    UserData: UserData
+  ): Promise<UserData|null> {
+    if (!UserData) return null;
+    const correctData: boolean = this.validator.checkDataEdited(UserData);
     if (!correctData) return null;
-    if (userData.name || userData.email) {
-      const name: string = userData.name || '';
-      const email: string = userData.email || '';
+    if (UserData.name || UserData.email) {
+      const name: string = UserData.name || '';
+      const email: string = UserData.email || '';
       const takenFields: boolean = await this.checkTakenFields(name, email);
       if (takenFields) return null;
     }
-    if (userData.passwd)
-      userData.passwd = await this.hashPasswd(userData.passwd);
-    return await super.updateUser(id, userData);
+    if (UserData.passwd)
+      UserData.passwd = await this.hashPasswd(UserData.passwd);
+    return await super.updateUser(id, UserData);
   }
 
   public async signInUser(
     email: string,
     passwd: string
-  ): Promise<userData|null> {
-    const res: userData|null = await this.getUserData({ email }, ['name', 'passwd']);
+  ): Promise<UserData|null> {
+    const res: UserData|null = await super.signInUser(email);
     if (!res) return null;
     const passwdCorrect: boolean = await bcrypt.compare(passwd, res.passwd);
     if (!passwdCorrect) return {};
@@ -71,30 +72,21 @@ export default class UserBaseConnector extends UserClientDichBoxDB {
     return res;
   }
 
-  public async checkColumn(
-    column: string,
-    value: string
-  ): Promise<string|null> {
-    const valObj: userData = { [column]: value };
-    const res: userData|null = await this.getUserData(valObj, [column])
-    return res ? res[column] : null;
-  }
-
   public async checkPasswd(
     name: string,
     passwd: string
   ): Promise<boolean> {
-    const res: userData|null = await this.getUserData({ name }, ['passwd']);
+    const res: UserData|null = await this.getUserData({ name }, ['passwd']);
     return !res ? false : await bcrypt.compare(passwd, res.passwd);
   }
 
-  private async getNotifiactionsExtended(nts: notificationsData[]): Promise<notificationsData[]> {
+  private async getNotifiactionsExtended(nts: NotificationsData[]): Promise<NotificationsData[]> {
     const listMsg: RegExp = /^((viewer|editor)(Add|Rm))$/;
-    const ntsMapper = async (n: notificationsData): Promise<notificationsData> => {
+    const ntsMapper = async (n: NotificationsData): Promise<NotificationsData> => {
       const msgType: string = n.type;
       const msgEntries: string[] = [];
       if (listMsg.test(msgType)) {
-        const [ params ]: notificationsData[] = await this.selectJoinedValues(
+        const [ params ]: NotificationsData[] = await this.daoClient.selectJoinedValues(
           ['boxes', 'users'],
           ['owner_id', 'id'],
           {},
@@ -109,7 +101,7 @@ export default class UserBaseConnector extends UserClientDichBoxDB {
         msgEntries.push('User', msgStr, 'box');
         return { ...n, ...params, msgEntries };
       } else if (msgType === 'boxAdd') {
-        const [ params ]: notificationsData[] = await this.selectJoinedValues(
+        const [ params ]: NotificationsData[] = await this.daoClient.selectJoinedValues(
           ['boxes', 'users'],
           ['owner_id', 'id'],
           {},
@@ -133,8 +125,8 @@ export default class UserBaseConnector extends UserClientDichBoxDB {
     return await Promise.all(nts.map(ntsMapper));
   }
 
-  public async getNotifications(name: string): Promise<notificationsData[]> {
-    const nts: notificationsData[] = await super.getNotifications(name);
+  public async getNotifications(name: string): Promise<NotificationsData[]> {
+    const nts: NotificationsData[] = await super.getNotifications(name);
     return !nts.length ? nts : await this.getNotifiactionsExtended(nts);
   }
 }

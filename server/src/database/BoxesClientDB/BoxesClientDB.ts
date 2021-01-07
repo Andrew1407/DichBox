@@ -1,18 +1,32 @@
-import { QueryResult } from 'pg';
-import ClientDichBoxDB from '../ClientDichBoxDB';
-import { boxData } from '../../datatypes';
+import IBoxesClientDB from './IBoxesClientDB';
+import IClientDB from '../IClientDB';
+import { BoxData, UserData } from '../../datatypes';
 
-export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
+export default class BoxesClientDichBoxDB implements IBoxesClientDB {
+  protected daoClient: IClientDB;
+
+  constructor(dao: IClientDB) {
+    this.daoClient = dao;
+  }
+
+  public connect() {
+    this.daoClient.clientConnect();
+  }
+
+  public async getUserId(name: string): Promise<number|null> {
+    return await this.daoClient.getUserId(name);
+  }
+
   public async getBoxesList(
     viewerName: string,
     boxOwnerName: string,
     follower: boolean
-  ): Promise<boxData[]|null> {
+  ): Promise<BoxData[]|null> {
     const ownPage: boolean = viewerName === boxOwnerName;
-    const viewerId: number = await this.getUserId(viewerName);
+    const viewerId: number = await this.daoClient.getUserId(viewerName);
     const boxOwnerId: number = ownPage ? viewerId :
-      await this.getUserId(boxOwnerName);
-    const getters: Promise<boxData[]>[] = ownPage ?
+      await this.daoClient.getUserId(boxOwnerName);
+    const getters: Promise<BoxData[]>[] = ownPage ?
       [
         this.getUserOwnBoxes(boxOwnerId),
         this.getUserInveteeBoxes(boxOwnerId)
@@ -21,22 +35,22 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
         this.getVisitorBoxes(boxOwnerId, follower),
         this.getLimitedBoxes(viewerId, boxOwnerId)
       ];
-    const queries: boxData[][] = await Promise.all(getters);
-    const boxesList: boxData[] = [...queries[0], ...queries[1]];
+    const queries: BoxData[][] = await Promise.all(getters);
+    const boxesList: BoxData[] = [...queries[0], ...queries[1]];
     return boxesList.length ? boxesList : null;
   }
 
   private async getLimitedBoxes(
     person_id: number,
     owner_id: number
-  ): Promise<boxData[]> {
+  ): Promise<BoxData[]> {
     const output: string[] = [
       'c.name as owner_name',
       'b.name',
       'b.name_color',
       'access_level'
     ];
-    const sharedBoxes: boxData[] = await this.selectDoubleJoinedValues(
+    const sharedBoxes: BoxData[] = await this.daoClient.selectDoubleJoinedValues(
       ['limited_viewers', 'boxes', 'users'],
       ['b.id = a.box_id', 'b.owner_id = c.id'],
       { owner_id, person_id },
@@ -46,7 +60,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
     return sharedBoxes;
   }
 
-  private async getUserOwnBoxes(owner_id: number): Promise<boxData[]> {
+  private async getUserOwnBoxes(owner_id: number): Promise<BoxData[]> {
     const returnColumns: string[] = 
       [
         'b.name as owner_name',
@@ -54,7 +68,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
         'a.name_color',
         'access_level'
       ];
-    const userBoxes: boxData[] = await this.selectJoinedValues(
+    const userBoxes: BoxData[] = await this.daoClient.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       { owner_id },
@@ -67,7 +81,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
   private async getVisitorBoxes(
     owner_id: number,
     follower: boolean
-  ): Promise<boxData[]> {
+  ): Promise<BoxData[]> {
     const boxesAccess: string[] = ['public'];
     if (follower)
       boxesAccess.push('followers');
@@ -80,7 +94,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
       'a.name_color as name_color',
       'access_level'
     ];
-    const visitorBoxes: boxData[] =  await this.selectJoinedValues(
+    const visitorBoxes: BoxData[] =  await this.daoClient.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       { owner_id },
@@ -90,14 +104,14 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
     return visitorBoxes;
   }
 
-  private async getUserInveteeBoxes(person_id: number): Promise<boxData[]> {
+  private async getUserInveteeBoxes(person_id: number): Promise<BoxData[]> {
     const returnColumns: string[] = [
       'c.name as owner_name',
       'a.name',
       'a.name_color',
       '\'invetee\' as access_level'
     ];
-    const inveteeBoxes: boxData[] = await this.selectDoubleJoinedValues(
+    const inveteeBoxes: BoxData[] = await this.daoClient.selectDoubleJoinedValues(
       ['boxes', 'box_editors', 'users'],
       ['a.id = b.box_id', 'a.owner_id = c.id'],
       { person_id },
@@ -109,13 +123,14 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
 
   private async getUsersIds(usernames: string[]): Promise<number[]> {
     const namesList: string = usernames
-      .map(x => `'${x}'`)
+      .map((x: string): string => `'${x}'`)
       .join(', ');
-    const res: QueryResult = await this.poolClient.query(
+    const res: UserData[] = await this.daoClient.rawQuery(
       `select id from users where name in (${namesList});`
     );
-    const ids: number[] = res.rows
-      .map(x => x.id);
+    const ids: number[] = res.map(
+      (x: UserData): number => x.id
+    );
     return ids;
   }
 
@@ -126,7 +141,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
     owner_id: number,
     follower: boolean,
     editor: boolean
-  ): Promise<boxData|null> {
+  ): Promise<BoxData|null> {
     const viewPermitted: boolean = (person_id === owner_id) || editor;
     const returnColumns: string[] = [
       'a.name',
@@ -139,14 +154,14 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
       'a.description_color'
     ];
     type gettersFns = {
-      public: () => Promise<boxData|null>,
-      private: () => Promise<boxData|null>,
-      followers: () => Promise<boxData|null>,
-      limited: () => Promise<boxData|null>,
+      public: () => Promise<BoxData|null>,
+      private: () => Promise<BoxData|null>,
+      followers: () => Promise<BoxData|null>,
+      limited: () => Promise<BoxData|null>,
     };
     const getters: gettersFns = {
-      public: async (): Promise<boxData|null> => {
-        const box: boxData[] = await this.selectJoinedValues(
+      public: async (): Promise<BoxData|null> => {
+        const box: BoxData[] = await this.daoClient.selectJoinedValues(
           ['boxes', 'users'],
           ['owner_id', 'id'],
           { owner_id },
@@ -155,18 +170,18 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
         );
         return box.length ? box[0] : null;
       },
-      private: async (): Promise<boxData|null> => {
+      private: async (): Promise<BoxData|null> => {
         return viewPermitted ?
           await getters.public() : null;
       },
-      followers: async (): Promise<boxData|null> => {
+      followers: async (): Promise<BoxData|null> => {
         return viewPermitted || follower ?
           await getters.public() : null;
       },
-      limited: async (): Promise<boxData|null> => {
+      limited: async (): Promise<BoxData|null> => {
         if (viewPermitted)
           return await getters.public();
-        const box: boxData[] = await this.selectDoubleJoinedValues(
+        const box: BoxData[] = await this.daoClient.selectDoubleJoinedValues(
           ['boxes', 'users', 'limited_viewers'],
           ['a.owner_id = b.id', 'a.id = c.box_id'],
           { owner_id, person_id },
@@ -183,21 +198,20 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
     viewerName: string,
     ownerName: string,
     follower: boolean,
-  ): Promise<boxData|null> {
+  ): Promise<BoxData|null> {
     const ownPage: boolean = viewerName === ownerName;
-    const owner_id: number = await this.getUserId(ownerName);
+    const owner_id: number = await this.daoClient.getUserId(ownerName);
     const viewer_id: number = ownPage ? owner_id :
-      await this.getUserId(viewerName);
-    const typeRes: boxData[]|null = await this.selectValues(
+      await this.daoClient.getUserId(viewerName);
+    const typeRes: BoxData[]|null = await this.daoClient.selectValues(
       'boxes', { owner_id, name: boxName }, ['id', 'access_level']
     );
-    if (!typeRes)
-      return null;
+    if (!typeRes) return null;
     const boxId: number = typeRes[0].id;
     const editor: boolean = ownPage ? ownPage :
       await this.checkEditor(boxId, viewer_id);
     const boxType: string = typeRes[0].access_level;
-    const box: boxData|null =  await this.boxInfoGetter(
+    const box: BoxData|null =  await this.boxInfoGetter(
       boxType, boxName, viewer_id, owner_id, follower, editor
     );
     return box ? { ...box, ...typeRes[0], editor, owner_id } : null;  
@@ -207,7 +221,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
     box_id: number,
     person_id: number
   ): Promise<boolean> {
-    const foundValue: { box_id: number }[]|null = await this.selectValues(
+    const foundValue: { box_id: number }[]|null = await this.daoClient.selectValues(
       'box_editors', { box_id, person_id }, ['box_id']
     );
     return !!foundValue;
@@ -220,7 +234,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
   ): Promise<void> {
     const ids: number[] = await this.getUsersIds(usernames);
     const values: string[] = ids.map(id => `($1, ${id})`);
-    await this.poolClient.query(
+    await this.daoClient.rawQuery(
       `insert into ${table} (box_id, person_id) values ${values};`,
       [box_id]
     );
@@ -228,15 +242,15 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
 
   public async insertBox(
     ownerName: string,
-    boxData: boxData,
+    BoxData: BoxData,
     limitedUsers: string[]|null,
     editors: string[]|null
-  ): Promise<boxData|null> {
-    const owner_id: number = await this.getUserId(ownerName);
-    const insertedBox: boxData =
-      await this.insertValue(
+  ): Promise<BoxData|null> {
+    const owner_id: number = await this.daoClient.getUserId(ownerName);
+    const insertedBox: BoxData =
+      await this.daoClient.insertValue(
         'boxes',
-        { ...boxData, owner_id },
+        { ...BoxData, owner_id },
         ['name', 'id', 'owner_id']
       );
     if (limitedUsers)
@@ -249,8 +263,8 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
   public async findUserBox(
     username: number,
     boxName: string
-  ): Promise<boxData|null> {
-    const res: boxData[]|null =  await this.selectJoinedValues(
+  ): Promise<BoxData|null> {
+    const res: BoxData[]|null =  await this.daoClient.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       {}, ['a.name'],
@@ -262,11 +276,11 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
   public async updateBox(
     ownerName: string,
     boxName: string,
-    boxData: boxData,
+    BoxData: BoxData,
     limitedlist: string[]|null = null,
     editorslist: string[]|null = null
-  ): Promise<boxData|null> {
-    const beforeUpdateRes: boxData[] = await this.selectJoinedValues(
+  ): Promise<BoxData|null> {
+    const beforeUpdateRes: BoxData[] = await this.daoClient.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       {}, ['a.id', 'access_level'],
@@ -274,22 +288,22 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
     );
     if (!beforeUpdateRes.length)
       return null;
-    const beforeUpdate: boxData = beforeUpdateRes[0];
+    const beforeUpdate: BoxData = beforeUpdateRes[0];
     const returnColumns: string[] = ['last_edited', 'owner_id'];
-    if (boxData)
-      returnColumns.push(...Object.keys(boxData));
+    if (BoxData)
+      returnColumns.push(...Object.keys(BoxData));
     if (!returnColumns.includes('access_level'))
       returnColumns.push('access_level');
-    const updated: boxData = await this.updateValueById(
+    const updated: BoxData = await this.daoClient.updateValueById(
       'boxes',
       beforeUpdate.id,
-      { ...boxData, last_edited: 'now()' },
+      { ...BoxData, last_edited: 'now()' },
       returnColumns
     );
     if (editorslist)
       await this.updateAccessList('box_editors', beforeUpdate.id, editorslist);
     else
-      await this.removeValue('box_editors', { box_id: beforeUpdate.id });
+      await this.daoClient.removeValue('box_editors', { box_id: beforeUpdate.id });
     const isLimited = (x: string): boolean => x === 'limited';
     const [ limitedNew, limitedOld ]: boolean[] =
       [updated.access_level, beforeUpdate.access_level].map(isLimited);
@@ -301,7 +315,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
       limitedOld && limitedNew,
     ];
     if (wasLimited || !limitedlist)
-      await this.removeValue('limited_viewers', { box_id: beforeUpdate.id });
+      await this.daoClient.removeValue('limited_viewers', { box_id: beforeUpdate.id });
     else if (setLimited)
       await this.insertPermissions('limited_viewers', beforeUpdate.id, limitedlist);
     else if (remainedLimited)
@@ -314,7 +328,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
     box_id: number,
     usernames: string[]
   ): Promise<void> {
-    const currentList: { person_id: number }[]|null  = await this.selectValues(
+    const currentList: { person_id: number }[]|null  = await this.daoClient.selectValues(
       table, { box_id }, ['person_id']
     );
     if (!currentList) {
@@ -334,7 +348,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
       );
     }
     await Promise.all(
-      queries.map(q => this.poolClient.query(q, [box_id]))
+      queries.map(q => this.daoClient.rawQuery(q, [box_id]))
     );
   }
 
@@ -342,7 +356,7 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
     username: string,
     boxName: string
   ): Promise<[number, number]|null> {
-    const foundRes: boxData[] = await this.selectJoinedValues(
+    const foundRes: BoxData[] = await this.daoClient.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       {}, ['owner_id', 'a.id'],
@@ -350,12 +364,12 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
     );
     if (!foundRes.length)
       return null;
-    const [{ owner_id, id }]: boxData[] = foundRes;
+    const [{ owner_id, id }]: BoxData[] = foundRes;
     return [ owner_id, id ];
   }
 
   public async removeBox(id: number): Promise<void> {
-    await this.removeValue('boxes', { id });
+    await this.daoClient.removeValue('boxes', { id });
   }
 
   public async checkBoxAccess(
@@ -366,39 +380,36 @@ export default abstract class BoxesClientDichBoxDB extends ClientDichBoxDB {
     editor: boolean = false
   ): Promise<[number, number]|null> {
     const ownPage: boolean = ownerName === viewerName;
-    const idsRes: boxData[] = await this.selectJoinedValues(
+    const idsRes: BoxData[] = await this.daoClient.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
       {}, ['owner_id', 'a.id', 'access_level'],
       `a.name = '${boxName}' and b.name = '${ownerName}'`
     );
-    if (!idsRes.length)
-      return null;
+    if (!idsRes.length) return null;
     const ownerId: number = idsRes[0].owner_id;
     const boxId: number = idsRes[0].id;
     const res: [number, number] = [ownerId, boxId];
-    if (ownPage || editor)
-      return res;
+    if (ownPage || editor) return res;
     const privacy: string = idsRes[0].access_level;
     const permitted: boolean = 
       (privacy === 'public') ||
       (privacy === 'private' && ownPage) ||
       (privacy === 'followers' && follower);
-    if (permitted) 
-      return res;
+    if (permitted) return res;
     if (privacy === 'limited') {
-      const viewerRes: boxData[]|null = await this.selectValues(
+      const viewerRes: BoxData[]|null = await this.daoClient.selectValues(
         'users', { name: viewerName }, ['id']
       );
       if (!viewerRes) return null;
       const viewerId: number = viewerRes[0].id;
-      const args: [boxData, string[]] =
+      const args: [BoxData, string[]] =
         [ { box_id: boxId, person_id: viewerId }, ['box_id'] ];
-      const getRes = (table: string): Promise<boxData[]|null> => 
-        this.selectValues(table, ...args);
-      const editorRes: boxData[]|null = await getRes('box_editors');
+      const getRes = (table: string): Promise<BoxData[]|null> => 
+        this.daoClient.selectValues(table, ...args);
+      const editorRes: BoxData[]|null = await getRes('box_editors');
       if (editorRes) return res;
-      const limitedRes: boxData[]|null = await getRes('limited_viewers');
+      const limitedRes: BoxData[]|null = await getRes('limited_viewers');
       if (limitedRes) return res;
     }
     return null;    

@@ -1,10 +1,11 @@
 import * as fs  from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
+import IStorageManager from './IStorageManager';
 
 dotenv.config();
 
-export default class StorageManager {
+export default class StorageManager implements IStorageManager {
   private logosPath: string;
   protected storagePath: string;
 

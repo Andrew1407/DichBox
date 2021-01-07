@@ -1,8 +1,8 @@
 import Validator from './Validator';
-import { userData } from '../datatypes';
+import { UserData } from '../datatypes';
 
 export default class UserValidator extends Validator {
-  public checkDataCreated(data: userData): boolean {
+  public checkDataCreated(data: UserData): boolean {
     const checkFields: string[] = ['name', 'email', 'passwd']; 
     const dataCorrect: boolean = !!checkFields.reduce((res, key) => 
       res && this.patterns[key].test(data[key])
@@ -10,7 +10,7 @@ export default class UserValidator extends Validator {
     return dataCorrect;
   }
 
-  public checkDataEdited(data: userData): boolean {
+  public checkDataEdited(data: UserData): boolean {
     const specifiFields: {
       email: (x: string) => boolean,
       passwd: (x: string) => boolean,

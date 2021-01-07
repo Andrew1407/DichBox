@@ -1,4 +1,4 @@
-import { boxData, userData } from '../datatypes';
+import { BoxData, UserData } from '../datatypes';
 
 export default abstract class Validator {
   protected patterns: {
@@ -18,24 +18,24 @@ export default abstract class Validator {
   }
 
   protected checkFields(
-    data: userData|boxData,
+    data: UserData|BoxData,
     specificFields: Object
   ): boolean {
     const fieldsCheck: Object = {
       ...specificFields,
-      name: x => this.patterns.name.test(x),
-      name_color: x => this.patterns.color.test(x),
-      description: x => !!x && x.length <= 100,
-      description_color: x => this.patterns.color.test(x),
+      name: (x: string): boolean => this.patterns.name.test(x),
+      name_color: (x: string): boolean => this.patterns.color.test(x),
+      description: (x: string): boolean => !!x && x.length <= 100,
+      description_color: (x: string): boolean => this.patterns.color.test(x),
     };
     const dataCorrect: boolean = !!Object.keys(data)
-      .reduce((res, key) => 
-        ( key in fieldsCheck ?
-          res && fieldsCheck[key](data[key]) : res )
-      );
+      .reduce((res, key) => ( 
+        key in fieldsCheck ?
+          res && fieldsCheck[key](data[key]) : res 
+      ));
     return dataCorrect;
   };
 
-  abstract checkDataCreated(data: userData|boxData): boolean;
-  abstract checkDataEdited(data: userData|boxData): boolean;
+  abstract checkDataCreated(data: UserData|BoxData): boolean;
+  abstract checkDataEdited(data: UserData|BoxData): boolean;
 }

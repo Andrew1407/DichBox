@@ -1,18 +1,19 @@
 import * as dotenv from 'dotenv';
 import { Pool, PoolClient, QueryResult } from 'pg';
+import IClientDB from './IClientDB';
 import {
-  userData,
-  boxData,
+  UserData,
+  BoxData,
   dataElement,
-  subscribersData,
-  notificationsData 
+  SubscribersData,
+  NotificationsData 
 } from '../datatypes';
 
 dotenv.config();
 
-export default class ClientDichBoxDB {
+export default class ClientDB implements IClientDB {
   private pool: Pool;
-  protected poolClient!: PoolClient;
+  private poolClient!: PoolClient;
   
   constructor() {
     this.pool = new Pool({
@@ -31,7 +32,7 @@ export default class ClientDichBoxDB {
     this.poolClient.release();
   }
 
-  private formatData(data: userData|boxData|subscribersData): 
+  private formatData(data: UserData|BoxData|SubscribersData): 
     [string[], dataElement[], string[]] {
       const keys: string[] = Object.keys(data);
       if (!keys.length)
@@ -52,9 +53,14 @@ export default class ClientDichBoxDB {
       res.rows[0].id : null;
   }
 
-  protected async selectValues(
+  public async rawQuery(query: string, args: any[] = []): Promise<any> {
+    const res: QueryResult = await this.poolClient.query(query, args);
+    return res.rows;
+  }
+
+  public async selectValues(
     table: string,
-    input: boxData|userData|subscribersData|notificationsData,
+    input: BoxData|UserData|SubscribersData|NotificationsData,
     output: string[] = ['*']
   ): Promise<any[]|null> {
     const [ keys, values, valuesTemplate ]: 
@@ -69,10 +75,10 @@ export default class ClientDichBoxDB {
     return res.rowCount ? res.rows : null;
   }
 
-  protected async selectJoinedValues(
+  public async selectJoinedValues(
     tables: string[],
     joinColumns: string[],
-    input: boxData|userData|subscribersData|notificationsData,
+    input: BoxData|UserData|SubscribersData|NotificationsData,
     output: string[] = ['*'],
     extraCondition: string = ''
   ): Promise<any[]> {
@@ -88,10 +94,10 @@ export default class ClientDichBoxDB {
     return res.rows;
   }
 
-  protected async selectDoubleJoinedValues(
+  public async selectDoubleJoinedValues(
     tables: string[],
     joinConditions: string[],
-    input: boxData|userData|subscribersData,
+    input: BoxData|UserData|SubscribersData,
     output: string[] = ['*'],
     extraCondition: string = ''
   ): Promise<any[]> {
@@ -107,12 +113,12 @@ export default class ClientDichBoxDB {
     return res.rows;
   }
 
-  protected async updateValueById(
+  public async updateValueById(
     table: string,
     id: number,
-    data: boxData|userData,
+    data: BoxData|UserData,
     returning: string[] = ['*']
-  ): Promise<Object> {
+  ): Promise<any> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(data);
     const updated: string[] = [];
@@ -125,11 +131,11 @@ export default class ClientDichBoxDB {
     return res.rowCount ? res.rows[0] : null;
   }
 
-  protected async insertValue(
+  public async insertValue(
     table: string,
-    data: boxData|userData|subscribersData,
+    data: BoxData|UserData|SubscribersData,
     returning: string[] = ['*']
-  ): Promise<Object> {
+  ): Promise<any> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(data);
     const res: QueryResult = await this.poolClient.query(
@@ -139,9 +145,9 @@ export default class ClientDichBoxDB {
     return res.rows[0];
   }
 
-  protected async removeValue(
+  public async removeValue(
     table: string,
-    searchParams: Object,
+    searchParams: unknown,
   ): Promise<void> {
     const [ keys, values, valuesTemplate ]: 
       [string[], dataElement[], string[]] = this.formatData(searchParams);

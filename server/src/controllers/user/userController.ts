@@ -1,11 +1,15 @@
 import { Request } from 'express';
-import { notificationsData, userData } from '../../datatypes';
+import { NotificationsData, UserData } from '../../datatypes';
 import { makeTuple } from '../extra';
 import { formatDate, formatDateTime } from '../dateFormatters';
 import { statuses, errMessages } from '../statusInfo';
-import UserDataConnector from '../../database/UserClientDB/UserDataConnector';
-import UserStotageManager from '../../storageManagers/UserStotageManager';
-import { userRoutes } from '../routesTypes';
+import UserDBConnector from '../../database/UserClientDB/UserDBConnector';
+import IUserClientDB from '../../database/UserClientDB/IUserClientDB';
+import ClientDB from '../../database/ClientDB';
+import UserValidator from '../../validation/UserValidator';
+import UserStotageManager from '../../storageManagers/user/UserStotageManager';
+import IUserStotageManager from '../../storageManagers/user/IUserStotageManager';
+import { UserRoutes } from '../routesTypes';
 
 type foundUser = {
   name: string,
@@ -13,20 +17,22 @@ type foundUser = {
   logo: string|null
 };
 
-const foundUsersMapper = async (user: userData): Promise<foundUser> => ({
+const foundUsersMapper = async (user: UserData): Promise<foundUser> => ({
   name: user.name, 
   name_color: user.name_color,
   logo: await userStorage.getLogoIfExists(user.id)
 });
 
-const userStorage: UserStotageManager = new UserStotageManager;
-const clientDB: UserDataConnector = new UserDataConnector();
-clientDB.clientConnect();
+const userStorage: IUserStotageManager = new UserStotageManager();
+const validator: UserValidator = new UserValidator();
+const dao: ClientDB = new ClientDB();
+const clientDB: IUserClientDB = new UserDBConnector(dao, validator);
+clientDB.connect();
 
-const userController: userRoutes = {
+const userController: UserRoutes = {
   async signUpUser(req: Request) {
-    const clientData: userData = req.body;
-    const inserted: userData = await clientDB.insertUser(clientData);
+    const clientData: UserData = req.body;
+    const inserted: UserData = await clientDB.insertUser(clientData);
     if (!inserted) {
       const msg: string = errMessages.USER_INVAID_REQUEST;
       return makeTuple(statuses.BAD_REQUEST, { msg });
@@ -40,12 +46,12 @@ const userController: userRoutes = {
     const name: string = req.body.pathName;
     const username: string = req.body.username;
     const ownPage: boolean = name === username;
-    const user: userData = await clientDB.getUserData({ name });
+    const user: UserData = await clientDB.getUserData({ name });
     if (!user) {
       const msg: string = errMessages.USER_NOT_FOUND;
       return makeTuple(statuses.NOT_FOUND, { msg });
     }
-    let userRes: userData & {
+    let userRes: UserData & {
       follower?: boolean,
       logo?: string
     };
@@ -65,7 +71,7 @@ const userController: userRoutes = {
   async signInUser(req: Request) {
     const email: string = req.body.email;
     const passwd: string = req.body.passwd;
-    const user: userData = await clientDB.signInUser(email, passwd);
+    const user: UserData = await clientDB.signInUser(email, passwd);
     if (!user)
       return makeTuple(statuses.NOT_FOUND, { msg: errMessages.USER_NOT_FOUND });
     const name: string|null = user ? user.name : null;
@@ -90,9 +96,9 @@ const userController: userRoutes = {
 
   async editUser(req: Request) {
     const username: string = req.body.username;
-    const editedData: userData|null = req.body.edited;
+    const editedData: UserData|null = req.body.edited;
     const editedLogo: string|null = req.body.logo;
-    const editedResponse: userData & { logo?: string } = {};
+    const editedResponse: UserData & { logo?: string } = {};
     const id: number = await clientDB.getUserId(username);
     if (Object.keys(editedData).length) {
       await clientDB.updateUser(id, editedData);
@@ -129,7 +135,7 @@ const userController: userRoutes = {
   async findUsernames(req: Request) {
     const nameTemplate: string = req.body.nameTemplate;
     const username: string = req.body.username;
-    const usernames: userData[]|null = await clientDB.getUsernames(nameTemplate, username);
+    const usernames: UserData[]|null = await clientDB.getUsernames(nameTemplate, username);
     let foundUsers: foundUser[] = [];
     if (usernames)
       foundUsers = await Promise.all(
@@ -141,9 +147,9 @@ const userController: userRoutes = {
   async getAccessLists(req: Request) {
     const username: string = req.body.username;
     const boxName: string = req.body.boxName;
-    const foundLists: userData[][] = 
+    const foundLists: UserData[][] = 
       await clientDB.getLimitedUsers(username, boxName);
-    const listsMapper = async (arr: userData[]): Promise<foundUser[]> =>(
+    const listsMapper = async (arr: UserData[]): Promise<foundUser[]> =>(
       await arr.length ? Promise.all(arr.map(foundUsersMapper)) : []
     );
     const [ limitedUsers, editors ]: foundUser[][] =
@@ -172,7 +178,7 @@ const userController: userRoutes = {
 
   async getSubscriptions(req: Request) {
     const name: string = req.body.name;
-    const foundPersons: userData[]|null = await clientDB.getUserSubsciptions(name);
+    const foundPersons: UserData[]|null = await clientDB.getUserSubsciptions(name);
     if (!foundPersons) {
       const msg: string = errMessages.USER_NOT_FOUND;
       return makeTuple(statuses.NOT_FOUND, { msg });
@@ -188,7 +194,7 @@ const userController: userRoutes = {
     const searchFormated: string = Array.from(searchStr)
       .filter(ch => ch !== ' ')
       .join('');
-    const searchedUsers: userData[] = await clientDB.searchUsers(searchFormated);
+    const searchedUsers: UserData[] = await clientDB.searchUsers(searchFormated);
     const searched: foundUser[] = await Promise.all(
       searchedUsers.map(foundUsersMapper)
     );
@@ -197,10 +203,10 @@ const userController: userRoutes = {
 
   async getNotifications(req: Request) {
     const name: string = req.body.name;
-    const notifications: notificationsData[] = await clientDB.getNotifications(name);
+    const notifications: NotificationsData[] = await clientDB.getNotifications(name);
     if (!notifications.length)
       return makeTuple(statuses.OK, { notifications });
-    const ntsMapper = async (n: notificationsData): Promise<notificationsData> => {
+    const ntsMapper = async (n: NotificationsData): Promise<NotificationsData> => {
       const icon: string|null = !n.param || n.param == -1 ?
         null : await userStorage.getLogoIfExists(n.param);
       n.note_date = formatDateTime(String(n.note_date));
@@ -208,7 +214,7 @@ const userController: userRoutes = {
       delete n.param;
       return { ...n, icon };
     };
-    const ntsRes: notificationsData[] = await Promise.all(
+    const ntsRes: NotificationsData[] = await Promise.all(
       notifications.map(ntsMapper)
     );
     return makeTuple(statuses.OK, { notifications: ntsRes });  

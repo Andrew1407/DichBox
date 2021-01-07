@@ -1,6 +1,7 @@
-import StorageManager from './StorageManager';
+import StorageManager from '../StorageManager';
+import IUserStotageManager from './IUserStotageManager';
 
-export default class UserStorageManager extends StorageManager {
+export default class UserStorageManager extends StorageManager implements IUserStotageManager {
   constructor() {
     super('users');
   }

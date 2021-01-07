@@ -1,4 +1,8 @@
-type userData = {
+export type dataElement = string|number|Date|number[]|boolean;
+export type entryType = 'file'|'dir'|'image';
+export type access_level = 'public'|'private'|'limited'|'invetee';
+
+export interface UserData {
   id?: number,
   name?: string,
   email?: string,
@@ -11,9 +15,7 @@ type userData = {
   notifications?: number
 };
 
-type access_level = 'public'|'private'|'limited'|'invetee';
-
-type boxData = {
+export interface BoxData {
   id?: number,
   name?: string,
   name_color?: string,
@@ -30,12 +32,12 @@ type boxData = {
   person_id?: number
 };
 
-type subscribersData = {
+export interface SubscribersData {
   person_id?: number,
   subscription?: number
 };
 
-type notificationsData = {
+export interface NotificationsData {
   id?: number,
   person_id?: number,
   type?: string,
@@ -50,38 +52,21 @@ type notificationsData = {
   icon?: string|null
 };
 
-type dataElement = string|number|Date|number[];
-
-type entryType = 'file'|'dir'|'image';
-
-type fileEntries = {
+export interface FileEntries {
   name: string,
   src: string
 };
 
-type dirEntries = {
+export interface DirEntries {
   type: entryType,
   name: string
 };
 
-type pathEntries = {
+export interface PathEntries {
   type: entryType,
   dir?: {
-   src: dirEntries[],
+   src: DirEntries[],
    name: string
   },  
-  file?: fileEntries
+  file?: FileEntries
 }
-
-export {
-  userData,
-  boxData,
-  dataElement,
-  subscribersData,
-  access_level,
-  pathEntries,
-  dirEntries,
-  fileEntries,
-  entryType,
-  notificationsData
-};

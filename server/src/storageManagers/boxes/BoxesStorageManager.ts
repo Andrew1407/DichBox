@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { pathEntries, dirEntries, fileEntries, entryType } from '../datatypes';
-import StorageManager from './StorageManager';
+import IBoxesStorageManager from './IBoxesStorageManager';
+import { PathEntries, DirEntries, FileEntries, entryType } from '../../datatypes';
+import StorageManager from '../StorageManager';
 
-export default class BoxesStorageManager extends StorageManager {
+export default class BoxesStorageManager extends StorageManager implements IBoxesStorageManager {
   constructor() {
     super('boxes');
   }
@@ -32,10 +33,9 @@ export default class BoxesStorageManager extends StorageManager {
     ]);
   }
 
-  private async getDirEntries(dirPath: string): Promise<dirEntries[]> {
-    const dirList: string[] = await fs.promises
-      .readdir(dirPath);
-    const dirMapper = async (name: string): Promise<dirEntries> => {
+  private async getDirEntries(dirPath: string): Promise<DirEntries[]> {
+    const dirList: string[] = await fs.promises.readdir(dirPath);
+    const dirMapper = async (name: string): Promise<DirEntries> => {
       const fullPath: string = path.join(dirPath, name);
       const nameStats: fs.Stats = await fs.promises.lstat(fullPath);
       if (await nameStats.isFile()) {
@@ -48,7 +48,7 @@ export default class BoxesStorageManager extends StorageManager {
       }
       return { name, type: 'file' };
     };
-    const entries: dirEntries[] = await Promise.all(
+    const entries: DirEntries[] = await Promise.all(
       dirList.map(dirMapper)
     );
     return entries;
@@ -58,7 +58,7 @@ export default class BoxesStorageManager extends StorageManager {
     ids: [number, number],
     initial: boolean,
     extraPath: string[]
-  ): Promise<pathEntries|null> {
+  ): Promise<PathEntries|null> {
     const idsStr: string[] = ids.map(x => x.toString());
     const boxPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
@@ -67,7 +67,7 @@ export default class BoxesStorageManager extends StorageManager {
       return null;
     const pathStats: fs.Stats = await fs.promises.lstat(boxPath);
     if (await pathStats.isDirectory()) {
-      const src: dirEntries[] = await this.getDirEntries(boxPath);
+      const src: DirEntries[] = await this.getDirEntries(boxPath);
       const name: string = extraPath.length > 1 ?
         boxPath.split('/').pop() : 'хрін тобі';
       return { dir: { src, name }, type: 'dir' };
@@ -77,8 +77,8 @@ export default class BoxesStorageManager extends StorageManager {
       const src: string = await fs.promises.readFile(boxPath, 'utf-8');
       const dirPath: string[] = boxPath.split('/');
       const name: string = dirPath.pop();
-      const file: fileEntries = { src, name };
-      const entries: pathEntries = { type: 'file', file };
+      const file: FileEntries = { src, name };
+      const entries: PathEntries = { type: 'file', file };
       return entries;
     }
     return null;
@@ -90,7 +90,7 @@ export default class BoxesStorageManager extends StorageManager {
     ids: [number, number],
     extraPath: string[],
     entries: string|null = null
-  ): Promise<pathEntries|null> {
+  ): Promise<PathEntries|null> {
     const idsStr: string[] = ids.map(x => x.toString());
     const boxPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
@@ -104,7 +104,7 @@ export default class BoxesStorageManager extends StorageManager {
       await fs.promises.writeFile(filePath, '');
     else if (type === 'image')
       await fs.promises.writeFile(filePath, entries);
-    const src: dirEntries[] = await this.getDirEntries(boxPath);
+    const src: DirEntries[] = await this.getDirEntries(boxPath);
     const typeKey: entryType = type === 'dir' ? 'dir' : 'file';
     return { type, [typeKey]: { src, name } };
   }
@@ -173,8 +173,7 @@ export default class BoxesStorageManager extends StorageManager {
     const filePathStr: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...filePath);
     const exists: boolean = fs.existsSync(filePathStr);
-    if (!exists)
-      return false;
+    if (!exists) return false;
     await fs.promises.writeFile(filePathStr, src);
     return true;
   }

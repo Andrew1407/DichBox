@@ -2,16 +2,23 @@ import { Request } from 'express';
 import { makeTuple, checkPathes } from '../extra';
 import { formatDateTime } from '../dateFormatters';
 import { statuses, errMessages } from '../statusInfo';
-import { boxData, pathEntries, entryType } from '../../datatypes';
-import BoxesDataConnector from '../../database/BoxesClientDB/BoxesDataConnector';
-import BoxesStorageManager from '../../storageManagers/BoxesStorageManager';
-import { boxesRoutes } from '../routesTypes';
+import { BoxData, PathEntries, entryType } from '../../datatypes';
+import BoxesDBConnector from '../../database/BoxesClientDB/BoxesDBConnector';
+import ClientDB from '../../database/ClientDB';
+import IClientDB from '../../database/IClientDB';
+import BoxesStorageManager from '../../storageManagers/boxes/BoxesStorageManager';
+import IBoxesStorageManager from '../../storageManagers/boxes/IBoxesStorageManager';
+import BoxValidator from '../../validation/BoxValidator';
+import { BoxesRoutes } from '../routesTypes';
+import IBoxesClientDB from '../../database/BoxesClientDB/IBoxesClientDB';
 
-const boxesStorage: BoxesStorageManager = new BoxesStorageManager();
-const clientDB: BoxesDataConnector = new BoxesDataConnector();
-clientDB.clientConnect();
+const boxesStorage: IBoxesStorageManager = new BoxesStorageManager();
+const dao: IClientDB = new ClientDB();
+const validator: BoxValidator = new BoxValidator();
+const clientDB: IBoxesClientDB = new BoxesDBConnector(dao, validator);
+clientDB.connect();
 
-const formatDateAll = (obj: boxData): void => {
+const formatDateAll = (obj: BoxData): void => {
   for (const key in obj) {
     const isDateField: RegExp = /^(reg_date|last_edited)$/;
     if (isDateField.test(key))
@@ -19,17 +26,17 @@ const formatDateAll = (obj: boxData): void => {
   }
 };
 
-const boxesController: boxesRoutes = {
+const boxesController: BoxesRoutes = {
   async createBox(req: Request) {
-    const { boxData, logo, limitedUsers, editors, username }: {
-      boxData: boxData,
+    const { BoxData, logo, limitedUsers, editors, username }: {
+      BoxData: BoxData,
       logo: string|null,
       limitedUsers: string[]|null,
       editors: string[]|null,
       username: string
     } = req.body;
-    const createdBox: boxData = await clientDB.insertBox(
-      username, boxData, limitedUsers, editors
+    const createdBox: BoxData = await clientDB.insertBox(
+      username, BoxData, limitedUsers, editors
     );
     await boxesStorage.createBox(
       createdBox.owner_id,
@@ -45,7 +52,7 @@ const boxesController: boxesRoutes = {
       boxOwnerName: string,
       follower: boolean
     } = req.body;
-    const boxesList: boxData[]|null = await clientDB.getBoxesList(
+    const boxesList: BoxData[]|null = await clientDB.getBoxesList(
       viewerName, boxOwnerName, follower
     );
     return makeTuple(statuses.OK, { boxesList });
@@ -54,7 +61,7 @@ const boxesController: boxesRoutes = {
   async verifyBoxName(req: Request) {
     const username: number = req.body.username;
     const boxName: string = req.body.boxName;
-    const foundBox: boxData|null = await clientDB.findUserBox(username, boxName);
+    const foundBox: BoxData|null = await clientDB.findUserBox(username, boxName);
     const foundValue: string|null = foundBox ? foundBox.name : null;
     return makeTuple(statuses.OK, { foundValue });
   },
@@ -66,7 +73,7 @@ const boxesController: boxesRoutes = {
       viewerName: string,
       boxName: string
     } = req.body;
-    const boxInfo: boxData|null = await clientDB.getBoxInfo(
+    const boxInfo: BoxData|null = await clientDB.getBoxInfo(
       boxName, viewerName, ownerName, follower
     );
     if (!boxInfo) {
@@ -86,10 +93,10 @@ const boxesController: boxesRoutes = {
     const logo: string|null = req.body.logo;
     const limitedList: string[]|null = req.body.limitedUsers;
     const editorsList: string[]|null = req.body.editors;
-    const boxData: boxData|null = req.body.boxData;
+    const BoxData: BoxData|null = req.body.BoxData;
     const boxName: string = req.body.boxName;
-    const updated: boxData|null = await clientDB.updateBox(
-      username, boxName, boxData, limitedList, editorsList
+    const updated: BoxData|null = await clientDB.updateBox(
+      username, boxName, BoxData, limitedList, editorsList
     );
     if (!updated) {
       const msg: string = errMessages.BOXES_INVAID_REQUEST;
@@ -101,7 +108,7 @@ const boxesController: boxesRoutes = {
     delete updated.id;
     delete updated.owner_id;
     formatDateAll(updated)
-    const jsonRes: boxData & { logo?: string } = 
+    const jsonRes: BoxData & { logo?: string } = 
       !logo || logo === 'removed' ?
         updated : { ...updated, logo };
     return makeTuple(statuses.OK, jsonRes);
@@ -146,7 +153,7 @@ const boxesController: boxesRoutes = {
     );
     if (!checkup)
       return makeTuple(statuses.NOT_FOUND, { msg });
-    const entries: pathEntries = 
+    const entries: PathEntries = 
       await boxesStorage.getPathEntries(checkup, initial, extraPath);
     return entries ?
       makeTuple(statuses.OK, { entries }) :
@@ -171,13 +178,13 @@ const boxesController: boxesRoutes = {
     const checkup: [number, number]|null = await clientDB.checkBoxAccess(
       ownerName, viewerName, boxName, follower, editor
     );
-    const edited: boxData = await clientDB.updateBox(
+    const edited: BoxData = await clientDB.updateBox(
       ownerName,
       boxName,
       { last_edited: 'now()' },
     );
     formatDateAll(edited);
-    const created: pathEntries = 
+    const created: PathEntries = 
       await boxesStorage.addFile(fileName, type, checkup, extraPath, src);
     return makeTuple(statuses.CREATED, { created, last_edited: edited.last_edited });
   },
@@ -251,7 +258,7 @@ const boxesController: boxesRoutes = {
       const msg: string = errMessages.BOXES_INTERNAL;
       return makeTuple(statuses.SERVER_INTERNAL, { msg });
     }
-    const editedMark: boxData = await clientDB.updateBox(
+    const editedMark: BoxData = await clientDB.updateBox(
       ownerName,
       boxName,
       { last_edited: 'now()' },
@@ -285,7 +292,7 @@ const boxesController: boxesRoutes = {
       const msg: string = errMessages.BOXES_INTERNAL;
       return makeTuple(statuses.SERVER_INTERNAL, { msg });
     }
-    const edited: boxData = await clientDB.updateBox(
+    const edited: BoxData = await clientDB.updateBox(
       ownerName,
       boxName,
       { last_edited: 'now()' },
@@ -313,7 +320,7 @@ const boxesController: boxesRoutes = {
     );
     if (!checkup)
       return makeTuple(statuses.NOT_FOUND, { msg });
-    const edited: boxData = await clientDB.updateBox(
+    const edited: BoxData = await clientDB.updateBox(
       ownerName,
       boxName,
       { last_edited: 'now()' },

@@ -1,14 +1,14 @@
 import Validator from './Validator';
-import { boxData } from '../datatypes';
+import { BoxData } from '../datatypes';
 
 export default class BoxValidator extends Validator {
-  public checkDataCreated(data: boxData): boolean {
+  public checkDataCreated(data: BoxData): boolean {
     if (!this.patterns.name.test(data.name))
       return false;
     return this.checkDataEdited(data);
   }
 
-  public checkDataEdited(data: boxData): boolean {
+  public checkDataEdited(data: BoxData): boolean {
     const specificFileds: {
       access_level: (x: string) => boolean
     } = {

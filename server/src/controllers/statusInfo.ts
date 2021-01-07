@@ -1,4 +1,4 @@
-type statuses = {
+interface Statuses {
   OK: 200,
   SERVER_INTERNAL: 500,
   NOT_FOUND: 404,
@@ -7,7 +7,7 @@ type statuses = {
   FORBIDDEN: 403
 };
 
-type errorMessages = {
+interface ErrorMessages {
   USER_INVAID_REQUEST: string,
   USER_NOT_FOUND: string,
   FORBIDDEN: string,
@@ -22,7 +22,7 @@ type errorMessages = {
   INVALID_PASSWORD: string
 };
 
-export const statuses: statuses = {
+export const statuses: Statuses = {
   OK: 200,
   SERVER_INTERNAL: 500,
   NOT_FOUND: 404,
@@ -31,7 +31,7 @@ export const statuses: statuses = {
   FORBIDDEN: 403
 };
 
-export const errMessages: errorMessages = {
+export const errMessages: ErrorMessages = {
   USER_INVAID_REQUEST: 'We just can\'t sign you up!',
   USER_NOT_FOUND: 'The searched digital twin wasn\'t found in the DichBox system...',
   FORBIDDEN: 'Forbidden for you!!!',

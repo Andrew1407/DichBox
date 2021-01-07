@@ -1,6 +1,6 @@
 import userController from './userController';
 import { getMiddlewares } from '../extra';
-import { userRoutes } from '../routesTypes';
+import { UserRoutes } from '../routesTypes';
 
-const userMiddlewares: userRoutes = getMiddlewares(userController);
+const userMiddlewares: UserRoutes = getMiddlewares(userController);
 export default userMiddlewares;
