@@ -1,4 +1,4 @@
-export default class TestLogger {
+export default abstract class TestLogger {
   private passedErrors: (Error|null)[] = [];
 
   protected addTestResult(result: Error|null): void {
@@ -7,19 +7,18 @@ export default class TestLogger {
 
   protected logAndCheck(testName: string): void {
     const total: number = this.passedErrors.length;
-    const errors: Error[] = [];
-    for (const err of this.passedErrors)
-      if (err) errors.push(err);
+    const errors: Error[] = this.passedErrors
+      .filter((e: Error|null): boolean => !!e);
     const failed: number = errors.length;
     const passed: number = total - failed;
-    const passedSign: string = total === passed ? '[+]' : '[-]';
-    const logStr: string = `${testName}. Total: ${total}, passed: ${passed}, failed: ${failed} ${passedSign}.`;
+    const passedSign: string = total === passed ? ' ✔️ ' : ' ❌';
+    const logStr: string = ` - ${testName}. Total: ${total}, passed: ${passed}, failed: ${failed} [${passedSign}].`;
     console.log(logStr);
     if (failed) {
       errors.forEach(
         (e: Error): void => console.error(e)
       );
-      process.exit(1);
+      process.exit(0);
     }
   }
 }

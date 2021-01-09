@@ -3,9 +3,10 @@ import { BoxData } from '../datatypes';
 
 export default class BoxValidator extends Validator {
   public checkDataCreated(data: BoxData): boolean {
-    if (!this.patterns.name.test(data.name))
-      return false;
-    return this.checkDataEdited(data);
+    const nameVaid: RegExp = this.patterns.name;
+    if (data.name && nameVaid.test(data.name))
+      return this.checkDataEdited(data);
+    return false;
   }
 
   public checkDataEdited(data: BoxData): boolean {

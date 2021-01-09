@@ -3,12 +3,13 @@ import IUserClientDB from './IUserClientDB';
 import IClientDB from '../IClientDB';
 import UserValidator from '../../validation/UserValidator';
 import UserClienDB from './UserClientDB';
+import Validator from '../../validation/Validator';
 import { NotificationsData, UserData } from '../../datatypes';
 
 export default class UserDBConnector extends UserClienDB implements IUserClientDB {
   private validator: UserValidator;
 
-  constructor(dao: IClientDB, validator: UserValidator) {
+  constructor(dao: IClientDB, validator: Validator) {
     super(dao);
     this.validator = validator;
   }
@@ -28,18 +29,18 @@ export default class UserDBConnector extends UserClienDB implements IUserClientD
       'select id from users where name = $1 or email = $2;',
       [name, email]
     );
-    return foundColumns.length == 0;
+    return !!foundColumns.length;
   }
 
-  public async insertUser(UserData: UserData|null): Promise<UserData|null> {
-    if (!UserData) return null;
-    const correctData: boolean = this.validator.checkDataEdited(UserData);
+  public async insertUser(userData: UserData|null): Promise<UserData|null> {
+    if (!userData) return null;
+    const correctData: boolean = this.validator.checkDataEdited(userData);
     if (!correctData) return null;
     const fieldsTaken: boolean =
-      await this.checkTakenFields(UserData.name, UserData.email)
+      await this.checkTakenFields(userData.name, userData.email)
     if (fieldsTaken) return null;
-    UserData.passwd = await this.hashPasswd(UserData.passwd);
-    return await super.insertUser(UserData);
+    userData.passwd = await this.hashPasswd(userData.passwd);
+    return await super.insertUser(userData);
   }
 
   public async updateUser(
@@ -111,7 +112,7 @@ export default class UserDBConnector extends UserClienDB implements IUserClientD
         msgEntries.push('User', 'has created a new box:');
         return { ...n, ...params, msgEntries };
       } else if (msgType === 'userRm') {
-        msgEntries.push('Thr account you followed', 'has been removed');
+        msgEntries.push('The account you followed', 'has been removed');
         const [ user_name, user_color ]: string[] = n.extra_values;
         delete n.param;
         return { ...n, msgEntries, user_name, user_color };

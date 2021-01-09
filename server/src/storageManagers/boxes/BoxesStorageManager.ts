@@ -14,23 +14,29 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     boxId: number,
     logo: string|null
   ): Promise<void> {
-    const idsStr: string[] =
-      [ userId, boxId ].map(x => x.toString());
+    const idsStr: string[] = [ userId, boxId ].map(
+      (x: number): string => x.toString()
+    );
     await this.createDir('boxes', ...idsStr);
-    if (logo)
-      await this.saveLogo(logo, boxId, userId);
+    if (logo) await this.saveLogo(logo, boxId, userId);
   }
 
   public async removeBox(
     userId: number,
     boxId: number
   ): Promise<void> {
-    const idsString: string[] = [userId, boxId]
-      .map(x => x.toString());
+    const idsString: string[] = [userId, boxId].map(
+      (x: number): string => x.toString()
+    );
     await Promise.all([
       this.removeDir('boxes', ...idsString),
       this.removeLogoIfExists(boxId, userId)
     ]);
+  }
+
+  private idsToString(ids: number[]): string[] {
+    const mapper = (x: number): string => x.toString();
+    return ids.map(mapper);
   }
 
   private async getDirEntries(dirPath: string): Promise<DirEntries[]> {
@@ -59,7 +65,7 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     initial: boolean,
     extraPath: string[]
   ): Promise<PathEntries|null> {
-    const idsStr: string[] = ids.map(x => x.toString());
+    const idsStr: string[] = this.idsToString(ids);
     const boxPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
     const exists: boolean = fs.existsSync(boxPath);
@@ -91,7 +97,7 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     extraPath: string[],
     entries: string|null = null
   ): Promise<PathEntries|null> {
-    const idsStr: string[] = ids.map(x => x.toString());
+    const idsStr: string[] = this.idsToString(ids);
     const boxPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
     const exists: boolean = fs.existsSync(boxPath);
@@ -115,7 +121,7 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     ids: [number, number],
     extraPath: string[]
   ): Promise<boolean> {
-    const idsStr: string[] = ids.map(x => x.toString());
+    const idsStr: string[] = this.idsToString(ids);
     const filePath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath, name);
     const exists: boolean = fs.existsSync(filePath);
@@ -134,14 +140,14 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     ids: [number, number],
     extraPath: string[]
   ): Promise<boolean> {
-    const idsStr: string[] = ids.map(x => x.toString());
+    const idsStr: string[] = this.idsToString(ids);
     const dirPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
-    const [ oldPath, newPath ]: string[] = [ name, newName ]
-      .map(p => path.join(dirPath, p));
+    const [ oldPath, newPath ]: string[] = [ name, newName ].map(
+      (p: string): string => path.join(dirPath, p)
+    );
     const exists: boolean = fs.existsSync(oldPath);
-    if (!exists)
-      return false;
+    if (!exists) return false;
     await fs.promises.rename(oldPath, newPath);
     return true;
   }
@@ -153,14 +159,13 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     extraPath: string[]
   ): Promise<string|null> {
     if (type === 'dir') return null;
-    const idsStr: string[] = ids.map(x => x.toString());
+    const idsStr: string[] = this.idsToString(ids);;
     const boxPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
     const exists: boolean = fs.existsSync(boxPath);
     if (!exists) return null;
     const filePath: string = path.join(boxPath, name);
-    const src: string = await fs.promises
-      .readFile(filePath, 'utf-8');
+    const src: string = await fs.promises.readFile(filePath, 'utf-8');
     return src;
   }
 
@@ -169,7 +174,7 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     filePath: string[],
     src: string
   ): Promise<boolean> {
-    const idsStr: string[] = ids.map(x => x.toString());
+    const idsStr: string[] = ids.map((x: number): string => x.toString());
     const filePathStr: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...filePath);
     const exists: boolean = fs.existsSync(filePathStr);

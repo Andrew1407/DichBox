@@ -242,7 +242,7 @@ export default class BoxesClientDichBoxDB implements IBoxesClientDB {
 
   public async insertBox(
     ownerName: string,
-    BoxData: BoxData,
+    boxData: BoxData,
     limitedUsers: string[]|null,
     editors: string[]|null
   ): Promise<BoxData|null> {
@@ -250,13 +250,13 @@ export default class BoxesClientDichBoxDB implements IBoxesClientDB {
     const insertedBox: BoxData =
       await this.daoClient.insertValue(
         'boxes',
-        { ...BoxData, owner_id },
+        { ...boxData, owner_id },
         ['name', 'id', 'owner_id']
       );
     if (limitedUsers)
       await this.insertPermissions('limited_viewers', insertedBox.id, limitedUsers);
     if (editors)
-      await this.insertPermissions('box_editors', insertedBox.id, editors)
+      await this.insertPermissions('box_editors', insertedBox.id, editors);
     return insertedBox;
   }
 
@@ -276,7 +276,7 @@ export default class BoxesClientDichBoxDB implements IBoxesClientDB {
   public async updateBox(
     ownerName: string,
     boxName: string,
-    BoxData: BoxData,
+    boxData: BoxData,
     limitedlist: string[]|null = null,
     editorslist: string[]|null = null
   ): Promise<BoxData|null> {
@@ -286,18 +286,17 @@ export default class BoxesClientDichBoxDB implements IBoxesClientDB {
       {}, ['a.id', 'access_level'],
       `a.name = '${boxName}' and b.name = '${ownerName}'`
     );
-    if (!beforeUpdateRes.length)
-      return null;
+    if (!beforeUpdateRes.length) return null;
     const beforeUpdate: BoxData = beforeUpdateRes[0];
     const returnColumns: string[] = ['last_edited', 'owner_id'];
-    if (BoxData)
-      returnColumns.push(...Object.keys(BoxData));
+    if (boxData)
+      returnColumns.push(...Object.keys(boxData));
     if (!returnColumns.includes('access_level'))
       returnColumns.push('access_level');
     const updated: BoxData = await this.daoClient.updateValueById(
       'boxes',
       beforeUpdate.id,
-      { ...BoxData, last_edited: 'now()' },
+      { ...boxData, last_edited: 'now()' },
       returnColumns
     );
     if (editorslist)
@@ -348,7 +347,9 @@ export default class BoxesClientDichBoxDB implements IBoxesClientDB {
       );
     }
     await Promise.all(
-      queries.map(q => this.daoClient.rawQuery(q, [box_id]))
+      queries.map((q: string): Promise<any> =>
+        this.daoClient.rawQuery(q, [box_id])
+      )
     );
   }
 

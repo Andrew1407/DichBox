@@ -37,16 +37,17 @@ export default class UserClienDB implements IUserClientDB {
     );
   }
 
-  public async insertUser(UserData: UserData): Promise<UserData> {
+  public async insertUser(userData: UserData): Promise<UserData> {
     return await this.daoClient
-      .insertValue('users', UserData, ['name', 'id']);
+      .insertValue('users', userData, ['name', 'id']);
   }
 
-  public async updateUser(id: number,
-    UserData: UserData
+  public async updateUser(
+    id: number,
+    userData: UserData
   ): Promise<UserData|null> {
     return await this.daoClient
-      .updateValueById('users', id, UserData)
+      .updateValueById('users', id, userData)
   }
 
   public async getUsersData(
@@ -94,9 +95,11 @@ export default class UserClienDB implements IUserClientDB {
     action: 'subscribe'|'unsubscribe'
   ): Promise<number|null> {
     const [ person_id, subscription ]: (number|null)[] = await Promise.all(
-      [personName, subscriptionName].map(x => this.daoClient.getUserId(x))
+      [personName, subscriptionName].map(
+        (x: string): Promise<number> => this.daoClient.getUserId(x)
+      )
     );
-    if (!person_id || !subscription)
+    if (!(person_id && subscription))
       return null;
     const getQueries = (): Promise<unknown>[] => {
       const args: ['subscribers', SubscribersData] = [
@@ -112,12 +115,12 @@ export default class UserClienDB implements IUserClientDB {
           `update users set followers = (followers ${followersSign} 1) where id = $1 returning followers;`,
           [subscription]
         ),
-        this[subsMethod](...args)
+        this.daoClient[subsMethod](...args)
       ];
     };
     
     const [ followersRes ]: any[] = await Promise.all(getQueries());
-    const followers: number = followersRes.rows[0].followers;
+    const followers: number = followersRes[0].followers;
     return followers;
   }
 
@@ -197,7 +200,7 @@ export default class UserClienDB implements IUserClientDB {
     value: string
   ): Promise<string|null> {
     const valObj: UserData = { [column]: value };
-    const res: UserData|null = await this.getUserData(valObj, [column])
+    const res: UserData|null = await this.getUserData(valObj, [column]);
     return res ? res[column] : null;
   }
 
@@ -207,7 +210,7 @@ export default class UserClienDB implements IUserClientDB {
 
   public async checkPasswd(
     name: string,
-    passwd: string
+    _: string
   ): Promise<boolean> {
     const res: UserData|null = await this.getUserData({ name }, ['passwd']);
     return !!res;

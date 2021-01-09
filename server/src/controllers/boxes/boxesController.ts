@@ -28,15 +28,15 @@ const formatDateAll = (obj: BoxData): void => {
 
 const boxesController: BoxesRoutes = {
   async createBox(req: Request) {
-    const { BoxData, logo, limitedUsers, editors, username }: {
-      BoxData: BoxData,
+    const { boxData, logo, limitedUsers, editors, username }: {
+      boxData: BoxData,
       logo: string|null,
       limitedUsers: string[]|null,
       editors: string[]|null,
       username: string
     } = req.body;
     const createdBox: BoxData = await clientDB.insertBox(
-      username, BoxData, limitedUsers, editors
+      username, boxData, limitedUsers, editors
     );
     await boxesStorage.createBox(
       createdBox.owner_id,
@@ -93,10 +93,10 @@ const boxesController: BoxesRoutes = {
     const logo: string|null = req.body.logo;
     const limitedList: string[]|null = req.body.limitedUsers;
     const editorsList: string[]|null = req.body.editors;
-    const BoxData: BoxData|null = req.body.BoxData;
+    const boxData: BoxData|null = req.body.boxData;
     const boxName: string = req.body.boxName;
     const updated: BoxData|null = await clientDB.updateBox(
-      username, boxName, BoxData, limitedList, editorsList
+      username, boxName, boxData, limitedList, editorsList
     );
     if (!updated) {
       const msg: string = errMessages.BOXES_INVAID_REQUEST;

@@ -53,7 +53,7 @@ export default class ClientDB implements IClientDB {
       res.rows[0].id : null;
   }
 
-  public async rawQuery(query: string, args: any[] = []): Promise<any> {
+  public async rawQuery(query: string, args: any[] = []): Promise<any[]> {
     const res: QueryResult = await this.poolClient.query(query, args);
     return res.rows;
   }

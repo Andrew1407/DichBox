@@ -32,7 +32,7 @@ clientDB.connect();
 const userController: UserRoutes = {
   async signUpUser(req: Request) {
     const clientData: UserData = req.body;
-    const inserted: UserData = await clientDB.insertUser(clientData);
+    const inserted: UserData|null = await clientDB.insertUser(clientData);
     if (!inserted) {
       const msg: string = errMessages.USER_INVAID_REQUEST;
       return makeTuple(statuses.BAD_REQUEST, { msg });

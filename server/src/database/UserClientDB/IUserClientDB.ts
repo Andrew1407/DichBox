@@ -2,7 +2,7 @@ import { UserData, NotificationsData } from '../../datatypes';
 
 export default interface IUserClientDB {
   connect(): void;
-  insertUser(UserData: UserData): Promise<UserData>;
+  insertUser(userData: UserData): Promise<UserData|null>;
   updateUser(id: number,UserData: UserData): Promise<UserData|null>;
   removeUser(id: number): Promise<void>;
   signInUser(email: string, passwd: string): Promise<UserData|null>;

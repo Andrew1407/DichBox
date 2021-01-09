@@ -28,11 +28,12 @@ export default abstract class Validator {
       description: (x: string): boolean => !!x && x.length <= 100,
       description_color: (x: string): boolean => this.patterns.color.test(x),
     };
-    const dataCorrect: boolean = !!Object.keys(data)
-      .reduce((res, key) => ( 
-        key in fieldsCheck ?
-          res && fieldsCheck[key](data[key]) : res 
-      ));
+    const reducer = (res: boolean, key: string): boolean => (
+      key in fieldsCheck ?
+        res && fieldsCheck[key](data[key]) : res 
+    );
+    const dataCorrect: boolean = Object.keys(data)
+      .reduce(reducer, true);
     return dataCorrect;
   };
 

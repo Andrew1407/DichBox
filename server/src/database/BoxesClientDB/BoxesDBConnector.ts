@@ -2,12 +2,13 @@ import IBoxesClientDB from './IBoxesClientDB';
 import BoxesClientDB from './BoxesClientDB';
 import IClientDB from '../IClientDB';
 import BoxValidator from '../../validation/BoxValidator';
+import Validator from '../../validation/Validator';
 import { BoxData } from '../../datatypes';
 
 export default class BoxesDBConnector extends BoxesClientDB implements IBoxesClientDB {
   private validator: BoxValidator;
 
-  constructor(dao: IClientDB, validator: BoxValidator) {
+  constructor(dao: IClientDB, validator: Validator) {
     super(dao);
     this.validator = validator;
   }
@@ -28,32 +29,32 @@ export default class BoxesDBConnector extends BoxesClientDB implements IBoxesCli
 
   public async insertBox(
     ownerName: string,
-    BoxData: BoxData|null,
+    boxData: BoxData|null,
     limitedUsers: string[]|null,
     editors: string[]|null
   ): Promise<BoxData|null> {
-    if (!BoxData || !BoxData.name)
+    if (!(boxData && boxData.name))
       return null;
-    const correctData: boolean = this.validator.checkDataCreated(BoxData);
+    const correctData: boolean = this.validator.checkDataCreated(boxData);
     if (!correctData) return null;
-    const nameTaken: boolean = await this.checkTakenName(ownerName, BoxData.name);
+    const nameTaken: boolean = await this.checkTakenName(ownerName, boxData.name);
     if (nameTaken) return null;
-    return await super.insertBox(ownerName, BoxData, limitedUsers, editors);
+    return await super.insertBox(ownerName, boxData, limitedUsers, editors);
   }
 
   public async updateBox(
     ownerName: string,
     boxName: string,
-    BoxData: BoxData|null,
+    boxData: BoxData|null,
     limitedlist: string[]|null = null,
     editorsList: string[]|null = null
   ): Promise<BoxData|null> {
-    if (BoxData) {
-      const correctData: boolean = this.validator.checkDataEdited(BoxData);
+    if (boxData) {
+      const correctData: boolean = this.validator.checkDataEdited(boxData);
       if (!correctData) return null;
-      const nameTaken: boolean = await this.checkTakenName(ownerName, BoxData.name);
+      const nameTaken: boolean = await this.checkTakenName(ownerName, boxData.name);
       if (nameTaken) return null;  
     }
-    return await super.updateBox(ownerName, boxName, BoxData, limitedlist, editorsList);
+    return await super.updateBox(ownerName, boxName, boxData, limitedlist, editorsList);
   }
 }

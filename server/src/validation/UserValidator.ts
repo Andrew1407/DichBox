@@ -3,10 +3,13 @@ import { UserData } from '../datatypes';
 
 export default class UserValidator extends Validator {
   public checkDataCreated(data: UserData): boolean {
-    const checkFields: string[] = ['name', 'email', 'passwd']; 
-    const dataCorrect: boolean = !!checkFields.reduce((res, key) => 
-      res && this.patterns[key].test(data[key])
-    );
+    const checkFields: string[] = ['name', 'email', 'passwd'];
+    const dataReducer = (res: boolean, key: string): boolean => {
+      if (typeof data[key] !== 'string')
+        return false;
+      return res && this.patterns[key].test(data[key]);
+    };
+    const dataCorrect: boolean = checkFields.reduce(dataReducer, true);
     return dataCorrect;
   }
 
