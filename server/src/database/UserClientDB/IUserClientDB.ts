@@ -1,7 +1,6 @@
 import { UserData, NotificationsData } from '../../datatypes';
 
 export default interface IUserClientDB {
-  connect(): void;
   insertUser(userData: UserData): Promise<UserData|null>;
   updateUser(id: number,UserData: UserData): Promise<UserData|null>;
   removeUser(id: number): Promise<void>;
@@ -17,7 +16,7 @@ export default interface IUserClientDB {
   //subscribers
   getUserSubsciptions(name: string): Promise<UserData[]|null>;
   checkSubscription(person_id: number, subscription: number): Promise<boolean>;
-  subscibe(
+  subscribe(
     personName: string,
     subscriptionName: string,
     action: 'subscribe'|'unsubscribe'

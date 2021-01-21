@@ -69,8 +69,7 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const boxPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
     const exists: boolean = fs.existsSync(boxPath);
-    if (!exists)
-      return null;
+    if (!exists) return null;
     const pathStats: fs.Stats = await fs.promises.lstat(boxPath);
     if (await pathStats.isDirectory()) {
       const src: DirEntries[] = await this.getDirEntries(boxPath);
@@ -101,8 +100,7 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const boxPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
     const exists: boolean = fs.existsSync(boxPath);
-    if (!exists)
-      return null;
+    if (!exists) return null;
     const filePath: string = path.join(boxPath, name);
     if (type === 'dir')
       await fs.promises.mkdir(filePath)
@@ -125,8 +123,7 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const filePath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath, name);
     const exists: boolean = fs.existsSync(filePath);
-    if (!exists)
-      return false;
+    if (!exists) return false;
     if (type === 'dir')
       await this.removeDir('boxes', ...idsStr, ...extraPath, name);
     else

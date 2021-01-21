@@ -82,7 +82,7 @@ const BoxForm = ({ editParametrs }) => {
       getVerifiersState(inputFields) && inputFields.length;
     const access_level = privacy;
     const [ editors, limitedUsers ] = [editorsList, limitedList]
-      .map(arr => arr.length ? arr.map(user => user.name) : null);
+      .map(arr => arr.map(user => user.name));
     const submitBody = {
       username,
       logo: logoEdited,

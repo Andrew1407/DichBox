@@ -1,4 +1,4 @@
-import { BoxData } from "../../../datatypes";
+import { BoxData } from '../../datatypes';
 
 export const testBoxes: BoxData[] = [
   {

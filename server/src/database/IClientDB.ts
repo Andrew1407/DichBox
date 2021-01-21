@@ -1,8 +1,6 @@
-import { UserData, BoxData, SubscribersData, NotificationsData } from '../datatypes';
-
 export default interface IClientDB {
-  clientConnect(): Promise<void>;
-  clientClose(): void;
+  openPool(): Promise<void>;
+  closePool(): void;
 
   rawQuery(query: string, args?: any[]): Promise<any>;
 
@@ -10,14 +8,14 @@ export default interface IClientDB {
 
   selectValues(
     table: string,
-    input: BoxData|UserData|SubscribersData|NotificationsData,
+    input: any,
     output?: string[]
   ): Promise<any[]|null>;
 
   selectJoinedValues(
     tables: string[],
     joinColumns: string[],
-    input: BoxData|UserData|SubscribersData|NotificationsData,
+    input: any,
     output?: string[],
     extraCondition?: string
   ): Promise<any[]>;
@@ -25,7 +23,7 @@ export default interface IClientDB {
   selectDoubleJoinedValues(
     tables: string[],
     joinConditions: string[],
-    input: BoxData|UserData|SubscribersData,
+    input: any,
     output?: string[],
     extraCondition?: string
   ): Promise<any[]>;
@@ -33,13 +31,13 @@ export default interface IClientDB {
   updateValueById(
     table: string,
     id: number,
-    data: BoxData|UserData,
+    data: any,
     returning?: string[]
   ): Promise<any>;
 
   insertValue(
     table: string,
-    data: BoxData|UserData|SubscribersData,
+    data: any,
     returning?: string[]
   ): Promise<any>;
 

@@ -41,6 +41,7 @@ const Header = () => {
     const inputValid = /\S+/.test(searchInput);
     if (!inputValid || foundErr) return;
     if (foundErr) setFoundErr(null);
+    setUsersList(null);
     setSearchStr(searchInput);
     const searchBody = { searchStr: searchInput };
     setLoading(true);

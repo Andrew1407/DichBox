@@ -16,7 +16,8 @@ export default class DateFormattterTest extends TestLogger implements ITester {
     const getResults = (data: testData, formatter: formatFn): void => {
       for (const [arg, exp] of data) {
         const res: string = formatter(arg);
-        const testErr: Error|null = this.equals(res, exp);
+        const expRes: string = formatter(exp);
+        const testErr: Error|null = this.equals(res, expRes);
         this.addTestResult(testErr);
       }
     };

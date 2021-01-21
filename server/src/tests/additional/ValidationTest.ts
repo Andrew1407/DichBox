@@ -1,13 +1,13 @@
-import TestLogger from "../TestLogger";
+import TestLogger from '../TestLogger';
 import ITester from '../ITester';
 import Validator from '../../validation/Validator';
 import UserValidator from '../../validation/UserValidator';
 import BoxValidator from '../../validation/BoxValidator';
-import { testUsersCreate, testUsersEdit } from './testData/testUserData';
-import { testBoxes } from './testData/testBoxData';
+import { testUsersCreate, testUsersEdit } from '../testData/additionalUsers';
+import { testBoxes } from '../testData/additionalBoxes';
 import { UserData, BoxData } from '../../datatypes';
 
-export default class DateFormattterTest extends TestLogger implements ITester {
+export default class DateFormatterTest extends TestLogger implements ITester {
   private BoxValidator: Validator;
   private UserValidator: Validator;
 
@@ -32,20 +32,20 @@ export default class DateFormattterTest extends TestLogger implements ITester {
   private equals(
     result: boolean,
     expected: boolean,
-    dataParsed: string
+    dataStringified: string
   ): Error|null {
     if (result === expected) return null;
-    const errMsg: string = `FAILED. Wrong validation with:\n"${dataParsed}"`;
+    const errMsg: string = `FAILED. Wrong validation with:\n"${dataStringified}"`;
     return new Error(errMsg);
   }
 
   private checkAll(
     validator: Validator,
     args: (UserData|BoxData)[][],
-    expexted: boolean[][]
+    expeсted: boolean[][]
   ): void {
     const [ argsCreate, argsEdit]: (UserData|BoxData)[][] = args;
-    const [ expCreate, expEdit ]: boolean[][] = expexted;
+    const [ expCreate, expEdit ]: boolean[][] = expeсted;
     for (const i in argsCreate) {
       const exp: boolean = expCreate[i];
       const arg: UserData|BoxData = argsCreate[i];

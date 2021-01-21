@@ -2,11 +2,11 @@ import * as bcrypt from 'bcrypt';
 import IUserClientDB from './IUserClientDB';
 import IClientDB from '../IClientDB';
 import UserValidator from '../../validation/UserValidator';
-import UserClienDB from './UserClientDB';
+import UserClientDB from './UserClientDB';
 import Validator from '../../validation/Validator';
 import { NotificationsData, UserData } from '../../datatypes';
 
-export default class UserDBConnector extends UserClienDB implements IUserClientDB {
+export default class UserDBConnector extends UserClientDB implements IUserClientDB {
   private validator: UserValidator;
 
   constructor(dao: IClientDB, validator: Validator) {
@@ -39,26 +39,27 @@ export default class UserDBConnector extends UserClienDB implements IUserClientD
     const fieldsTaken: boolean =
       await this.checkTakenFields(userData.name, userData.email)
     if (fieldsTaken) return null;
-    userData.passwd = await this.hashPasswd(userData.passwd);
-    return await super.insertUser(userData);
+    const passwd: string = await this.hashPasswd(userData.passwd);
+    return await super.insertUser({ ...userData, passwd });
   }
 
   public async updateUser(
     id: number,
-    UserData: UserData
+    userData: UserData
   ): Promise<UserData|null> {
-    if (!UserData) return null;
-    const correctData: boolean = this.validator.checkDataEdited(UserData);
+    if (!userData) return null;
+    const correctData: boolean = this.validator.checkDataEdited(userData);
     if (!correctData) return null;
-    if (UserData.name || UserData.email) {
-      const name: string = UserData.name || '';
-      const email: string = UserData.email || '';
+    if (userData.name || userData.email) {
+      const name: string = userData.name || '';
+      const email: string = userData.email || '';
       const takenFields: boolean = await this.checkTakenFields(name, email);
       if (takenFields) return null;
     }
-    if (UserData.passwd)
-      UserData.passwd = await this.hashPasswd(UserData.passwd);
-    return await super.updateUser(id, UserData);
+    if (!userData.passwd)
+      return await super.updateUser(id, userData);
+    const passwd: string = await this.hashPasswd(userData.passwd);
+    return await super.updateUser(id,  { ...userData, passwd });
   }
 
   public async signInUser(
@@ -81,7 +82,7 @@ export default class UserDBConnector extends UserClienDB implements IUserClientD
     return !res ? false : await bcrypt.compare(passwd, res.passwd);
   }
 
-  private async getNotifiactionsExtended(nts: NotificationsData[]): Promise<NotificationsData[]> {
+  private async getNotificationsExtended(nts: NotificationsData[]): Promise<NotificationsData[]> {
     const listMsg: RegExp = /^((viewer|editor)(Add|Rm))$/;
     const ntsMapper = async (n: NotificationsData): Promise<NotificationsData> => {
       const msgType: string = n.type;
@@ -128,6 +129,6 @@ export default class UserDBConnector extends UserClienDB implements IUserClientD
 
   public async getNotifications(name: string): Promise<NotificationsData[]> {
     const nts: NotificationsData[] = await super.getNotifications(name);
-    return !nts.length ? nts : await this.getNotifiactionsExtended(nts);
+    return !nts.length ? nts : await this.getNotificationsExtended(nts);
   }
 }

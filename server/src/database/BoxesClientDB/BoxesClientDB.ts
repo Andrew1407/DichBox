@@ -2,15 +2,11 @@ import IBoxesClientDB from './IBoxesClientDB';
 import IClientDB from '../IClientDB';
 import { BoxData, UserData } from '../../datatypes';
 
-export default class BoxesClientDichBoxDB implements IBoxesClientDB {
+export default class BoxesClientDB implements IBoxesClientDB {
   protected daoClient: IClientDB;
 
   constructor(dao: IClientDB) {
     this.daoClient = dao;
-  }
-
-  public connect() {
-    this.daoClient.clientConnect();
   }
 
   public async getUserId(name: string): Promise<number|null> {
@@ -253,15 +249,15 @@ export default class BoxesClientDichBoxDB implements IBoxesClientDB {
         { ...boxData, owner_id },
         ['name', 'id', 'owner_id']
       );
-    if (limitedUsers)
+    if (limitedUsers && limitedUsers.length)
       await this.insertPermissions('limited_viewers', insertedBox.id, limitedUsers);
-    if (editors)
+    if (editors && editors.length)
       await this.insertPermissions('box_editors', insertedBox.id, editors);
     return insertedBox;
   }
 
   public async findUserBox(
-    username: number,
+    username: string,
     boxName: string
   ): Promise<BoxData|null> {
     const res: BoxData[]|null =  await this.daoClient.selectJoinedValues(
@@ -287,22 +283,24 @@ export default class BoxesClientDichBoxDB implements IBoxesClientDB {
       `a.name = '${boxName}' and b.name = '${ownerName}'`
     );
     if (!beforeUpdateRes.length) return null;
-    const beforeUpdate: BoxData = beforeUpdateRes[0];
-    const returnColumns: string[] = ['last_edited', 'owner_id'];
+    const [ beforeUpdate ]: BoxData[] = beforeUpdateRes;
+    const foundColumns: string[] = ['last_edited', 'owner_id'];
     if (boxData)
-      returnColumns.push(...Object.keys(boxData));
-    if (!returnColumns.includes('access_level'))
-      returnColumns.push('access_level');
+      foundColumns.push(...Object.keys(boxData));
+    const accessLevelUpdated: boolean = foundColumns
+      .includes('access_level');
+    if (!foundColumns.includes('access_level'))
+      foundColumns.push('access_level');
     const updated: BoxData = await this.daoClient.updateValueById(
       'boxes',
       beforeUpdate.id,
       { ...boxData, last_edited: 'now()' },
-      returnColumns
+      foundColumns
     );
-    if (editorslist)
-      await this.updateAccessList('box_editors', beforeUpdate.id, editorslist);
-    else
-      await this.daoClient.removeValue('box_editors', { box_id: beforeUpdate.id });
+    if (editorslist) await ( editorslist.length ?
+      this.updateAccessList('box_editors', beforeUpdate.id, editorslist) :
+      this.daoClient.removeValue('box_editors', { box_id: beforeUpdate.id })
+    )
     const isLimited = (x: string): boolean => x === 'limited';
     const [ limitedNew, limitedOld ]: boolean[] =
       [updated.access_level, beforeUpdate.access_level].map(isLimited);
@@ -313,12 +311,20 @@ export default class BoxesClientDichBoxDB implements IBoxesClientDB {
       !limitedOld && limitedNew,
       limitedOld && limitedNew,
     ];
-    if (wasLimited || !limitedlist)
-      await this.daoClient.removeValue('limited_viewers', { box_id: beforeUpdate.id });
-    else if (setLimited)
-      await this.insertPermissions('limited_viewers', beforeUpdate.id, limitedlist);
-    else if (remainedLimited)
-      await this.updateAccessList('limited_viewers', beforeUpdate.id, limitedlist);
+    const cleanList = async (box_id: number): Promise<void> => {
+      await this.daoClient.removeValue('limited_viewers', { box_id });
+    };
+    if (wasLimited) {
+      await cleanList(beforeUpdate.id)
+    } else if (limitedlist) {
+      if (setLimited && limitedlist.length)
+        await this.insertPermissions('limited_viewers', beforeUpdate.id, limitedlist);
+      else if (remainedLimited)
+        await ( limitedlist.length ?
+          this.updateAccessList('limited_viewers', beforeUpdate.id, limitedlist) :
+          cleanList(beforeUpdate.id)
+        )
+    }
     return { ...updated, id: beforeUpdate.id };
   }
     

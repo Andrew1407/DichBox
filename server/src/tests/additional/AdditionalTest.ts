@@ -1,5 +1,5 @@
 import ITester from '../ITester';
-import DateFormattterTest from './DateFormatterTest';
+import DateFormatterTest from './DateFormatterTest';
 import ValidatorTest from './ValidationTest';
 
 export default class AdditionalTest implements ITester {
@@ -7,7 +7,7 @@ export default class AdditionalTest implements ITester {
   private tvalidator: ITester;
 
   constructor() {
-    this.tformatter = new DateFormattterTest();
+    this.tformatter = new DateFormatterTest();
     this.tvalidator = new ValidatorTest();
   }
 

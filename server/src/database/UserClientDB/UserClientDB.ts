@@ -2,15 +2,11 @@ import IUserClientDB from './IUserClientDB';
 import IClientDB from '../IClientDB';
 import { UserData, SubscribersData, NotificationsData } from '../../datatypes';
 
-export default class UserClienDB implements IUserClientDB {
+export default class UserClientDB implements IUserClientDB {
   protected daoClient: IClientDB;
 
   constructor(dao: IClientDB) {
     this.daoClient = dao;
-  }
-
-  public connect() {
-    this.daoClient.clientConnect();
   }
 
   public async getUserId(name: string): Promise<number|null> {
@@ -89,7 +85,7 @@ export default class UserClienDB implements IUserClientDB {
     return subs;
   }
 
-  public async subscibe(
+  public async subscribe(
     personName: string,
     subscriptionName: string,
     action: 'subscribe'|'unsubscribe'

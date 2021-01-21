@@ -1,13 +1,7 @@
 import * as dotenv from 'dotenv';
 import { Pool, PoolClient, QueryResult } from 'pg';
 import IClientDB from './IClientDB';
-import {
-  UserData,
-  BoxData,
-  dataElement,
-  SubscribersData,
-  NotificationsData 
-} from '../datatypes';
+import { dataElement } from '../datatypes';
 
 dotenv.config();
 
@@ -24,15 +18,15 @@ export default class ClientDB implements IClientDB {
     });
   }
 
-  public async clientConnect(): Promise<void> {
+  public async openPool(): Promise<void> {
     this.poolClient = await this.pool.connect();
   }
 
-  public clientClose(): void {
+  public closePool(): void {
     this.poolClient.release();
   }
 
-  private formatData(data: UserData|BoxData|SubscribersData): 
+  private formatData(data: any): 
     [string[], dataElement[], string[]] {
       const keys: string[] = Object.keys(data);
       if (!keys.length)
@@ -60,7 +54,7 @@ export default class ClientDB implements IClientDB {
 
   public async selectValues(
     table: string,
-    input: BoxData|UserData|SubscribersData|NotificationsData,
+    input: any,
     output: string[] = ['*']
   ): Promise<any[]|null> {
     const [ keys, values, valuesTemplate ]: 
@@ -78,7 +72,7 @@ export default class ClientDB implements IClientDB {
   public async selectJoinedValues(
     tables: string[],
     joinColumns: string[],
-    input: BoxData|UserData|SubscribersData|NotificationsData,
+    input: any,
     output: string[] = ['*'],
     extraCondition: string = ''
   ): Promise<any[]> {
@@ -97,7 +91,7 @@ export default class ClientDB implements IClientDB {
   public async selectDoubleJoinedValues(
     tables: string[],
     joinConditions: string[],
-    input: BoxData|UserData|SubscribersData,
+    input: any,
     output: string[] = ['*'],
     extraCondition: string = ''
   ): Promise<any[]> {
@@ -116,7 +110,7 @@ export default class ClientDB implements IClientDB {
   public async updateValueById(
     table: string,
     id: number,
-    data: BoxData|UserData,
+    data: any,
     returning: string[] = ['*']
   ): Promise<any> {
     const [ keys, values, valuesTemplate ]: 
@@ -133,7 +127,7 @@ export default class ClientDB implements IClientDB {
 
   public async insertValue(
     table: string,
-    data: BoxData|UserData|SubscribersData,
+    data: any,
     returning: string[] = ['*']
   ): Promise<any> {
     const [ keys, values, valuesTemplate ]: 

@@ -1,3 +1,5 @@
+import clientConnection from '../controllers/clientConnection';
+
 export default abstract class TestLogger {
   private passedErrors: (Error|null)[] = [];
 
@@ -18,7 +20,8 @@ export default abstract class TestLogger {
       errors.forEach(
         (e: Error): void => console.error(e)
       );
-      process.exit(0);
+      clientConnection.closePool();
+      process.exit(1);
     }
   }
 }

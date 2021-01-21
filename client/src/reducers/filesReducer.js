@@ -10,8 +10,7 @@ const filesReducer = (state, action) => {
       const foundFiles = stateCopy.filter(f =>
         f && file.name === f.name && file.filePath === `/${f.filePath}`
       );
-      if (foundFiles.length)
-        return state;
+      if (foundFiles.length) return state;
       closeOpenedFile();
       const leftArray = stateCopy.length === 10 ?
         stateCopy.slice(0, -1) : stateCopy;
@@ -95,13 +94,11 @@ const filesReducer = (state, action) => {
       const filtered = stateCopy.filter(f => 
         !f.filePath.startsWith(rightPaph)
       );
-      if (!filtered.length)
-        return [ null ];
+      if (!filtered.length) return [];
       const isOpened = filtered.reduce(((res, f) => 
         res || f.opened
       ), false);
-      if (isOpened)
-        return filtered;
+      if (isOpened) return filtered;
       filtered[0].opened = true;
       return filtered;
     } 

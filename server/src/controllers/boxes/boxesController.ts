@@ -4,19 +4,16 @@ import { formatDateTime } from '../dateFormatters';
 import { statuses, errMessages } from '../statusInfo';
 import { BoxData, PathEntries, entryType } from '../../datatypes';
 import BoxesDBConnector from '../../database/BoxesClientDB/BoxesDBConnector';
-import ClientDB from '../../database/ClientDB';
-import IClientDB from '../../database/IClientDB';
 import BoxesStorageManager from '../../storageManagers/boxes/BoxesStorageManager';
 import IBoxesStorageManager from '../../storageManagers/boxes/IBoxesStorageManager';
 import BoxValidator from '../../validation/BoxValidator';
 import { BoxesRoutes } from '../routesTypes';
+import clientConnection from '../clientConnection';
 import IBoxesClientDB from '../../database/BoxesClientDB/IBoxesClientDB';
 
 const boxesStorage: IBoxesStorageManager = new BoxesStorageManager();
-const dao: IClientDB = new ClientDB();
 const validator: BoxValidator = new BoxValidator();
-const clientDB: IBoxesClientDB = new BoxesDBConnector(dao, validator);
-clientDB.connect();
+const clientDB: IBoxesClientDB = new BoxesDBConnector(clientConnection, validator);
 
 const formatDateAll = (obj: BoxData): void => {
   for (const key in obj) {
@@ -59,7 +56,7 @@ const boxesController: BoxesRoutes = {
   },
 
   async verifyBoxName(req: Request) {
-    const username: number = req.body.username;
+    const username: string = req.body.username;
     const boxName: string = req.body.boxName;
     const foundBox: BoxData|null = await clientDB.findUserBox(username, boxName);
     const foundValue: string|null = foundBox ? foundBox.name : null;
@@ -122,7 +119,7 @@ const boxesController: BoxesRoutes = {
       ownPage: boolean
     } = req.body;
     const msg: string = errMessages.FORBIDDEN;
-    if (!ownPage && confirmation !== 'permitted')
+    if (!ownPage || confirmation !== 'permitted')
       return makeTuple(statuses.FORBIDDEN, { msg });
     const ids: [number, number]|null =
       await clientDB.getUserBoxIds(username, boxName);

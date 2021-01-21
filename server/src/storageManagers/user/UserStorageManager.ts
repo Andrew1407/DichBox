@@ -1,5 +1,5 @@
 import StorageManager from '../StorageManager';
-import IUserStotageManager from './IUserStotageManager';
+import IUserStotageManager from './IUserStorageManager';
 
 export default class UserStorageManager extends StorageManager implements IUserStotageManager {
   constructor() {

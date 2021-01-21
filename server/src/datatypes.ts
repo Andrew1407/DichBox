@@ -1,6 +1,6 @@
 export type dataElement = string|number|Date|number[]|boolean;
 export type entryType = 'file'|'dir'|'image';
-export type access_level = 'public'|'private'|'limited'|'invetee';
+export type access_level = 'public'|'private'|'limited'|'invetee'|'followers';
 
 export interface UserData {
   id?: number,

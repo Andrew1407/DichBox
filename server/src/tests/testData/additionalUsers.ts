@@ -1,4 +1,4 @@
-import { UserData } from "../../../datatypes";
+import { UserData } from '../../datatypes';
 
 export const testUsersCreate: UserData[] = [
   {

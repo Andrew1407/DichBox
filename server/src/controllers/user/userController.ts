@@ -5,10 +5,10 @@ import { formatDate, formatDateTime } from '../dateFormatters';
 import { statuses, errMessages } from '../statusInfo';
 import UserDBConnector from '../../database/UserClientDB/UserDBConnector';
 import IUserClientDB from '../../database/UserClientDB/IUserClientDB';
-import ClientDB from '../../database/ClientDB';
 import UserValidator from '../../validation/UserValidator';
-import UserStotageManager from '../../storageManagers/user/UserStotageManager';
-import IUserStotageManager from '../../storageManagers/user/IUserStotageManager';
+import UserStorageManager from '../../storageManagers/user/UserStorageManager';
+import IUserStorageManager from '../../storageManagers/user/IUserStorageManager';
+import clientConnection from '../clientConnection';
 import { UserRoutes } from '../routesTypes';
 
 type foundUser = {
@@ -23,11 +23,9 @@ const foundUsersMapper = async (user: UserData): Promise<foundUser> => ({
   logo: await userStorage.getLogoIfExists(user.id)
 });
 
-const userStorage: IUserStotageManager = new UserStotageManager();
+const userStorage: IUserStorageManager = new UserStorageManager();
 const validator: UserValidator = new UserValidator();
-const dao: ClientDB = new ClientDB();
-const clientDB: IUserClientDB = new UserDBConnector(dao, validator);
-clientDB.connect();
+const clientDB: IUserClientDB = new UserDBConnector(clientConnection, validator);
 
 const userController: UserRoutes = {
   async signUpUser(req: Request) {
@@ -74,16 +72,15 @@ const userController: UserRoutes = {
     const user: UserData = await clientDB.signInUser(email, passwd);
     if (!user)
       return makeTuple(statuses.NOT_FOUND, { msg: errMessages.USER_NOT_FOUND });
-    const name: string|null = user ? user.name : null;
-    return name ?
-      makeTuple(statuses.OK, { name }) :
+    return user.name ?
+      makeTuple(statuses.OK, { name: user.name }) :
       makeTuple(statuses.BAD_REQUEST, { msg: errMessages.INVALID_PASSWORD });
   },
 
   async verifyUserInput(req: Request) {
     const inputValue: string = req.body.inputValue;
     const column: string = req.body.inputField;
-    const foundValue: string = await clientDB.checkColumn(column, inputValue);
+    const foundValue: string|null = await clientDB.checkColumn(column, inputValue);
     return makeTuple(statuses.OK, { foundValue });
   },
 
@@ -120,11 +117,11 @@ const userController: UserRoutes = {
   async removeUser(req: Request) {
     const name: string = req.body.username;
     const rmAccess: string = req.body.confirmation;
-    if (rmAccess !== 'permitted') {
+    const id: number = await clientDB.getUserId(name);
+    if (rmAccess !== 'permitted' || !id) {
       const msg: string = errMessages.FORBIDDEN;
       return makeTuple(statuses.FORBIDDEN, { msg });
     }
-    const id: number = await clientDB.getUserId(name);
     await Promise.all([
       userStorage.removeUser(id),
       clientDB.removeUser(id)
@@ -165,15 +162,15 @@ const userController: UserRoutes = {
       responseValues: boolean
     } = req.body;
     const followers: number|null = 
-      await clientDB.subscibe(personName, subscriptionName, action);
+      await clientDB.subscribe(personName, subscriptionName, action);
     if (followers === null) {
       const msg: string = errMessages.SUBSCRIPTIONS_NOT_FOUND;
       return makeTuple(statuses.NOT_FOUND, { msg });
     }
+    const subscribeAction: boolean = action === 'subscribe';
     if (!responseValues) 
-      return makeTuple(statuses.OK, { unsubscribed: true });
-    const follower: boolean = action === 'subscribe';
-    return makeTuple(statuses.OK, { follower, followers });
+      return makeTuple(statuses.OK, { unsubscribed: !subscribeAction });
+    return makeTuple(statuses.OK, { followers, follower: subscribeAction });
   },
 
   async getSubscriptions(req: Request) {

@@ -1,9 +1,8 @@
 import { BoxData } from '../../datatypes';
 
 export default interface IBoxesClientDB {
-  connect(): void;
   removeBox(id: number): Promise<void>;
-  findUserBox(username: number, boxName: string): Promise<BoxData|null>;
+  findUserBox(username: string, boxName: string): Promise<BoxData|null>;
   getUserBoxIds(username: string, boxName: string): Promise<[number, number]|null>;
   getUserId(name: string): Promise<number|null>;
 
