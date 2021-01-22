@@ -101,7 +101,7 @@
   border: 2px solid rgb(0, 217, 255);
 }
 
-#be-add-file-warning {
+.be-add-file-warning {
   margin-top: 3%;
   color: crimson;
   font-size: 100%;

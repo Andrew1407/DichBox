@@ -19,9 +19,9 @@ export default abstract class Validator {
 
   protected checkFields(
     data: UserData|BoxData,
-    specificFields: Object
+    specificFields: any
   ): boolean {
-    const fieldsCheck: Object = {
+    const fieldsCheck: any = {
       ...specificFields,
       name: (x: string): boolean => this.patterns.name.test(x),
       name_color: (x: string): boolean => this.patterns.color.test(x),

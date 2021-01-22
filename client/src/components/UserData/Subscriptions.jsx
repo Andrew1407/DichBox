@@ -13,7 +13,7 @@ import '../../styles/users-list.css';
 
 const Subscriptions = () => {
   const history = useHistory();
-  const { usersList, setUsersList, setLoading } = useContext(MenuContext);
+  const { usersList, setUsersList, setLoading, setFoundErr } = useContext(MenuContext);
   const { userData } = useContext(UserContext);
   const [searchInput, setSearchInput] = useState('');
   const shortenName = str => str.length < 20 ? str : `${str.slice(0, 19)}...`;
@@ -49,10 +49,15 @@ const Subscriptions = () => {
   useEffect(() => {
     const fetchSubscriptions = async () => {
       setLoading(true);
-      const subsBody = { name: userData.name };
-      const { data } =  await axios.post(`${process.env.APP_ADDR}/users/subs_list`, subsBody);
-      const { subs } = data;
-      if (subs) setUsersList(subs);
+      try {  
+        const subsBody = { name: userData.name };
+        const { data } =  await axios.post(`${process.env.APP_ADDR}/users/subs_list`, subsBody);
+        const { subs } = data;
+        if (subs) setUsersList(subs);
+      } catch {
+        const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
+        setFoundErr(['server', msg]);
+      }
       setLoading(false);
     };
 

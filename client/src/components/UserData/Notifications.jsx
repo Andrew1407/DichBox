@@ -11,7 +11,7 @@ import trashBin from '../../styles/imgs/trash-bin.png';
 import '../../styles/notifications.css';
 
 const Notifications = () => {
-  const { usersList, setUsersList, setLoading } = useContext(MenuContext);
+  const { usersList, setUsersList, setLoading, setFoundErr } = useContext(MenuContext);
   const { userData, dispatchUserData } = useContext(UserContext);
 
   const handleRemove = (...ntsIds) => async () => {
@@ -31,11 +31,16 @@ const Notifications = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       setLoading(true);
-      const ntsBody = { name: userData.name };
-      const { data } =  await axios.post(`${process.env.APP_ADDR}/users/notifications_list`, ntsBody);
-      const { notifications } = data;
-      if (notifications)
-        setUsersList(notifications);
+      try {  
+        const ntsBody = { name: userData.name };
+        const { data } =  await axios.post(`${process.env.APP_ADDR}/users/notifications_list`, ntsBody);
+        const { notifications } = data;
+        if (notifications)
+          setUsersList(notifications);
+      } catch {
+        const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
+        setFoundErr(['server', msg]);
+      }
       setLoading(false);
     };
 

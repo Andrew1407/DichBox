@@ -13,7 +13,7 @@ import '../../styles/edit-profile.css';
 
 const EditProfile = () => {
   const history = useHistory();
-  const { menuOption, setMenuOption, setLoading } = useContext(MenuContext);
+  const { menuOption, setMenuOption, setLoading, setFoundErr } = useContext(MenuContext);
   const { userData, dispatchUserData, username, dispatchUsername } = useContext(UserContext);
   const { 
     useVerifiers,
@@ -134,15 +134,20 @@ const EditProfile = () => {
     if (logoEdited)
       editedBody.logo = logoEdited;
     setLoading(true);
-    const { data } =  await axios.post(`${process.env.APP_ADDR}/users/edit`, editedBody);
-    dispatchUserData({ type: 'REFRESH_DATA', data });
-    if (data.name) {
-      dispatchUsername({ type: 'SET_NAME', value: data.name});
-      history.push('/' + data.name);
+    try {
+      const { data } =  await axios.post(`${process.env.APP_ADDR}/users/edit`, editedBody);
+      dispatchUserData({ type: 'REFRESH_DATA', data });
+      if (data.name) {
+        dispatchUsername({ type: 'SET_NAME', value: data.name});
+        history.push('/' + data.name);
+      }
+      cleanWarnings();
+      dispatchDataInput({ type: 'CLEAN_DATA' });
+      setMenuOption('default');
+    } catch {
+      const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
+      setFoundErr(['server', msg]);
     }
-    cleanWarnings();
-    dispatchDataInput({ type: 'CLEAN_DATA' });
-    setMenuOption('default');
     setLoading(false);
   };
   const submitEditedFields = useCallback(

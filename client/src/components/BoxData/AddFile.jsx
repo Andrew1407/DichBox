@@ -14,12 +14,13 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
   const [nameInput, setNameInput] = useState('');
   const [imageInput, setImageInput] = useState(null);
   const [imageChosen, setImageChosen] = useState(false);
-  const getInputWarningClb = () => {
+  const getInputWarningClb = (fname) => {
+    if (!fname) return '';
     const inputValid = /^[^\s/]{1,40}$/;
     const nameExists = pathEntries
-      .filter(x => x && x.name === nameInput)
+      .filter(x => x && x.name === fname)
       .length;
-    if (!inputValid.test(nameInput))
+    if (!inputValid.test(fname))
       return 'Invalid input (name can\'t include slashes and spaces)';
     if (nameExists)
       return `An entry with the same name already exists in "/${pathName.join('/')}"`;
@@ -30,9 +31,13 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
     [pathName, nameInput, pathEntries]
   );
 
-  const warning = getInputWarning();
+  const warning = getInputWarning(
+    addFileVisible === 'image' ?
+      (imageInput && imageInput.name) :
+      nameInput
+  );
   const isCollorCorrect = (!warning && nameInput) ||
-    (addFileVisible === 'image' && imageChosen);
+    (addFileVisible === 'image' && imageChosen && !warning);
   const correctColor = isCollorCorrect ? 'rgb(0, 255, 76)' : 'rgb(0, 217, 255)';
 
   const addNewFileClb = async () => {
@@ -102,6 +107,8 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
 
   }, [fileManipulation, addFileVisible]);
 
+  console.log(!(isCollorCorrect && imageInput))
+
   return (
     <AnimatePresence>
     { addFileVisible &&
@@ -109,13 +116,14 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
         <motion.div { ...boxToolMotion } id="be-add-file">
           <label htmlFor="addFile">Select image: </label>
           <input type="file" accept="image/*" onChange={ writeImage }/>
-          <input className="files-btn" type="button" value="add" onClick={ addNewFile } style={{ borderColor: correctColor, color: correctColor }}/>
+          <input className="files-btn" type="button" value="add" disabled={ !(isCollorCorrect && imageInput) } onClick={ addNewFile } style={{ borderColor: correctColor, color: correctColor }}/>
+          { !(isCollorCorrect && imageInput) && <i className="be-add-file-warning">{ warning }</i> }
         </motion.div> :
         <motion.div { ...boxToolMotion } id="be-add-file">
           <label htmlFor="addFile">{ addFileVisible } name:</label>
           <input spellCheck="false" type="text" name="addFile" value={ nameInput } onChange={ e => setNameInput(e.target.value) } />
           <input className="files-btn" type="button" value="add" disabled={ warning || !nameInput } style={{ borderColor: correctColor, color: correctColor }} onClick={ addNewFile } />
-          { warning && !!nameInput && <i id="be-add-file-warning">{ warning }</i> }
+          { warning && !!nameInput && <i className="be-add-file-warning">{ warning }</i> }
         </motion.div>
       )
     }

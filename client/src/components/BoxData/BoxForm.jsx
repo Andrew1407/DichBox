@@ -16,7 +16,7 @@ import '../../styles/box-form.css';
 const BoxForm = ({ editParametrs }) => {
   const history = useHistory();
   const params = useParams();
-  const { setMenuOption, setLoading } = useContext(MenuContext);
+  const { setMenuOption, setLoading, setFoundErr } = useContext(MenuContext);
   const { boxDetails, setBoxDetails, setEditBoxState } = useContext(BoxesContext);
   const { 
     useVerifiers,
@@ -91,32 +91,37 @@ const BoxForm = ({ editParametrs }) => {
       editors
     };
     setLoading(true);
-    if (!editParametrs.edit && isCorrect) {
-      const createBody = {
-        ...submitBody,
-        boxData: { ...dataInput, access_level },
-      };
-      const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/create`, createBody);
-      history.push(`/${username}/${data.name}`);
-    } else if (editParametrs.edit && isCorrect) {
-      const edited = !inputFields.length ? null :
-        inputFields.reduce((obj, field) => (
-          { ...obj, [field]: dataInput[field] }
-        ), {});
-      const editBody = {
-        ...submitBody,
-        boxData: privacy === boxDetails.access_level ? 
-          edited : { ...edited, access_level },
-        boxName: params.box,
-      };
-      const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/edit`, editBody);
-      const boxDetailsEdited = { ...boxDetails, ...data };
-      if (logoEdited === 'removed')
-        boxDetailsEdited.logo = null;
-      setBoxDetails(boxDetailsEdited);
-      if (data.name)
+    try {  
+      if (!editParametrs.edit && isCorrect) {
+        const createBody = {
+          ...submitBody,
+          boxData: { ...dataInput, access_level },
+        };
+        const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/create`, createBody);
         history.push(`/${username}/${data.name}`);
-      setEditBoxState(false);
+      } else if (editParametrs.edit && isCorrect) {
+        const edited = !inputFields.length ? null :
+          inputFields.reduce((obj, field) => (
+            { ...obj, [field]: dataInput[field] }
+          ), {});
+        const editBody = {
+          ...submitBody,
+          boxData: privacy === boxDetails.access_level ? 
+            edited : { ...edited, access_level },
+          boxName: params.box,
+        };
+        const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/edit`, editBody);
+        const boxDetailsEdited = { ...boxDetails, ...data };
+        if (logoEdited === 'removed')
+          boxDetailsEdited.logo = null;
+        setBoxDetails(boxDetailsEdited);
+        if (data.name)
+          history.push(`/${username}/${data.name}`);
+        setEditBoxState(false);
+      }
+    } catch {
+      const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
+      setFoundErr(['server', msg]);
     }
     setLoading(false);
   };

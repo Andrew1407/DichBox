@@ -1,25 +1,27 @@
+import * as cluster from 'cluster';
+import { cpus } from 'os';
 import * as express from 'express';
-import * as cors from 'cors';
-import * as bodyparser from 'body-parser';
-import * as dotenv from 'dotenv';
-import usersRouter from './routes/userRoutes';
-import boxesRouter from './routes/boxesRoutes';
-import { viewPath, getViewHandler } from './view';
+import Server from './app/Server';
 
-dotenv.config();
-const PORT: number = Number(process.env.PORT) || 7041;
-const HOST: string = process.env.HOST || 'localhost';
-const app: express.Application = express();
-app.use(cors());
-app.use(bodyparser.json({ limit: '100mb' }))
-app.use(bodyparser.urlencoded({
-  limit: '100mb',
-  extended: true
-}));
-app.use(express.static(viewPath));
+const TEST_WORKER: number = 1;
 
-app.use('/users', usersRouter);
-app.use('/boxes', boxesRouter);
-app.get('*', getViewHandler);
+if (cluster.isMaster) {
+  const forkCluster = (): void => {
+    cluster.fork();
+  };
 
-app.listen(PORT, HOST);
+  cpus().forEach(forkCluster);
+  cluster.on('exit', forkCluster);
+} else {
+  const workerId: number = cluster.worker.id;
+  const runTests: boolean = workerId === TEST_WORKER;
+  const onClusterExit = (): void => {
+    console.log(`The server was shuted down on the process: ${workerId}`);
+  };
+  
+  const app: express.Application = express();
+  const server: Server = new Server(app);
+  
+  server.start(runTests);
+  server.handleShutdown(onClusterExit);
+}

@@ -13,7 +13,8 @@ const Boxes = () => {
   const {
     menuOption,
     setMenuOption,
-    setLoading
+    setLoading,
+    setFoundErr
   } = useContext(MenuContext);
   const {
     boxesList,
@@ -34,11 +35,16 @@ const Boxes = () => {
           follower: userData.follower
         };
         setLoading(true);
-        const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/user_boxes`, boxesBody);
-        const { boxesList } = data;
-        const boxes = boxesList && boxesList.length ?
-          boxesList : [null]; 
-        setBoxesList(boxes);
+        try {
+          const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/user_boxes`, boxesBody);
+          const { boxesList } = data;
+          const boxes = boxesList && boxesList.length ?
+            boxesList : [null]; 
+          setBoxesList(boxes);
+        } catch {
+          const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
+          setFoundErr(['server', msg]);
+        }
         setLoading(false);
       }
     };
