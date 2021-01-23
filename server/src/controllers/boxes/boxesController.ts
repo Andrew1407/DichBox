@@ -243,14 +243,13 @@ const boxesController: BoxesRoutes = {
     );
     if (!checkup)
       return makeTuple(statuses.FORBIDDEN, { msg });
-    const filesWritted: boolean[] = await Promise.all(
+    const filesWritten: boolean[] = await Promise.all(
       filesFormated.map(f => boxesStorage.editFile(
         checkup, f.filePath.slice(2), f.src
       ))
     );
-    const edited: boolean = filesWritted.reduce(
-      ((res, acc) => res && acc), true
-    );
+    const editedReducer = (res: boolean, acc: boolean): boolean => res && acc;
+    const edited: boolean = filesWritten.reduce(editedReducer, true);
     if (!edited) {
       const msg: string = errMessages.BOXES_INTERNAL;
       return makeTuple(statuses.SERVER_INTERNAL, { msg });

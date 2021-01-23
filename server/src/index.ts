@@ -7,16 +7,24 @@ const TEST_WORKER: number = 1;
 
 if (cluster.isMaster) {
   const forkCluster = (): void => {
-    cluster.fork();
+    const worker: cluster.Worker = cluster.fork();
+    const handleWorkerExit = (code: number): void => {
+      if (
+        code === 1 &&
+        worker.id === TEST_WORKER
+      ) process.exit(1);
+      cluster.fork();
+    };
+
+    worker.on('exit', handleWorkerExit);
   };
 
   cpus().forEach(forkCluster);
-  cluster.on('exit', forkCluster);
 } else {
   const workerId: number = cluster.worker.id;
   const runTests: boolean = workerId === TEST_WORKER;
   const onClusterExit = (): void => {
-    console.log(`The server was shuted down on the process: ${workerId}`);
+    console.log(`The server was shut down on the process ${workerId}.`);
   };
   
   const app: express.Application = express();

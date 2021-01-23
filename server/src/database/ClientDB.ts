@@ -23,7 +23,8 @@ export default class ClientDB implements IClientDB {
   }
 
   public closePool(): void {
-    this.poolClient.release();
+    if (this.poolClient)
+      this.poolClient.release();
   }
 
   private formatData(data: any): 
