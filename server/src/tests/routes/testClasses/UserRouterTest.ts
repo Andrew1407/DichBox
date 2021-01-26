@@ -4,12 +4,12 @@ import { UserData, BoxData } from '../../../datatypes';
 import { statuses, errMessages } from '../../../controllers/statusInfo';
 
 export default class UserRouterTest extends TestLogger {
-  private testUser: UserData[];
+  private testUsers: UserData[];
   private testBox: BoxData;
 
   constructor(users: UserData[], box: BoxData) {
     super();
-    this.testUser = users;
+    this.testUsers = users;
     this.testBox = box;
   }
 
@@ -19,8 +19,8 @@ export default class UserRouterTest extends TestLogger {
   }
 
   public async testSignInUp(): Promise<void> {
-    for (const user of this.testUser) {
-      const { name, email, passwd, name_color, description } = user;
+    for (const user of this.testUsers) {
+      const { name, email, passwd } = user;
       const newUser: UserData = { name, email, passwd };
       const body: any = { name };
       const routesExp: any = {
@@ -34,7 +34,7 @@ export default class UserRouterTest extends TestLogger {
     }
 
     const invalidArgs: [string, any, any][] = [
-      ['/users/create', this.testUser[0],
+      ['/users/create', this.testUsers[0],
         {
           status: statuses.BAD_REQUEST,
           body: { msg: errMessages.USER_INVAID_REQUEST }
@@ -46,7 +46,7 @@ export default class UserRouterTest extends TestLogger {
           body: { msg: errMessages.USER_NOT_FOUND }
         }
       ],
-      ['/users/enter', { email: this.testUser[0].email, passwd: ''},
+      ['/users/enter', { email: this.testUsers[0].email, passwd: ''},
         {
           status: statuses.BAD_REQUEST, 
           body: { msg: errMessages.INVALID_PASSWORD }
@@ -60,7 +60,7 @@ export default class UserRouterTest extends TestLogger {
   }
 
   public async testEdit(): Promise<void> {
-    for (const user of this.testUser) {
+    for (const user of this.testUsers) {
       const { name, name_color, description } = user;
       const edited: UserData = { name_color, description };
       const editRes: any = await makeRequest(
@@ -73,7 +73,7 @@ export default class UserRouterTest extends TestLogger {
   }
 
   public async testVerify(): Promise<void> {
-    const { name, passwd } = this.testUser[0];
+    const { name, passwd } = this.testUsers[0];
     const verifyArgs: [string, any, any][] = [
       [
         '/users/passwd_verify', { username: name, passwd },
@@ -99,9 +99,9 @@ export default class UserRouterTest extends TestLogger {
   }
 
   public async testSubscriptions(): Promise<void> {
-    const personName: string = this.testUser[0].name;
-    const subscriptionName: string = this.testUser[1].name;
-    const name_color: string = this.testUser[1].name_color;
+    const personName: string = this.testUsers[0].name;
+    const subscriptionName: string = this.testUsers[1].name;
+    const name_color: string = this.testUsers[1].name_color;
     const subObj: any = {
       status: statuses.OK,
       body: { followers: 1, follower: true }
@@ -183,9 +183,9 @@ export default class UserRouterTest extends TestLogger {
   }
 
   public async testSearch(): Promise<void> {
-    const pathName: string = this.testUser[0].name;
-    const { name_color, email, description } = this.testUser[0];
-    const username: string = this.testUser[1].name;
+    const pathName: string = this.testUsers[0].name;
+    const { name_color, email, description } = this.testUsers[0];
+    const username: string = this.testUsers[1].name;
     const resTemplate: any = {
       name: pathName,
       name_color,
@@ -243,7 +243,7 @@ export default class UserRouterTest extends TestLogger {
             searched: [
               {
                 name: username,
-                name_color: this.testUser[1].name_color,
+                name_color: this.testUsers[1].name_color,
                 logo: null
               },
               { name: pathName, name_color, logo: null }
@@ -260,7 +260,7 @@ export default class UserRouterTest extends TestLogger {
   }
 
   public async testNotifications(): Promise<void> {
-    const { name } = this.testUser[0];
+    const { name } = this.testUsers[0];
     const ntsArgs: any[] = [
       [
         '/users/notifications_list',
@@ -299,7 +299,7 @@ export default class UserRouterTest extends TestLogger {
   public async testAccessList(): Promise<void> {
     const res: any = await makeRequest('/users/access_lists', 
       {
-      username: this.testUser[0].name,
+      username: this.testUsers[0].name,
       boxName: this.testBox.name
       }
     );
@@ -313,7 +313,7 @@ export default class UserRouterTest extends TestLogger {
   public async testRemoveUser(): Promise<void> {
     const invalidArgs: any[] = [
       { username: '', confirmation: 'permitted' },
-      { username: this.testUser[0].name }
+      { username: this.testUsers[0].name }
     ];
     const expectedRes: any = {
       status: statuses.FORBIDDEN,
@@ -327,7 +327,7 @@ export default class UserRouterTest extends TestLogger {
       status: statuses.OK,
       body: { removed: true }
     };
-    for (const user of this.testUser) {
+    for (const user of this.testUsers) {
       const { name } = user;
       const permitted: any = { username: name, confirmation: 'permitted' };
       const result: any = await makeRequest('/users/remove', permitted);
@@ -361,7 +361,7 @@ export default class UserRouterTest extends TestLogger {
     const bodyExpStr: string = JSON.stringify(expected.body);
     const bodyResStr: string = JSON.stringify(result.body);
     const bodyEqual: boolean = bodyExpStr === bodyResStr;
-    return (statusEqual && bodyEqual) ? null :
-      new Error(errMsg);
+    return (statusEqual && bodyEqual) ? 
+      null : new Error(errMsg);
   }
 }

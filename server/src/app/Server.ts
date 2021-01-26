@@ -2,8 +2,8 @@ import * as http from 'http';
 import * as dotenv from 'dotenv';
 import { Application as expressApp } from 'express';
 import runTests from '../tests/entryTest';
-import clientConnection from '../controllers/clientConnection';
 import configureApp from './configureApp';
+import ClientDB from '../database/ClientDB';
 
 dotenv.config();
 
@@ -18,7 +18,9 @@ export default class Server {
   public start(initTests: boolean): void {
     const PORT: number = Number(process.env.PORT) || 7041;
     const HOST: string = process.env.HOST || 'localhost';
-    const listenArgs: any[] = initTests ? [PORT, HOST, runTests] : [PORT, HOST];
+    const listenArgs: any[] = [PORT, HOST];
+    if (initTests)
+      listenArgs.push(runTests);
     this.server.listen(...listenArgs);
   }
 
@@ -26,7 +28,9 @@ export default class Server {
     const onExitClb = (): void => {
       this.server.close((err?: Error) => {
         if (err) console.error(err);
-        clientConnection.closePool();
+        ClientDB
+          .getInstance()
+          .closePool();
         if (clb) clb();
         process.exit(0);
       });

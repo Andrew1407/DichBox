@@ -12,7 +12,7 @@ export default class BaseConnectorTest extends TestLogger implements ITesterDB {
 
   constructor() {
     super();
-    this.clientDB = new ClientDB();
+    this.clientDB = ClientDB.getInstance();
     this.testBox = testBox.slice(0, 2)
       .map((x: BoxData): any => ({ ...x }));
     this.testUser = testUser.slice(0, 2)
@@ -20,7 +20,6 @@ export default class BaseConnectorTest extends TestLogger implements ITesterDB {
   }
 
   public async testInsert(): Promise<void> {
-    await this.clientDB.openPool();
     const insertBox: BoxData = this.testBox[0];
     const insertUser: UserData = this.testUser[0];
     const insertUserResult: UserData = await this.clientDB.insertValue(
@@ -153,7 +152,6 @@ export default class BaseConnectorTest extends TestLogger implements ITesterDB {
       const selectRes = await this.clientDB.selectValues(...arg);
       this.check(selectRes, null);
     }
-    this.clientDB.closePool();
   }
 
   public async run(): Promise<void> {

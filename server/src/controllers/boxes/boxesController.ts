@@ -3,17 +3,15 @@ import { makeTuple, checkPathes } from '../extra';
 import { formatDateTime } from '../dateFormatters';
 import { statuses, errMessages } from '../statusInfo';
 import { BoxData, PathEntries, entryType } from '../../datatypes';
-import BoxesDBConnector from '../../database/BoxesClientDB/BoxesDBConnector';
-import BoxesStorageManager from '../../storageManagers/boxes/BoxesStorageManager';
 import IBoxesStorageManager from '../../storageManagers/boxes/IBoxesStorageManager';
-import BoxValidator from '../../validation/BoxValidator';
 import { BoxesRoutes } from '../routesTypes';
-import clientConnection from '../clientConnection';
 import IBoxesClientDB from '../../database/BoxesClientDB/IBoxesClientDB';
+import BoxesControllerFactory from '../controllersFactory/BoxesControllerFactory';
+import IControllerFactory from '../controllersFactory/IControllerFactory';
 
-const boxesStorage: IBoxesStorageManager = new BoxesStorageManager();
-const validator: BoxValidator = new BoxValidator();
-const clientDB: IBoxesClientDB = new BoxesDBConnector(clientConnection, validator);
+const boxesFactory: IControllerFactory = new BoxesControllerFactory();
+const clientDB: IBoxesClientDB = boxesFactory.getConnector() as IBoxesClientDB;
+const boxesStorage: IBoxesStorageManager = boxesFactory.getStorageManager() as IBoxesStorageManager;
 
 const formatDateAll = (obj: BoxData): void => {
   for (const key in obj) {

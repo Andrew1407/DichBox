@@ -7,9 +7,10 @@ import IBoxesClientDB from '../../../database/BoxesClientDB/IBoxesClientDB';
 import Validator from '../../../validation/Validator';
 import UserValidator from '../../../validation/UserValidator';
 import BoxValidator from '../../../validation/BoxValidator';
-import clientConnection from '../../../controllers/clientConnection';
 import { testBox, testUser } from '../../testData/database';
 import { UserData, BoxData, NotificationsData } from '../../../datatypes';
+import IClientDB from '../../../database/IClientDB';
+import ClientDB from '../../../database/ClientDB';
 
 export default class ConnectorDBTest extends TestLogger implements ITesterDB {
   private testBox: BoxData[];
@@ -25,16 +26,11 @@ export default class ConnectorDBTest extends TestLogger implements ITesterDB {
     this.testUser = testUser.slice(6).map(
       (x: UserData): any => ({ ...x })
     );
+    const dao: IClientDB = ClientDB.getInstance();
     const boxValidator: Validator = new BoxValidator();
     const userValidator: Validator = new UserValidator();
-    this.userConnector = new UserDBConnector(
-      clientConnection,
-      userValidator
-    );
-    this.boxesConnector = new BoxesDBConnector(
-      clientConnection,
-      boxValidator
-    );
+    this.userConnector = new UserDBConnector(dao, userValidator);
+    this.boxesConnector = new BoxesDBConnector(dao, boxValidator);
   }
 
   public async testInsert(): Promise<void> {

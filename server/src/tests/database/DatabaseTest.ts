@@ -1,3 +1,4 @@
+import ClientDB from '../../database/ClientDB';
 import ITester from '../ITester';
 import ITesterDB from './ITesterDB';
 import BaseConnectorTest from './testClasses/BaseConnectorTest';
@@ -16,6 +17,8 @@ export default class DatabaseTest implements ITester {
   }
 
   public async test(): Promise<void> {
+    await ClientDB.getInstance().openPool();
+
     await this.baseTest.testInsert();
     await this.baseTest.testUpdate();
     await this.baseTest.testSelect();

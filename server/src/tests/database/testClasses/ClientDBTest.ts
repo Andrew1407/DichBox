@@ -4,9 +4,10 @@ import UserClientDB from '../../../database/UserClientDB/UserClientDB';
 import IUserClientDB from '../../../database/UserClientDB/IUserClientDB';
 import BoxesClientDB from '../../../database/BoxesClientDB/BoxesClientDB';
 import IBoxesClientDB from '../../../database/BoxesClientDB/IBoxesClientDB';
-import clientConnection from '../../../controllers/clientConnection';
 import { testBox, testUser } from '../../testData/database';
 import { UserData, BoxData, NotificationsData } from '../../../datatypes';
+import IClientDB from '../../../database/IClientDB';
+import ClientDB from '../../../database/ClientDB';
 
 export default class ClientDBTest extends TestLogger implements ITesterDB {
   private testBox: BoxData[];
@@ -16,12 +17,15 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
   
   constructor() {
     super();
-    this.testBox = testBox.slice(2, 6)
-      .map((x: BoxData): any => ({ ...x }));
-    this.testUser = testUser.slice(2, 6)
-      .map((x: UserData): any => ({ ...x }));
-    this.userClient = new UserClientDB(clientConnection);
-    this.boxesClient = new BoxesClientDB(clientConnection);
+    this.testBox = testBox
+      .slice(2, 6)
+      .map((x: BoxData): BoxData => ({ ...x }));
+    this.testUser = testUser
+      .slice(2, 6)
+      .map((x: UserData): UserData => ({ ...x }));
+    const dao: IClientDB = ClientDB.getInstance();
+    this.userClient = new UserClientDB(dao);
+    this.boxesClient = new BoxesClientDB(dao);
   }
 
   public async testInsert(): Promise<void> {

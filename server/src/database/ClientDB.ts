@@ -6,20 +6,26 @@ import { dataElement } from '../datatypes';
 dotenv.config();
 
 export default class ClientDB implements IClientDB {
-  private pool: Pool;
-  private poolClient!: PoolClient;
-  
-  constructor() {
-    this.pool = new Pool({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWD,
-      database: process.env.DB_NAME
-    });
+  private static singleClient: ClientDB;
+
+  public static getInstance(): ClientDB {
+    if (!ClientDB.singleClient)
+      ClientDB.singleClient = new ClientDB();
+    return ClientDB.singleClient;
   }
+  
+  private poolClient: PoolClient;
+  
+  private constructor() { }
 
   public async openPool(): Promise<void> {
-    this.poolClient = await this.pool.connect();
+    if (!this.poolClient)
+      this.poolClient = await new Pool({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWD,
+        database: process.env.DB_NAME
+      }).connect();
   }
 
   public closePool(): void {

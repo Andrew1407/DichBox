@@ -1,6 +1,6 @@
 import TestLogger from '../../TestLogger';
 import makeRequest from '../requestHandler';
-import { UserData, BoxData, access_level } from '../../../datatypes';
+import { UserData, BoxData } from '../../../datatypes';
 import { statuses, errMessages } from '../../../controllers/statusInfo';
 
 export default class BoxesRouterTest extends TestLogger {

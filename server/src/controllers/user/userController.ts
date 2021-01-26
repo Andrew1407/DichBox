@@ -3,13 +3,11 @@ import { NotificationsData, UserData } from '../../datatypes';
 import { makeTuple } from '../extra';
 import { formatDate, formatDateTime } from '../dateFormatters';
 import { statuses, errMessages } from '../statusInfo';
-import UserDBConnector from '../../database/UserClientDB/UserDBConnector';
 import IUserClientDB from '../../database/UserClientDB/IUserClientDB';
-import UserValidator from '../../validation/UserValidator';
-import UserStorageManager from '../../storageManagers/user/UserStorageManager';
 import IUserStorageManager from '../../storageManagers/user/IUserStorageManager';
-import clientConnection from '../clientConnection';
+import UserControllerFactory from '../controllersFactory/UserControllerFactory';
 import { UserRoutes } from '../routesTypes';
+import IControllerFactory from '../controllersFactory/IControllerFactory';
 
 type foundUser = {
   name: string,
@@ -23,9 +21,9 @@ const foundUsersMapper = async (user: UserData): Promise<foundUser> => ({
   logo: await userStorage.getLogoIfExists(user.id)
 });
 
-const userStorage: IUserStorageManager = new UserStorageManager();
-const validator: UserValidator = new UserValidator();
-const clientDB: IUserClientDB = new UserDBConnector(clientConnection, validator);
+const userFactory: IControllerFactory = new UserControllerFactory();
+const clientDB: IUserClientDB = userFactory.getConnector() as IUserClientDB;
+const userStorage: IUserStorageManager = userFactory.getStorageManager() as IUserStorageManager;
 
 const userController: UserRoutes = {
   async signUpUser(req: Request) {

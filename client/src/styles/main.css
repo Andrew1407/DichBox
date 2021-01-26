@@ -61,7 +61,9 @@ body {
   font-size: 160%;
   color: crimson;
 }
+
 .sign-field {
+  padding-left: 2%;
   margin-bottom: 10%;
 }
 
@@ -72,7 +74,6 @@ body {
 .sign-field > input {
   font-size: 100%;
   width: 90%;
-  margin-left: 3%;
   outline: none;
   border-color: black;
   border-bottom: 3px solid rgb(0, 217, 255);
@@ -88,7 +89,7 @@ body {
 }
 
 .warning {
-  font-size: 90%;
+  font-size: 83%;
   color: crimson;
 }
 

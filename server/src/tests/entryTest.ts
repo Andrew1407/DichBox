@@ -3,7 +3,7 @@ import AdditionalTest from './additional/AdditionalTest';
 import DatabaseTest from './database/DatabaseTest';
 import FileSystemTest from './fileSystem/FileSystemTest';
 import RouterTest from './routes/RouterTest';
-import clientConnection from '../controllers/clientConnection';
+import ClientDB from '../database/ClientDB';
 
 const runTests = async (): Promise<void> => {
   const tests: ITester[] = [
@@ -27,7 +27,9 @@ const testsLog: boolean = commandArgs.includes(testArgs);
 
 if (testsLog) {
   const onExit = (): void => {
-    clientConnection.closePool();
+    ClientDB
+      .getInstance()
+      .closePool();
     process.exit(0);
   };
   runTests().then(onExit);

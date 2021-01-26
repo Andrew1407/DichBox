@@ -1,4 +1,4 @@
-import clientConnection from '../controllers/clientConnection';
+import ClientDB from '../database/ClientDB';
 
 export default abstract class TestLogger {
   private passedErrors: (Error|null)[] = [];
@@ -20,7 +20,8 @@ export default abstract class TestLogger {
       errors.forEach(
         (e: Error): void => console.error(e)
       );
-      clientConnection.closePool();
+      
+      ClientDB.getInstance().closePool();
       process.exit(1);
     }
   }
