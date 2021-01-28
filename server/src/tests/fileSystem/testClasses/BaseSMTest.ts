@@ -9,8 +9,8 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export default class BaseSMTest extends TestLogger implements ITester {
-  private storageManager: IStorageManager;
-  private logosPath: string;
+  private readonly storageManager: IStorageManager;
+  private readonly logosPath: string;
 
   constructor() {
     super();

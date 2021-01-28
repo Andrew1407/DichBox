@@ -3,8 +3,8 @@ import DateFormatterTest from './DateFormatterTest';
 import ValidatorTest from './ValidationTest';
 
 export default class AdditionalTest implements ITester {
-  private tformatter: ITester;
-  private tvalidator: ITester;
+  private readonly tformatter: ITester;
+  private readonly tvalidator: ITester;
 
   constructor() {
     this.tformatter = new DateFormatterTest();

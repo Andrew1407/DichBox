@@ -10,19 +10,20 @@ import IClientDB from '../../../database/IClientDB';
 import ClientDB from '../../../database/ClientDB';
 
 export default class ClientDBTest extends TestLogger implements ITesterDB {
-  private testBox: BoxData[];
-  private testUser: UserData[];
-  private userClient: IUserClientDB;
-  private boxesClient: IBoxesClientDB;
+  private readonly testBox: BoxData[];
+  private readonly testUser: UserData[];
+  private readonly userClient: IUserClientDB;
+  private readonly boxesClient: IBoxesClientDB;
   
   constructor() {
     super();
-    this.testBox = testBox
-      .slice(2, 6)
-      .map((x: BoxData): BoxData => ({ ...x }));
-    this.testUser = testUser
-      .slice(2, 6)
-      .map((x: UserData): UserData => ({ ...x }));
+    type testData = BoxData|UserData;
+    const copyData = (data: testData[]): testData[] => {
+      return data.slice(2, 6)
+        .map((obj: testData): testData => ({ ...obj }));
+    };
+    this.testBox = copyData(testBox);
+    this.testUser = copyData(testUser);
     const dao: IClientDB = ClientDB.getInstance();
     this.userClient = new UserClientDB(dao);
     this.boxesClient = new BoxesClientDB(dao);

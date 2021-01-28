@@ -8,7 +8,7 @@ import ClientDB from '../database/ClientDB';
 dotenv.config();
 
 export default class Server {
-  private server: http.Server
+  private readonly server: http.Server;
 
   constructor(app: expressApp) {
     configureApp(app);

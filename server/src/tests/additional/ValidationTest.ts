@@ -8,8 +8,8 @@ import { testBoxes } from '../testData/additionalBoxes';
 import { UserData, BoxData } from '../../datatypes';
 
 export default class DateFormatterTest extends TestLogger implements ITester {
-  private BoxValidator: Validator;
-  private UserValidator: Validator;
+  private readonly BoxValidator: Validator;
+  private readonly UserValidator: Validator;
 
   constructor() {
     super();

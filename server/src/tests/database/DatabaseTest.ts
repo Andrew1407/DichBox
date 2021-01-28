@@ -6,9 +6,9 @@ import ClientDBTest from './testClasses/ClientDBTest';
 import ConnectorDBTest from './testClasses/ConnectorDBTest';
 
 export default class DatabaseTest implements ITester {
-  private baseTest: ITesterDB;
-  private clientTest: ITesterDB;
-  private connectorTest: ITesterDB;
+  private readonly baseTest: ITesterDB;
+  private readonly clientTest: ITesterDB;
+  private readonly connectorTest: ITesterDB;
 
   constructor() {
     this.baseTest = new BaseConnectorTest();

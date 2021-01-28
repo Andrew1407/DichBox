@@ -3,11 +3,7 @@ import IClientDB from '../IClientDB';
 import { BoxData, UserData } from '../../datatypes';
 
 export default class BoxesClientDB implements IBoxesClientDB {
-  protected daoClient: IClientDB;
-
-  constructor(dao: IClientDB) {
-    this.daoClient = dao;
-  }
+  constructor(protected readonly daoClient: IClientDB) { }
 
   public async getUserId(name: string): Promise<number|null> {
     return await this.daoClient.getUserId(name);

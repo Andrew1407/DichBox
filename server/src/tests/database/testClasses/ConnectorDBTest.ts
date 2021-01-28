@@ -13,19 +13,20 @@ import IClientDB from '../../../database/IClientDB';
 import ClientDB from '../../../database/ClientDB';
 
 export default class ConnectorDBTest extends TestLogger implements ITesterDB {
-  private testBox: BoxData[];
-  private testUser: UserData[];
-  private userConnector: IUserClientDB;
-  private boxesConnector: IBoxesClientDB;
+  private readonly testBox: BoxData[];
+  private readonly testUser: UserData[];
+  private readonly userConnector: IUserClientDB;
+  private readonly boxesConnector: IBoxesClientDB;
 
   constructor() {
     super();
-    this.testBox = testBox.slice(2, 6).map(
-      (x: BoxData): any => ({ ...x })
-    );
-    this.testUser = testUser.slice(6).map(
-      (x: UserData): any => ({ ...x })
-    );
+    type testData = BoxData|UserData;
+    const copyData = (data: testData[]): testData[] => {
+      return data.slice(2, 6)
+        .map((obj: testData): testData => ({ ...obj }));
+    };
+    this.testBox = copyData(testBox);
+    this.testUser = copyData(testUser);
     const dao: IClientDB = ClientDB.getInstance();
     const boxValidator: Validator = new BoxValidator();
     const userValidator: Validator = new UserValidator();

@@ -9,11 +9,12 @@ export default class RouterTest implements ITester {
   private boxesRouter: BoxesRouterTest;
 
   constructor() {
-    const user: UserData[] = testUser
-      .map(x => ({ ...x }));
+    const users: UserData[] = testUser.map(
+      (obj: UserData): UserData => ({ ...obj })
+    );
     const box: BoxData = { ...testBox };
-    this.userRouter = new UserRouterTest(user, box);
-    this.boxesRouter = new BoxesRouterTest(user, box);
+    this.userRouter = new UserRouterTest(users, box);
+    this.boxesRouter = new BoxesRouterTest(users, box);
   }
 
   public async test(): Promise<void> {

@@ -6,7 +6,7 @@ import Validator from '../../validation/Validator';
 import { BoxData } from '../../datatypes';
 
 export default class BoxesDBConnector extends BoxesClientDB implements IBoxesClientDB {
-  private validator: BoxValidator;
+  private readonly validator: BoxValidator;
 
   constructor(dao: IClientDB, validator: Validator) {
     super(dao);

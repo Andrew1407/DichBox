@@ -1,12 +1,12 @@
 import { BoxData, UserData } from '../datatypes';
 
 export default abstract class Validator {
-  protected patterns: {
+  protected readonly patterns: {
     name: RegExp,
     passwd: RegExp,
     email: RegExp,
     color: RegExp
-  }
+  };
 
   constructor() {
     this.patterns = {

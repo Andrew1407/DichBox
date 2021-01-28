@@ -7,7 +7,7 @@ import Validator from '../../validation/Validator';
 import { NotificationsData, UserData } from '../../datatypes';
 
 export default class UserDBConnector extends UserClientDB implements IUserClientDB {
-  private validator: UserValidator;
+  private readonly validator: UserValidator;
 
   constructor(dao: IClientDB, validator: Validator) {
     super(dao);

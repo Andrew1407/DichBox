@@ -2,12 +2,8 @@ import IUserClientDB from './IUserClientDB';
 import IClientDB from '../IClientDB';
 import { UserData, SubscribersData, NotificationsData } from '../../datatypes';
 
-export default class UserClientDB implements IUserClientDB {
-  protected daoClient: IClientDB;
-
-  constructor(dao: IClientDB) {
-    this.daoClient = dao;
-  }
+export default class UserClientDB implements IUserClientDB { 
+  constructor(protected readonly daoClient: IClientDB) { }
 
   public async getUserId(name: string): Promise<number|null> {
     return await this.daoClient.getUserId(name);

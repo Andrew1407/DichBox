@@ -1,7 +1,7 @@
 import ClientDB from '../database/ClientDB';
 
 export default abstract class TestLogger {
-  private passedErrors: (Error|null)[] = [];
+  private readonly passedErrors: (Error|null)[] = [];
 
   protected addTestResult(result: Error|null): void {
     this.passedErrors.push(result);

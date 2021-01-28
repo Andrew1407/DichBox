@@ -4,14 +4,10 @@ import { UserData, BoxData } from '../../../datatypes';
 import { statuses, errMessages } from '../../../controllers/statusInfo';
 
 export default class UserRouterTest extends TestLogger {
-  private testUsers: UserData[];
-  private testBox: BoxData;
-
-  constructor(users: UserData[], box: BoxData) {
-    super();
-    this.testUsers = users;
-    this.testBox = box;
-  }
+  constructor(
+    private readonly testUsers: UserData[],
+    private readonly testBox: BoxData
+  ) { super() }
 
   public async run(): Promise<void> {
     const testName: string = 'User routes test';

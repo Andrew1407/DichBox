@@ -9,8 +9,8 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export default class UserSMTest extends TestLogger implements ITester {
-  private userStorageManager: IUserStorageManager;
-  private dirPath: string;
+  private readonly userStorageManager: IUserStorageManager;
+  private readonly dirPath: string;
 
   constructor() {
     super();

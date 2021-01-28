@@ -107,8 +107,6 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
 
   }, [fileManipulation, addFileVisible]);
 
-  console.log(!(isCollorCorrect && imageInput))
-
   return (
     <AnimatePresence>
     { addFileVisible &&
@@ -117,7 +115,7 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
           <label htmlFor="addFile">Select image: </label>
           <input type="file" accept="image/*" onChange={ writeImage }/>
           <input className="files-btn" type="button" value="add" disabled={ !(isCollorCorrect && imageInput) } onClick={ addNewFile } style={{ borderColor: correctColor, color: correctColor }}/>
-          { !(isCollorCorrect && imageInput) && <i className="be-add-file-warning">{ warning }</i> }
+          { warning && imageInput && <i className="be-add-file-warning">{ warning }</i> }
         </motion.div> :
         <motion.div { ...boxToolMotion } id="be-add-file">
           <label htmlFor="addFile">{ addFileVisible } name:</label>

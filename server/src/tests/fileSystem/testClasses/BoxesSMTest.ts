@@ -10,8 +10,8 @@ import { DirEntries, entryType, PathEntries } from '../../../datatypes';
 dotenv.config();
 
 export default class BoxesSMTest extends TestLogger implements ITester {
-  private boxesStorageManager: IBoxesStorageManager;
-  private boxesPath: string;
+  private readonly boxesStorageManager: IBoxesStorageManager;
+  private readonly boxesPath: string;
 
   constructor() {
     super();

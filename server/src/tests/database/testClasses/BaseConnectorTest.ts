@@ -6,17 +6,20 @@ import { testBox, testUser } from '../../testData/database';
 import { UserData, BoxData } from '../../../datatypes';
 
 export default class BaseConnectorTest extends TestLogger implements ITesterDB {
-  private clientDB: IClientDB;
-  private testBox: BoxData[];
-  private testUser: UserData[];
+  private readonly clientDB: IClientDB;
+  private readonly testBox: BoxData[];
+  private readonly testUser: UserData[];
 
   constructor() {
     super();
+    type testData = BoxData|UserData;
+    const copyData = (data: testData[]): testData[] => {
+      return data.slice(0, 2)
+        .map((obj: testData): testData => ({ ...obj }));
+    };
     this.clientDB = ClientDB.getInstance();
-    this.testBox = testBox.slice(0, 2)
-      .map((x: BoxData): any => ({ ...x }));
-    this.testUser = testUser.slice(0, 2)
-      .map((x: UserData): any => ({ ...x }));;
+    this.testBox = copyData(testBox);
+    this.testUser = copyData(testUser);
   }
 
   public async testInsert(): Promise<void> {

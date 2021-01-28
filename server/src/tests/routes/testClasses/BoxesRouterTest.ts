@@ -3,15 +3,11 @@ import makeRequest from '../requestHandler';
 import { UserData, BoxData } from '../../../datatypes';
 import { statuses, errMessages } from '../../../controllers/statusInfo';
 
-export default class BoxesRouterTest extends TestLogger {
-  private testUser: UserData[];
-  private testBox: BoxData;
-
-  constructor(users: UserData[], box: BoxData) {
-    super();
-    this.testUser = users;
-    this.testBox = box;
-  }
+export default class BoxesRouterTest extends TestLogger { 
+  constructor(
+    private readonly testUsers: UserData[],
+    private readonly testBox: BoxData
+  ) { super() }
 
   public async run(): Promise<void> {
     const testName: string = 'Boxes routes test';
@@ -19,9 +15,9 @@ export default class BoxesRouterTest extends TestLogger {
   }
 
   public async testBoxData(): Promise<void> {
-    const owner_name: string = this.testUser[0].name;
-    const owner_nc: string = this.testUser[0].name_color;
-    const viewerName: string = this.testUser[1].name;
+    const owner_name: string = this.testUsers[0].name;
+    const owner_nc: string = this.testUsers[0].name_color;
+    const viewerName: string = this.testUsers[1].name;
     const { name, name_color, access_level, description } = this.testBox;
     const argData: [string, any, any][] = [
       [
@@ -90,7 +86,7 @@ export default class BoxesRouterTest extends TestLogger {
   public async testEditBox(): Promise<void> {
     const boxName: string = this.testBox.name;
     const name: string = 'new_test_box_name';
-    const username: string = this.testUser[0].name;
+    const username: string = this.testUsers[0].name;
     this.testBox.name = name;
     const {
       description,
@@ -139,7 +135,7 @@ export default class BoxesRouterTest extends TestLogger {
   }
 
   public async testFiles(): Promise<void> {
-    const viewerName: string = this.testUser[0].name;
+    const viewerName: string = this.testUsers[0].name;
     const boxPath: string[] = [viewerName, this.testBox.name];
     const fileName: string = 'test_file.txt';
     const type: string = 'file';
@@ -310,7 +306,7 @@ export default class BoxesRouterTest extends TestLogger {
   }
 
   public async testRemoveBox(): Promise<void> {
-    const username: string = this.testUser[0].name;
+    const username: string = this.testUsers[0].name;
     const forbiddenObj: any = {
       status: statuses.FORBIDDEN, 
       body: { msg: errMessages.FORBIDDEN }
