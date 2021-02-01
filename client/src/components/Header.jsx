@@ -97,7 +97,7 @@ const Header = () => {
   }, [searchInput]);
 
   return (
-    <div>
+    <div data-testid="header-test">
       <AnimatePresence>
       { !hidden && 
         <motion.div { ...headerMotion } id="header">

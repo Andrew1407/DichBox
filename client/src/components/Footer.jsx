@@ -2,7 +2,7 @@ import React from 'react';
 import '../styles/footer.css';
 
 const Footer = () => (
-  <div id="footer">
+  <div id="footer" data-testid="footer-test">
     <p id="version">
       <small>
        <b>version: 0.5.6</b>

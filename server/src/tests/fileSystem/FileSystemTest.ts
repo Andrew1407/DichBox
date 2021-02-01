@@ -21,7 +21,7 @@ export default class  FileSystemTest implements ITester {
 
   public async run(): Promise<void> {
     console.log('File system tests:');
-    const runTest = (test: ITester) => (): Promise<void> => test.test();
-    await Promise.all(this.fsTests.map(runTest));
+    for (const test of this.fsTests)
+      await test.run();
   }
 }
