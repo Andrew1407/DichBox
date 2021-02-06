@@ -1,14 +1,10 @@
-import {entryType, PathEntries } from '../../datatypes';
+import IStorageManager from '../IStorageManager';
+import { entryType, PathEntries } from '../../datatypes';
 
-export default interface IBoxesStorageManager {
+export default interface IBoxesStorageManager extends IStorageManager {
   createBox(userId: number, boxId: number, logo: string|null): Promise<void>;
   removeBox(userId: number, boxId: number): Promise<void>;
   
-  getLogoIfExists(id: number, extraId?: number): Promise<string|null>;
-  saveLogo(logo: string, id: number, extraId?: number): Promise<string>;
-  removeLogoIfExists(id: number, extraId?: number): Promise<void>;
-
-
   getPathEntries(
     ids: [number, number],
     initial: boolean,

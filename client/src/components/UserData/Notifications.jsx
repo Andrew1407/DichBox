@@ -49,7 +49,7 @@ const Notifications = () => {
   }, [userData]);
 
   return (
-    <motion.div { ...componentMotion } className="menu-form">
+    <motion.div { ...componentMotion } data-testid="notifications-test" className="menu-form">
       <h1 id="nts-header">Notifications{ 
         !!(+userData.notifications) &&  <span> ({ userData.notifications })</span> 
       }</h1>

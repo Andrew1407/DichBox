@@ -175,7 +175,10 @@ const EditProfile = () => {
   return (
     <motion.form
       { ...componentMotion }
-      id="edit-profile" className="menu-form" onSubmit={ submitEditedFields }
+      data-testid="edit-profile-test"
+      id="edit-profile"
+      className="menu-form"
+      onSubmit={ submitEditedFields }
     >
       <div className="menu-form edit-field">
           <img id="edit-logo" src={ logoEdited ? logoEdited === 'removed' ? logoDefault : logoEdited : logo } />

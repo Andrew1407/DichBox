@@ -30,7 +30,7 @@ const ShowArea = () => {
     element.style.display = 'none';
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
-    document.removeChild(element)
+    document.removeChild(element);
   };
   const handleDownload = useCallback(handleDownloadClb, [visibleFile]);
 
@@ -144,7 +144,7 @@ const ShowArea = () => {
   }, [openedFiles]);
 
   return ( visibleFile &&
-    <div id="show-area">
+    <div id="show-area" data-testid="show-area-test">
       <div id="edit-menu" style={ visibleFile.type === 'image' ? { width: '10%', marginLeft: '88%' }: {} }>
         { visibleFile.type !== 'image' && userData.editor && (editMode ?
           <motion.img

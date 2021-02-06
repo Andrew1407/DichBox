@@ -6,7 +6,6 @@ import { BoxesContext } from '../../contexts/BoxesContext';
 import { UserContext } from '../../contexts/UserContext';
 import { MenuContext } from '../../contexts/MenuContext';
 
-
 const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation }) => {
   const { pathEntries, setPathEntries, boxDetails, setBoxDetails } = useContext(BoxesContext);
   const { username, userData } = useContext(UserContext);
@@ -14,7 +13,7 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
   const [nameInput, setNameInput] = useState('');
   const [imageInput, setImageInput] = useState(null);
   const [imageChosen, setImageChosen] = useState(false);
-  const getInputWarningClb = (fname) => {
+  const getInputWarningClb = fname => {
     if (!fname) return '';
     const inputValid = /^[^\s/]{1,40}$/;
     const nameExists = pathEntries
@@ -111,13 +110,13 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
     <AnimatePresence>
     { addFileVisible &&
       ( addFileVisible === 'image' ?
-        <motion.div { ...boxToolMotion } id="be-add-file">
+        <motion.div { ...boxToolMotion } id="be-add-file" data-testid="add-img-test">
           <label htmlFor="addFile">Select image: </label>
           <input type="file" accept="image/*" onChange={ writeImage }/>
           <input className="files-btn" type="button" value="add" disabled={ !(isCollorCorrect && imageInput) } onClick={ addNewFile } style={{ borderColor: correctColor, color: correctColor }}/>
           { warning && imageInput && <i className="be-add-file-warning">{ warning }</i> }
         </motion.div> :
-        <motion.div { ...boxToolMotion } id="be-add-file">
+        <motion.div { ...boxToolMotion } id="be-add-file" data-testid="add-file-test">
           <label htmlFor="addFile">{ addFileVisible } name:</label>
           <input spellCheck="false" type="text" name="addFile" value={ nameInput } onChange={ e => setNameInput(e.target.value) } />
           <input className="files-btn" type="button" value="add" disabled={ warning || !nameInput } style={{ borderColor: correctColor, color: correctColor }} onClick={ addNewFile } />

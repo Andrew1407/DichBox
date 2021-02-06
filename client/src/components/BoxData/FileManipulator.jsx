@@ -114,7 +114,7 @@ const FileManipulator = ({ setFileManupulation, fileManipulation, addFileVisible
 
 
   return ( fileManipulation &&
-    <div className="menu-form">
+    <div className="menu-form" data-testid='file-manipulator-test'>
       <p id="fm-header">{ fileManipulation.action === 'rename' ? 'Rename' : 'Remove' } { getFullPathStr(fileManipulation) }?</p>
       { fileManipulation.action === 'rename' && 
         <div id="fm-rename">

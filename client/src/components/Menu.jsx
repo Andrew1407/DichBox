@@ -13,9 +13,9 @@ import SearchList from './SearchList';
 import hideImg from '../styles/imgs/hide-arrow.png';
 import showImg from '../styles/imgs/show-arrow.png';
 import homeLogo from '../styles/imgs/home-icon.png';
-import '../styles/menu.css';
 import Errors from './Errors/Errors';
 import Loading from './Loading';
+import '../styles/menu.css';
 
 const Menu = () => {
   const { username, userData, pathName } = useContext(UserContext);
@@ -77,7 +77,7 @@ const Menu = () => {
   }, [pathName]);
 
   return (
-  <div id="menu"
+  <div id="menu" data-testid="menu-test"
     style={ menuVisible ?
       { 
         maxWidth: '30%',

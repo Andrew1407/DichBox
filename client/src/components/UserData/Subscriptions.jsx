@@ -66,7 +66,7 @@ const Subscriptions = () => {
   }, [userData]);
 
   return (
-    <motion.div { ...componentMotion } className="menu-form">
+    <motion.div { ...componentMotion } data-testid="subscriptions-test" className="menu-form">
       <h1 id="subs-header">Subscriptions</h1>
       <div id="subs-search">
         <label>search: </label>
@@ -79,7 +79,7 @@ const Subscriptions = () => {
         <div>
           { foundPersons.map(person =>
             <div key={ person.name } className="subs-display sub-person" onClick={ handlePersonClick(person.name) }>
-              <div className="subs-data subs-display">
+              <div className="subs-data subs-display" title={ person.name }>
                 <img src={ person.logo || logoDefault }/>
                 <motion.span
                   { ...itemMotion }

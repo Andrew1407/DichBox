@@ -20,7 +20,7 @@ const BoxPrivacy = ({ privacy, setPrivacy, limitedList, setLimitedList, setChang
   const handleRadioChange = useCallback(handleRadioChangeClb, []);
   
   return (
-    <div className="box-privacy">
+    <div className="box-privacy" data-testid="box-privacy-test">
       <p>*box privacy:</p>
       { radios.map(val =>
         <div className="box-privacy-radio" key={ val[0] } >

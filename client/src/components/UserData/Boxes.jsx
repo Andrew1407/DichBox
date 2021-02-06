@@ -53,7 +53,7 @@ const Boxes = () => {
   }, [userData, boxesList]);
 
   return (
-    <motion.div { ...componentMotion } className="menu-form">
+    <motion.div { ...componentMotion } data-testid="boxes-test" className="menu-form">
       <div id="boxes-header" className="menu-form">
         <h1 id="boxes-title">Boxes</h1>
         <div id="boxes-search">

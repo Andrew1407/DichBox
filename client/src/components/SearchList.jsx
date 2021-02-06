@@ -23,10 +23,10 @@ const SearchList = () => {
 
   return (
     <AnimatePresence>
-    <motion.div { ...componentMotion } id="search-list" className="menu-form">
+    <motion.div { ...componentMotion } id="search-list" data-testid="search-list-test" className="menu-form">
       <h1 id="search-list-header">Found users</h1>
       { usersList && usersList.filter(x => x).length ? 
-        usersList.map(person => 
+        usersList.map(person => person &&
           <div className="search-list-display search-list-person" key={ person.name }>
             <div onClick={ handlePersonClick(person.name) } className="search-list-data search-list-display">
               <img src={ person.logo || logoDefault }/>

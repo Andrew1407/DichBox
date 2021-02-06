@@ -39,7 +39,7 @@ const BoxesList = ({ searchInput, setMenuOption }) => {
     });
 
   return ( showBoxes.length ?
-    <div id="boxes-list">
+    <div id="boxes-list" data-testid="boxes-list-test">
       { showBoxes.map(box => 
         <div className="boxes-items" key={ `${box.name}, ${box.access_level}` } onClick={ handleBoxClick(box) } >
           <motion.p { ...itemMotion }>
@@ -50,11 +50,11 @@ const BoxesList = ({ searchInput, setMenuOption }) => {
       )}
     </div> :
     ( !userData.ownPage && listOption === 'followers') ?
-      <h1 id="boxes-list-empty">Follow
+      <h1 data-testid="boxes-list-test" className="boxes-list-empty">Follow
         <b style={{ color: userData.name_color }} onClick={ () => setMenuOption('default') }> { userData.name } </b>
         to see the boxes for followers
       </h1> :
-      <h1 id="boxes-list-empty">No boxes there</h1>
+      <h1 data-testid="boxes-list-test" className="boxes-list-empty">No boxes there</h1>
   );
 };
 

@@ -160,7 +160,7 @@ const BoxEntries = () => {
 
   return ( editBox ? 
     <BoxForm editParametrs={{ setEditBoxState, boxDetails, edit: true }} /> :
-    <motion.div { ...componentMotion } className="menu-form">
+    <motion.div { ...componentMotion } data-testid="box-entries-test" className="menu-form">
       <div>
         { !boxInfoHidden && boxDetails.logo && <img id="entries-logo" src={ boxDetails.logo }/> }
         <div className="name-desc">

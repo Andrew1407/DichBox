@@ -14,7 +14,7 @@ const FilesList = () => {
     dispatchOpenedFiles({ type: "FILE_CLOSE", index }); 
 
   return (
-    <div id="files-list">{
+    <div id="files-list" data-testid="files-list-test">{
       openedFiles.map((file, i) => 
         <div title={`${file.filePath.slice(1)}/${file.name}`} onClick={ showFile(file.opened, i) } className="opened-file" key={ i } style={{ color: file.opened ? 'black': 'rgb(0, 217, 255)', backgroundColor: file.opened ? 'rgb(0, 217, 255)' : 'black' }} >
           <p className="opened-file-name">{ file.name }</p>

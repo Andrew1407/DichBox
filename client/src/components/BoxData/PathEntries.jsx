@@ -79,7 +79,9 @@ const PathEntries = ({ entriesSearch, setFileManupulation, addFileVisible, setAd
   return (
     <motion.div
       { ...pathEntriesMotion }
-      className="menu-options-list" id="mol-units-list"
+      data-testid="path-entries-test"
+      className="menu-options-list"
+      id="mol-units-list"
     >
       { (pathDepth.length > 2) && 
         <div className="box-entries-item" onClick={ hadnleHistoryMove(pathDepth.slice(0, -1)) } >
@@ -88,7 +90,7 @@ const PathEntries = ({ entriesSearch, setFileManupulation, addFileVisible, setAd
         </div>
       }
       { !!filteredSearch.length && filteredSearch.map(unit =>
-        !unit.name ? null : 
+        !unit.name ? null :
         <div className="be-item-wrap" key={ unit.name }>
           <div title={ unit.name } className="box-entries-item" onClick={ unit.type === 'dir' ? hadnleHistoryMove([...pathDepth, unit.name]) : handleClickFile(unit) } >
             <img src={ unit.type === 'dir' ? dirLogo : fileLogo } />

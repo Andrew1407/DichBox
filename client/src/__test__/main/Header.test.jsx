@@ -35,8 +35,8 @@ describe('Header tests', () => {
       expect(butnImg).toHaveAttribute('src', defaultLogo);
     },
     'has search area': () => {
+      const serachImg = foundHeader.querySelector('img');
       expect(foundSearchInput).toBeDefined();
-      const [ serachImg ] = foundHeader.getElementsByTagName('img');
       expect(serachImg).toHaveAttribute('src', searchLogo);
     }
   };

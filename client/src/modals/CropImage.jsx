@@ -53,12 +53,11 @@ const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited }) => {
       <div id="crop-area">
         <ReactCrop {...{ src: img, crop, onChange: setCrop, onImageLoaded: setImgCropped }} />
       </div>
-        <div className="crop-input-field">
-          <p>file:</p>
-          <input type="file" accept="image/*" onChange={ handleInputImage } />
-        </div>
-
-      <div id="crop-apply-btns">
+      <div data-testid="crop-input-title-test" className="crop-input-field">
+        <p>file:</p>
+        <input type="file" accept="image/*" onChange={ handleInputImage } />
+      </div>
+      <div data-testid="crop-input-btns-test" id="crop-apply-btns">
         <motion.input
           { ...buttonsMotion }
           type="button" value="apply" onClick={ applyCrop }

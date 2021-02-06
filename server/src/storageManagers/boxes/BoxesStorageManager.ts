@@ -44,12 +44,12 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const dirMapper = async (name: string): Promise<DirEntries> => {
       const fullPath: string = path.join(dirPath, name);
       const nameStats: fs.Stats = await fs.promises.lstat(fullPath);
-      if (await nameStats.isFile()) {
+      if (nameStats.isFile()) {
         const isImage: boolean = /\.(png|jpeg|jpg|webp|tiff|raw|gif|bmp)$/.test(name);
         const type: entryType = isImage ? 'image' : 'file';
         return { name, type };
       }
-      else if (await nameStats.isDirectory()) {
+      else if (nameStats.isDirectory()) {
         return { name, type: 'dir' };
       }
       return { name, type: 'file' };
@@ -71,13 +71,13 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const exists: boolean = fs.existsSync(boxPath);
     if (!exists) return null;
     const pathStats: fs.Stats = await fs.promises.lstat(boxPath);
-    if (await pathStats.isDirectory()) {
+    if (pathStats.isDirectory()) {
       const src: DirEntries[] = await this.getDirEntries(boxPath);
       const name: string = extraPath.length > 1 ?
         boxPath.split('/').pop() : 'хрін тобі';
       return { dir: { src, name }, type: 'dir' };
     }
-    if (await pathStats.isFile()) {
+    if (pathStats.isFile()) {
       if (initial) return null;
       const src: string = await fs.promises.readFile(boxPath, 'utf-8');
       const dirPath: string[] = boxPath.split('/');

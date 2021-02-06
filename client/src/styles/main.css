@@ -58,6 +58,7 @@ body {
 }
 
 .edit-warning {
+  margin-left: 3%;
   font-size: 160%;
   color: crimson;
 }

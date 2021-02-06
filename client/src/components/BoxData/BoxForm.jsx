@@ -175,7 +175,7 @@ const BoxForm = ({ editParametrs }) => {
   return (
     <motion.form
       { ...componentMotion }
-      className="menu-form" onSubmit={ handleSubmit }
+      className="menu-form" data-testid="box-form-test" onSubmit={ handleSubmit }
     >
       <h1 id="create-box-title">{ editParametrs.edit ? 'Edit box' : 'Create new box'}</h1>
       <div className="edit-field">

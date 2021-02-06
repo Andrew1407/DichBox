@@ -59,13 +59,13 @@ const SearchUsers = ({ changedList, setChangedList, inputList, setInputList }) =
 
 
   return (
-    <div className="box-limited">
+    <div className="box-limited" id="search-users-container" data-testid="search-users-test">
       <div className="box-limited-input">
         <label htmlFor="limitedList">username:</label>
         <input type="text" name="limitedList" value={ searchInput } onChange={ handleUserInput } />
         <button onClick={ handeClearOnClick }>clear</button>
         { !!foundUsers.length && 
-          <div className="box-limited-search">
+          <div className="box-limited-search" id="found-users-list">
             { foundUsers.map(user => 
               <div title={ user.name } className="found-user" key={ user.name } onClick={ handleFoundUserClick(user) } >
                 <img src={ user.logo || logoDefault } />

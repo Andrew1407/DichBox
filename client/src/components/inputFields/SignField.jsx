@@ -1,10 +1,10 @@
 import React from 'react';
 
 const SignField = ({ warning, handleOnChange, type, label }) => (
-  <div className="sign-field">
+  <div className="sign-field" data-testid="sign-field-test">
     <p>{ label }:</p>
-    <input spellCheck="false" type={ type } onChange={ handleOnChange } style={{ borderBottomColor: warning ? warning.borderColor : null }} />
-    <i className="warning">{ warning ? warning.text : null }</i>
+    <input {...{ type, spellCheck: false, onChange: handleOnChange, style: { borderBottomColor: warning && warning.borderColor } }} />
+    <i className="warning">{ warning && warning.text }</i>
   </div>
 );
 

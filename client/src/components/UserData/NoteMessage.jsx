@@ -12,7 +12,7 @@ const NoteMessage = ({ type, userName, userColor, boxName, boxColor, msg }) => {
 
   const msgTemplates = {};
   msgTemplates['((viewer|editor)(Add|Rm))'] = (
-    <div className="note-msg">
+    <div data-testid="note-msg-test" className="note-msg">
       <p>
         <i>{ msg[0] }</i>
         <span onClick={ handleRouteMove(userName) } style={{ color: userColor }}> { userName } </span>
@@ -23,7 +23,7 @@ const NoteMessage = ({ type, userName, userColor, boxName, boxColor, msg }) => {
     </div>
   );
   msgTemplates['boxAdd'] = (
-    <div className="note-msg">
+    <div data-testid="note-msg-test" className="note-msg">
       <p>
         <i>{ msg[0] }</i>
         <span onClick={ handleRouteMove(userName) } style={{ color: userColor }}> { userName } </span>
@@ -33,7 +33,7 @@ const NoteMessage = ({ type, userName, userColor, boxName, boxColor, msg }) => {
     </div>
   );
   msgTemplates['userRm'] = (
-    <div className="note-msg">
+    <div data-testid="note-msg-test" className="note-msg">
       <p>
         <i>{ msg[0] + ' (' }</i> 
         <span style={{ color: userColor }}>{ userName }</span>
@@ -42,7 +42,7 @@ const NoteMessage = ({ type, userName, userColor, boxName, boxColor, msg }) => {
     </div>
   );
   msgTemplates['helloMsg'] = (
-    <div className="note-msg">
+    <div data-testid="note-msg-test" className="note-msg">
       <p><i>{ msg[0] }</i></p>
     </div>
   );
@@ -53,7 +53,11 @@ const NoteMessage = ({ type, userName, userColor, boxName, boxColor, msg }) => {
       return msgTemplates[msgType];
   } 
   
-  return (<div><p><i>Invalid notification</i></p></div>);
+  return (
+    <div data-testid="note-msg-test">
+      <p><i>Invalid notification</i></p>
+    </div>
+  );
 };
 
 export default NoteMessage;

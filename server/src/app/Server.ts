@@ -35,7 +35,7 @@ export default class Server {
         process.exit(0);
       });
 
-      setTimeout((): void => {
+      setInterval((): void => {
         process.exit(0);
       }, 1000).unref();
     };

@@ -26,9 +26,9 @@ const Errors = () => {
     <AnimatePresence>
     <motion.div
       { ...componentMotion }
-      id="errors-container" className="menu-form"
+      data-testid="errors-test" id="errors-container" className="menu-form"
     >
-      <h1 id="error-title"> Error</h1>
+      <h1 id="error-title">Error</h1>
       <p id="error-message">{ errMessage }</p>
       <div id="error-image">
         <img src={ errLogos[logoKey] }/>

@@ -7,8 +7,8 @@ import '../styles/confirm-modal.css';
 const CofirmModal = ({ isOpen, okClb, message, setModalOptions }) => {
   return (
     <ReactModal {...{ isOpen }} className="confirm-modal">
-        <p id="confirm-message">¿ { message }  ؟</p>
-        <div id="confirm-btns">
+        <p data-testid="confirm-modal-title-test" id="confirm-message">¿ { message }  ؟</p>
+        <div data-testid="confirm-modal-btns-test" id="confirm-btns">
           <motion.input 
             { ...buttonsMotion }
             type="button" value="ok" onClick={ okClb }

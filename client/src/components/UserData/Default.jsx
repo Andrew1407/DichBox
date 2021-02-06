@@ -10,7 +10,6 @@ import { componentMotion } from '../../styles/motions/menu-components';
 import logoDefault from '../../styles/imgs/default-user-logo.png';
 import '../../styles/menu-default.css';
 
-
 const Default = () => {
   const history = useHistory();
   const { userData, username, dispatchUsername, dispatchUserData, setPathName } = useContext(UserContext);
@@ -55,7 +54,7 @@ const Default = () => {
   };
 
   return (
-    <motion.div { ...componentMotion } className="menu-form">
+    <motion.div { ...componentMotion } data-testid="default-test" className="menu-form">
       <img src={ userData.logo || logoDefault } id="default-logo" />
       <div className="name-desc">
         <p className="nd-name" style={{ color: userData.name_color }} >{ userData.name }</p>
@@ -96,7 +95,7 @@ const Default = () => {
           > ({ userData.notifications })</span> }</motion.p>
         }
       </div>
-      <p className="default-extra" >
+      <p className="default-extra">
         folowers:
         <span id="extra-followers"> { userData.followers }</span>
       </p>
