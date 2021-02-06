@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Footer tests matches snapshot 1`] = `
+<div
+  data-testid="footer-test"
+  id="footer"
+>
+  <p
+    id="version"
+  >
+    <small>
+      <b>
+        version: 0.6.1
+      </b>
+    </small>
+  </p>
+  <p>
+    <b>
+      DichES
+    </b>
+  </p>
+  <p>
+    <b>
+      <small>
+        <a
+          href="https://github.com/Andrew1407/DichBox"
+          id="repo-ref"
+          target="_blank"
+        >
+          git repo
+        </a>
+      </small>
+    </b>
+  </p>
+</div>
+`;

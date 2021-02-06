@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import renderer from 'react-test-renderer';
 import Loading from '../../components/Loading';
 import loadingGif from '../../styles/imgs/loading.gif';
 
@@ -15,6 +16,10 @@ describe('Loading tests', () => {
     'has image': () => {
       const loadingImg = foundLoading.querySelector('img');
       expect(loadingImg).toHaveAttribute('src', loadingGif);
+    },
+    'matches snapshot': () => {
+      const tree = renderer.create(<Loading />).toJSON();
+      expect(tree).toMatchSnapshot();
     }
   };
 

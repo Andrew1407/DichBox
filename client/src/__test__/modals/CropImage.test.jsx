@@ -6,6 +6,7 @@ describe('Crop image modal test', () => {
   const getModal = testId => {
     const { getByTestId } = render(
       <CropImage {...{
+        ariaShowApp: true,
         cropModalHidden: false,
         setCropModalHidden: jest.fn(),
         setLogoEdited: jest.fn()

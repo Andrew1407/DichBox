@@ -6,7 +6,7 @@ import { buttonsMotion } from '../styles/motions/modal-buttons';
 import 'react-image-crop/dist/ReactCrop.css';
 import '../styles/crop-image.css';
 
-const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited }) => {
+const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited, ariaShowApp }) => {
   const [img, setImg] = useState(null);
   const [imgCropped, setImgCropped] = useState(null);
   const [crop, setCrop] = useState({ aspect: 1 / 1 });
@@ -49,7 +49,7 @@ const CropImage = ({ cropModalHidden, setCropModalHidden, setLogoEdited }) => {
   };
   
   return (
-    <ReactModal isOpen={ !cropModalHidden } className="crop-modal" >
+    <ReactModal isOpen={ !cropModalHidden } ariaHideApp={ !ariaShowApp } className="crop-modal" >
       <div id="crop-area">
         <ReactCrop {...{ src: img, crop, onChange: setCrop, onImageLoaded: setImgCropped }} />
       </div>

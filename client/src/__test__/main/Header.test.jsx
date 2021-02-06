@@ -1,6 +1,7 @@
 import React from 'react';
 import { Router } from 'react-router-dom';
 import { render } from '@testing-library/react';
+import renderer from 'react-test-renderer';
 import Header from '../../components/Header';
 import MenuContextProvider from '../../contexts/MenuContext';
 import UserContextProvider from '../../contexts/UserContext';
@@ -38,6 +39,22 @@ describe('Header tests', () => {
       const serachImg = foundHeader.querySelector('img');
       expect(foundSearchInput).toBeDefined();
       expect(serachImg).toHaveAttribute('src', searchLogo);
+    },
+    'matches snapshot': () => {
+      const tree = renderer.create(
+        <Router history={{ push: jest.fn(), location: { pathname: '' }, listen: jest.fn() }}>
+          <MenuContextProvider>
+          <UserContextProvider>
+          <VerifiersContextProvider>
+          <BoxesContextProvider>
+            <Header />
+          </BoxesContextProvider>
+          </VerifiersContextProvider>
+          </UserContextProvider>
+          </MenuContextProvider>
+        </Router>
+      ).toJSON();
+      expect(tree).toMatchSnapshot();
     }
   };
 

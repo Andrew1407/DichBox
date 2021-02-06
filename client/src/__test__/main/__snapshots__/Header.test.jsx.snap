@@ -1,0 +1,62 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Header tests matches snapshot 1`] = `
+<div
+  data-testid="header-test"
+>
+  <div
+    id="header"
+    style={
+      Object {
+        "transform": "translateY(-150px) translateZ(0)",
+      }
+    }
+  >
+    <div
+      className="highlight"
+      id="header-name"
+      onClick={[Function]}
+    >
+      <h1>
+        DichBox
+      </h1>
+    </div>
+    <div
+      id="header-menu"
+      style={Object {}}
+    >
+      <img
+        className="highlight"
+        onClick={[Function]}
+        src="test-file-stub"
+        style={
+          Object {
+            "backgroundColor": "grey",
+          }
+        }
+      />
+    </div>
+    <form
+      className="highlight"
+      id="header-search"
+      onSubmit={[Function]}
+    >
+      <input
+        onChange={[Function]}
+        placeholder="search users"
+        type="text"
+        value=""
+      />
+      <img
+        onClick={[Function]}
+        src="test-file-stub"
+        style={
+          Object {
+            "transform": "skewX(25deg) translateZ(0)",
+          }
+        }
+      />
+    </form>
+  </div>
+</div>
+`;

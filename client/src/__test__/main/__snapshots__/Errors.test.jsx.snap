@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Errors tests matches snapshot 1`] = `
+<div
+  className="menu-form"
+  data-testid="errors-test"
+  id="errors-container"
+  style={
+    Object {
+      "transform": "translateX(-800px) translateZ(0)",
+    }
+  }
+>
+  <h1
+    id="error-title"
+  >
+    Error
+  </h1>
+  <p
+    id="error-message"
+  >
+    server error
+  </p>
+  <div
+    id="error-image"
+  >
+    <img
+      src="test-file-stub"
+    />
+  </div>
+</div>
+`;

@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 import { buttonsMotion } from '../styles/motions/modal-buttons';
 import '../styles/confirm-modal.css';
 
-const CofirmModal = ({ isOpen, okClb, message, setModalOptions }) => {
+const CofirmModal = ({ isOpen, okClb, message, setModalOptions, ariaShowApp }) => {
   return (
-    <ReactModal {...{ isOpen }} className="confirm-modal">
+    <ReactModal {...{ isOpen, ariaHideApp: !ariaShowApp }} className="confirm-modal">
         <p data-testid="confirm-modal-title-test" id="confirm-message">¿ { message }  ؟</p>
         <div data-testid="confirm-modal-btns-test" id="confirm-btns">
           <motion.input 

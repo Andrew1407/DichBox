@@ -8,6 +8,7 @@ describe('Confirm modal test', () => {
     const { getByTestId } = render(
       <ConfirmModal {...{
         message,
+        ariaShowApp: true,
         isOpen: true,
         okClb: jest.fn(),
         setModalOptions: jest.fn()

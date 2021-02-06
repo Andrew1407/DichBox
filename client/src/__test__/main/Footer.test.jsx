@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import renderer from 'react-test-renderer';
 import Footer from '../../components/Footer';
 
 describe('Footer tests', () => {
@@ -19,6 +20,10 @@ describe('Footer tests', () => {
       expect(foundFooter).toHaveTextContent('git repo');
       expect(srcRef).toHaveAttribute('href', 'https://github.com/Andrew1407/DichBox');
       expect(srcRef).toHaveAttribute('target', '_blank');
+    },
+    'matches snapshot': () => {
+      const tree = renderer.create(<Footer />).toJSON();
+      expect(tree).toMatchSnapshot();
     }
   };
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { cleanup, render } from '@testing-library/react';
+import renderer from 'react-test-renderer';
 import Errors from '../../components/Errors/Errors';
 import { MenuContext } from '../../contexts/MenuContext';
 import boxErrLogo from '../styles/imgs/errors/box.png';
@@ -47,6 +48,15 @@ describe('Errors tests', () => {
         expect(imgEl).toHaveAttribute('src', errImg);
         cleanup();
       }
+    },
+    'matches snapshot': () => {
+      const foundErr = testData[testData.length - 1].slice(0, -1);
+      const tree = renderer.create(
+        <MenuContext.Provider value={{ foundErr }}>
+          <Errors />
+        </MenuContext.Provider>
+      ).toJSON();
+      expect(tree).toMatchSnapshot();
     }
   };
 
