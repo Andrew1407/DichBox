@@ -84,7 +84,9 @@ const Menu = () => {
         minWidth: '30%',
         borderTop: '2px solid rgb(75, 73, 73)',
         borderRight: '4px solid rgb(75, 73, 73)'
-      } : { }
+      } : {
+        maxWidth: '30%'
+      }
     }
   >
   <AnimatePresence>
