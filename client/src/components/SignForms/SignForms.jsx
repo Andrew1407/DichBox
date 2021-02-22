@@ -140,11 +140,11 @@ const SingForms = () => {
         <motion.p
           { ...bouncingMotion }
           onClick={ handleSignForm(true) } style={ setBtnStateStyle(isSignUp) }
-        >sing up</motion.p>
+        >sign up</motion.p>
         <motion.p
           { ...bouncingMotion }
           onClick={ handleSignForm(false) } style={ setBtnStateStyle(!isSignUp) }
-        >sing in</motion.p>
+        >sign in</motion.p>
       </div>
       <AnimatePresence>
       { isSignUp ? 
