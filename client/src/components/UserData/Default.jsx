@@ -96,7 +96,7 @@ const Default = () => {
         }
       </div>
       <p className="default-extra">
-        folowers:
+        followers:
         <span id="extra-followers"> { userData.followers }</span>
       </p>
       { userData.ownPage && <p className="default-extra" id="default-regdate">
