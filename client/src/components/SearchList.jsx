@@ -17,7 +17,7 @@ const SearchList = () => {
   const shortenName = str => str.length < 20 ? str : `${str.slice(0, 19)}...`;
   const handlePersonClick = username => () => {
     history.push(`/${username}`);
-    setSearchStr('');
+    setSearchStr(null);
     setUsersList(null);
   };
 

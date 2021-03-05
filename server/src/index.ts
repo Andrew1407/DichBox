@@ -3,7 +3,9 @@ import { cpus } from 'os';
 import * as express from 'express';
 import Server from './app/Server';
 
-const TEST_WORKER: number = 1;
+const testFlag: string = '--test-worker';
+const includeTestWorker: boolean = process.argv.includes(testFlag);
+const TEST_WORKER: number = Number(includeTestWorker);
 
 if (cluster.isMaster) {
   const forkCluster = (): void => {

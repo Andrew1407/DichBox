@@ -96,6 +96,11 @@ const Header = () => {
       setSearchStr(null);
   }, [searchInput]);
 
+  useEffect(() => {
+    if (searchStr == null)
+      setSearchInput('');
+  }, [searchStr]);
+
   return (
     <div data-testid="header-test">
       <AnimatePresence>
