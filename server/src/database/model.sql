@@ -152,7 +152,9 @@ create function notify_viewer_rm_fn()
   as
 $$
 begin
-  insert into notifications (person_id, type, param) values (old.person_id, 'viewerRm', old.box_id);
+  if exists (select id from boxes where id = old.box_id) then
+    insert into notifications (person_id, type, param) values (old.person_id, 'viewerRm', old.box_id);
+  end if;
   return old;
 end;
 $$;
@@ -169,7 +171,7 @@ create function notify_editor_add_fn()
   as
 $$
 begin
-  insert into notifications (person_id, type, param) values (new.person_id, 'editorAdd', new.box_id);
+  insert into notifications (person_id, type, param) values (new.person_id, 'editorAdd', new.box_id);    
   return new;
 end;
 $$;
@@ -186,7 +188,9 @@ create function notify_editor_rm_fn()
   as
 $$
 begin
-  insert into notifications (person_id, type, param) values (old.person_id, 'editorRm', old.box_id);
+  if exists (select id from boxes where id = old.box_id) then
+    insert into notifications (person_id, type, param) values (old.person_id, 'editorRm', old.box_id);
+  end if;
   return old;
 end;
 $$;
