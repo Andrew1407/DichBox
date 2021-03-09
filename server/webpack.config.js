@@ -17,7 +17,7 @@ module.exports = {
     extensions: ['.ts', '.js']
   },
   output: {
-    filename: 'server.js',
+    filename: 'index.js',
     path: path.resolve(__dirname, 'dist')
   },
   target: 'node',
