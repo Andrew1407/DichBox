@@ -59,6 +59,7 @@ const BoxEntries = () => {
 
   const handleViewBoxesClickClb = () => {
     setMenuOption('boxes');
+    setBoxesList([]);
     setPathEntries([]);
     setBoxDetails([]);
     setBoxHiddenState(false);
