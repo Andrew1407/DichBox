@@ -95,7 +95,7 @@ const userController: UserRoutes = {
     const editedLogo: string|null = req.body.logo;
     const editedResponse: UserData & { logo?: string } = {};
     const id: number = await clientDB.getUserId(username);
-    if (Object.keys(editedData).length) {
+    if (editedData && Object.keys(editedData).length) {
       await clientDB.updateUser(id, editedData);
       for (const field in editedData)
         if (field !== 'passwd')
