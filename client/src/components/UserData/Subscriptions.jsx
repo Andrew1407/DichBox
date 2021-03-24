@@ -78,8 +78,8 @@ const Subscriptions = () => {
         </div> :
         <div>
           { foundPersons.map(person =>
-            <div key={ person.name } className="subs-display sub-person" onClick={ handlePersonClick(person.name) }>
-              <div className="subs-data subs-display" title={ person.name }>
+            <div key={ person.name } className="subs-display sub-person">
+              <div className="subs-data subs-display" title={ person.name } onClick={ handlePersonClick(person.name) }>
                 <img src={ person.logo || logoDefault }/>
                 <motion.span
                   { ...itemMotion }
