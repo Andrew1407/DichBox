@@ -110,7 +110,7 @@ const Default = () => {
       { userData.ownPage && <div id="sign-options">
         <motion.p
           { ...itemMotion }
-          onClick={ handleSignOptions('Remove this account inevitably', removeOkClb) }
+          onClick={ handleSignOptions('Remove this account', removeOkClb) }
         >remove account</motion.p>
         <motion.p
           { ...signOutMotion }
