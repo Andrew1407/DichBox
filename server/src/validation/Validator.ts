@@ -25,7 +25,7 @@ export default abstract class Validator {
       ...specificFields,
       name: (x: string): boolean => this.patterns.name.test(x),
       name_color: (x: string): boolean => this.patterns.color.test(x),
-      description: (x: string): boolean => !!x && x.length <= 100,
+      description: (x: string): boolean => typeof x === 'string' && x.length <= 100,
       description_color: (x: string): boolean => this.patterns.color.test(x),
     };
     const reducer = (res: boolean, key: string): boolean => (
