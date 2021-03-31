@@ -40,7 +40,7 @@ const userController: UserRoutes = {
 
   async findUser(req: Request) {
     const name: string = req.body.pathName;
-    const username: string = req.body.username;
+    const username: string|null = req.body.username;
     const ownPage: boolean = name === username;
     const user: UserData = await clientDB.getUserData({ name });
     if (!user) {
