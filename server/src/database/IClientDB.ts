@@ -4,7 +4,7 @@ export default interface IClientDB {
 
   rawQuery(query: string, args?: any[]): Promise<any>;
 
-  getUserId(name: string): Promise<number|null>;
+  getUserId(name: string|null): Promise<number>;
 
   selectValues(
     table: string,

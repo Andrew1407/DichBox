@@ -65,8 +65,11 @@ export interface DirEntries {
 export interface PathEntries {
   type: entryType,
   dir?: {
-   src: DirEntries[],
-   name: string
+    src: DirEntries[],
+    name: string
   },  
-  file?: FileEntries
+  file?: FileEntries|{
+    src: DirEntries[],
+    name: string
+  }
 }

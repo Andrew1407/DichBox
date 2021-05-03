@@ -57,8 +57,9 @@ const Subscriptions = () => {
       } catch {
         const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
         setFoundErr(['server', msg]);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     if (!usersList && userData.name)

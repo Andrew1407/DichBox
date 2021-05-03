@@ -36,8 +36,9 @@ const UserContextProvider = props => {
             const errType = status === 404 ? 'user' : 'server'; 
             setFoundErr([errType, data.msg]);
           }
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
       }
     };
     

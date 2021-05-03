@@ -1,9 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { UserContext } from '../../contexts/UserContext';
 import { MenuContext } from '../../contexts/MenuContext';
+import { BoxesContext } from '../../contexts/BoxesContext';
 import ConfirmModal from '../../modals/ConfirmModal';
 import { itemMotion, signOutMotion } from  '../../styles/motions/list-items';
 import { componentMotion } from '../../styles/motions/menu-components';
@@ -13,7 +14,8 @@ import '../../styles/menu-default.css';
 const Default = () => {
   const history = useHistory();
   const { userData, username, dispatchUsername, dispatchUserData, setPathName } = useContext(UserContext);
-  const { setMenuOption } = useContext(MenuContext);
+  const { setMenuOption, openedFiles, dispatchOpenedFiles } = useContext(MenuContext);
+  const { boxDetails, setBoxDetails, setPathEntries } = useContext(BoxesContext);
   const [modalOptions, setModalOptions] = useState(null);
   const handeMenuChoice = choice => e => {
     e.preventDefault();
@@ -30,14 +32,15 @@ const Default = () => {
     setModalOptions(null);
     dispatchUserData({ type: 'CLEAN_DATA' });
     setPathName('');
+    if (openedFiles.length)
+      dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
     history.push('/');
   };
 
   const removeOkClb = async () => {
     const rmBody = { username, confirmation: 'permitted' }
     const { data } = await axios.post(`${process.env.APP_ADDR}/users/remove`, rmBody);
-    if (data.removed)
-      signOutOkClb();
+    if (data.removed) signOutOkClb();
   };
 
   const handleSubscribtion = action => async () => {
@@ -52,6 +55,12 @@ const Default = () => {
     const { follower, followers } = data;
     dispatchUserData({ type: 'REFRESH_DATA', data: { follower, followers } });
   };
+
+  useEffect(() => {
+    setPathEntries([]);
+    if (Object.keys(boxDetails).length)
+      setBoxDetails({});
+  }, []);
 
   return (
     <motion.div { ...componentMotion } data-testid="default-test" className="menu-form">

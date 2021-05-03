@@ -17,12 +17,12 @@ type requestOptions = {
 };
 
 type responseType = {
-  status: number|null,
-  body: unknown|null
+  status: number,
+  body: unknown
 };
 
 type responsePromise = (val: responseType) => void;
-type clientRequestClb = (clientRes: http.IncomingMessage) => void;
+type clientRequestClb = (clientRes: http.IncomingMessage) => Promise<void>;
 type queryType = (route: string, body?: unknown|null) => Promise<responseType>;
 
 const makeRequest: queryType = (route, body = null) => new Promise(
@@ -39,24 +39,15 @@ const makeRequest: queryType = (route, body = null) => new Promise(
       path: route,
       headers
     };
-    const responseBody: responseType = {
-      status: null,
-      body: null
-    };
-    const bodyChunks: Buffer[] = [];
-    const dataHandler = (chunk: Buffer): void => {
-      bodyChunks.push(chunk);
-    };
-    const closeHandler = (): void => {
+    const requestClb: clientRequestClb = async clientRes => {
+      const bodyChunks: Buffer[] = [];
+      for await (const chunk of clientRes) bodyChunks.push(chunk);
       const bodyFull: Buffer = Buffer.concat(bodyChunks);
-      responseBody.body = JSON.parse(bodyFull.toString());
+      const responseBody: responseType = {
+        status: clientRes.statusCode,
+        body: JSON.parse(bodyFull.toString())
+      };
       res(responseBody);
-    };
-    const requestClb: clientRequestClb = clientRes => {
-      responseBody.status = clientRes.statusCode;
-      clientRes
-        .on('data', dataHandler)
-        .on('close', closeHandler);
     };
     const clientRequest: http.ClientRequest = http.request(options, requestClb);
     clientRequest.end(bodyStringified);

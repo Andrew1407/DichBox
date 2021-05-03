@@ -39,11 +39,13 @@ const SingForms = () => {
         const fetchData = fetchUserInput;
         const found = await fetchData('email', input);
         return isSignUp ? found : !found;
-      }
+      },
+      defaultState: { value: '', correct: false }
     },
     passwd: {
       regExp: /^[\S]{5,20}$/,
       warningRegExp: 'Password length should be 5-16 symbols (no spaces)',
+      ddefaultState: { value: '', correct: false }
     }
   };
   const signUpVerParams = {
@@ -56,7 +58,8 @@ const SingForms = () => {
         const fetchData = fetchUserInput;
         const found = await fetchData('name', input);
         return found;
-      }
+      },
+      defaultState: { value: '', correct: false }
     }
   };
   const { getVerifiersState, getOnChangeVerifier } =

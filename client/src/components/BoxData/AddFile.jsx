@@ -43,10 +43,8 @@ const AddFile = ({ setAddFileVisible, addFileVisible, pathName, fileManipulation
     let createBody = {
       fileName: nameInput,
       type: addFileVisible,
-      follower: userData.follower,
       viewerName: username,
-      boxPath: [boxDetails.owner_name, ...pathName],
-      editor: userData.editor
+      boxPath: [boxDetails.owner_name, ...pathName]
     };
     createBody = addFileVisible === 'image' ?
       { ...createBody, fileName: imageInput.name, src: imageInput.src } :

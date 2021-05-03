@@ -17,8 +17,7 @@ const MenuContextProvider = props => {
       const { name, filePath, opened } = openedFiles[index];
       const fp = filePath[0] === '/' ? filePath : `/${filePath}`;
       const found = searchName === name && searchPath === fp;
-      if (found)
-        return { index, opened };
+      if (found) return { index, opened };
     }
     return { index: -1 };
   };

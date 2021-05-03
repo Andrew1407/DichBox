@@ -59,7 +59,7 @@ export default class UserDBConnector extends UserClientDB implements IUserClient
     if (!userData.passwd)
       return await super.updateUser(id, userData);
     const passwd: string = await this.hashPasswd(userData.passwd);
-    return await super.updateUser(id,  { ...userData, passwd });
+    return await super.updateUser(id, { ...userData, passwd });
   }
 
   public async signInUser(

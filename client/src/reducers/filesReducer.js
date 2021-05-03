@@ -78,12 +78,9 @@ const filesReducer = (state, action) => {
     },
     FILES_RENAME_PATH: () => {
       const { oldPath, newPath } = action;
-      const rightPath = new RegExp('^' + oldPath);
       return stateCopy.map(f => {
-        if (!rightPath.test(f.filePath))
-          return f;
-        const filePath = f.filePath
-          .replace(rightPath, newPath);
+        if (!f.filePath.startsWith(oldPath)) return f;
+        const filePath = newPath + f.filePath.slice(oldPath.length);
         return { ...f, filePath }; 
       });
     },

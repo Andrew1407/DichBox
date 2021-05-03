@@ -21,7 +21,7 @@ const Notifications = () => {
     dispatchUserData({
       type: 'REFRESH_DATA',
       data: { 
-        notifications: userData.notifications - ntsIds.length  
+        notifications: usersList.length - ntsIds.length  
       }
     });
     const ntsLast = usersList.filter(ntf => !ntsIds.includes(ntf.id)); 
@@ -40,8 +40,9 @@ const Notifications = () => {
       } catch {
         const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
         setFoundErr(['server', msg]);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     if (!usersList && userData.name)
@@ -51,9 +52,9 @@ const Notifications = () => {
   return (
     <motion.div { ...componentMotion } data-testid="notifications-test" className="menu-form">
       <h1 id="nts-header">Notifications{ 
-        !!(+userData.notifications) &&  <span> ({ userData.notifications })</span> 
+        !!(usersList?.length) && <span> ({ usersList.length })</span> 
       }</h1>
-      { !(usersList && usersList.length) ?
+      { !(usersList?.length) ?
         <div>
           <h1 id="nts-empty">Notifications list is empty</h1>
         </div> :

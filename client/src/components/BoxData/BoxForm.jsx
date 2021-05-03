@@ -16,7 +16,7 @@ import '../../styles/box-form.css';
 const BoxForm = ({ editParametrs }) => {
   const history = useHistory();
   const params = useParams();
-  const { setMenuOption, setLoading, setFoundErr } = useContext(MenuContext);
+  const { setMenuOption, setLoading, setFoundErr, dispatchOpenedFiles } = useContext(MenuContext);
   const { boxDetails, setBoxDetails, setEditBoxState } = useContext(BoxesContext);
   const { 
     useVerifiers,
@@ -43,10 +43,13 @@ const BoxForm = ({ editParametrs }) => {
       fetchVerifier: async input => {
         const { foundValue } = await fetchBoxInput(username, input);
         let res = foundValue === input;
-        if (!editParametrs.edit)
-          res &= foundValue !== editParametrs.boxDetails.name;
+        if (editParametrs.edit)
+          res = res && foundValue !== editParametrs.boxDetails.name;
         return res;
-      }
+      },
+      defaultState: editParametrs.edit ?
+        { value: editParametrs.boxDetails.name, correct: true } :
+        { value: '', correct: false }
     },
     name_color: {},
     description: {},
@@ -104,6 +107,7 @@ const BoxForm = ({ editParametrs }) => {
           inputFields.reduce((obj, field) => (
             { ...obj, [field]: dataInput[field] }
           ), {});
+        if (edited && params.box === edited.name) delete edited.name;
         const editBody = {
           ...submitBody,
           boxData: privacy === boxDetails.access_level ? 
@@ -122,8 +126,10 @@ const BoxForm = ({ editParametrs }) => {
     } catch {
       const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
       setFoundErr(['server', msg]);
+    } finally {
+      setLoading(false);
+      dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
     }
-    setLoading(false);
   };
   const handleSubmit = useCallback(
     handleSubmitClb,
@@ -141,7 +147,7 @@ const BoxForm = ({ editParametrs }) => {
   };
   
   useEffect(() => {
-    const fetchLimitedList = async () => {
+    const fetchAccessList = async () => {
       const { boxDetails } = editParametrs;
       const boxPrivacy = boxDetails.access_level;
       const defaultValues = {};
@@ -161,8 +167,7 @@ const BoxForm = ({ editParametrs }) => {
       setPrivacy(boxPrivacy);
     };
 
-    if (editParametrs.edit)
-      fetchLimitedList();
+    if (editParametrs.edit) fetchAccessList();
 
     return () => {
       cleanWarnings();

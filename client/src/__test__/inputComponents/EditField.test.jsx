@@ -17,7 +17,7 @@ describe('Edit field tests', () => {
       const field = getField({ ...testProps, textarea: true });
       const textarea = field.querySelector('textarea');
       expect(textarea).toHaveAttribute('spellCheck', 'false');
-      expect(textarea).toHaveAttribute('maxLength', '150');
+      expect(textarea).toHaveAttribute('maxLength', '100');
       expect(textarea).toHaveValue('');
       expect(textarea).toHaveStyle('color: #00d9ff');
     },

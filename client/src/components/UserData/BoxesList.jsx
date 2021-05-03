@@ -20,7 +20,7 @@ const BoxesList = ({ searchInput, setMenuOption }) => {
           .split('/')
           .slice(1, 3);
         if (userName !== userData.name || filesBoxName !== box.name)
-          dispatchOpenedFiles({type: 'FILES_CLOSE_ALL' });
+          dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
       }
     }
     setBoxesList([]);

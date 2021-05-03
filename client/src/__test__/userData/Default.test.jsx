@@ -2,6 +2,7 @@ import React from 'react';
 import { Router } from 'react-router-dom';
 import { render } from '@testing-library/react';
 import { UserContext } from '../../contexts/UserContext';
+import BoxesContextProvider from '../../contexts/BoxesContext';
 import MenuContextProvider from '../../contexts/MenuContext';
 import Default from '../../components/UserData/Default';
 import testImgSrc from '../../styles/imgs/dich-icon.png';
@@ -20,7 +21,9 @@ describe('Default tests', () => {
       <Router history={{ push: jest.fn(), location: { pathname: `/${userData.name}` }, listen: jest.fn() }}>
         <MenuContextProvider>
         <UserContext.Provider value={ userProps }>
+        <BoxesContextProvider>
           <Default />
+        </BoxesContextProvider>
         </UserContext.Provider>
         </MenuContextProvider>
       </Router>

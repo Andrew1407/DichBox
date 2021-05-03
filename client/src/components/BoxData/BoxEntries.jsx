@@ -81,8 +81,7 @@ const BoxEntries = () => {
       dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
       const boxesBody = {
         viewerName: username,
-        boxOwnerName: userData.name,
-        follower: userData.follower
+        boxOwnerName: userData.name
       };
       const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/user_boxes`, boxesBody);
       const { boxesList } = data;
@@ -96,7 +95,7 @@ const BoxEntries = () => {
   const handleBoxRemoveClb = () => setModalOptions({
     setModalOptions,
     isOpen: true,
-    message: `Remove box "${boxDetails.name}" inevitably`,
+    message: `Remove box "${boxDetails.name}"`,
     okClb: boxRemoveSubmit
   });
   const handleBoxRemove = useCallback(
@@ -132,7 +131,6 @@ const BoxEntries = () => {
         return;
       const dataBody = {
         boxName: params.box,
-        follower: userData.follower,
         ownerName: userData.name,
         viewerName: username
       };
@@ -151,8 +149,9 @@ const BoxEntries = () => {
           const errType = status === 404 ? (boxPath.length > 1 ? 'dir' : 'box') : 'server';
           setFoundErr([errType, data.msg]);
         }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchBoxData();
@@ -222,7 +221,7 @@ const BoxEntries = () => {
         </div>
       </div>
       <PathEntries  {...{ entriesSearch, setFileManupulation, addFileVisible, setAddFileVisible  }} />
-      <input className="edit-btn" id="box-entries-back-btn" type="button" value="view user boxes" onClick={ handleViewBoxesClick } />
+      <input className="edit-btn" id="box-entries-back-btn" type="button" value="view other boxes" onClick={ handleViewBoxesClick } />
       <ConfirmModal { ...modalOptions } />
     </motion.div>  
   );

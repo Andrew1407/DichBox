@@ -40,21 +40,19 @@ const PathEntries = ({ entriesSearch, setFileManupulation, addFileVisible, setAd
       return;
     }
     const getBody = {
-      ...unit,
+      type: unit.type,
+      fileName: unit.name,
       boxPath: pathDepth,
-      follower: userData.follower,
-      viewerName: username,
-      editor: userData.editor
+      viewerName: username
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/get`, getBody);
     const { foundData, found } = data;
     if (!found) return;
     const file = {
-      name: unit.name,
+      ...unit,
       src: foundData,
       filePath,
-      opened: true,
-      type: unit.type
+      opened: true
     };
     dispatchOpenedFiles({ type: 'FILE_APPEND', file });
   };

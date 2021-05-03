@@ -4,19 +4,14 @@ export default interface IBoxesClientDB {
   removeBox(id: number): Promise<void>;
   findUserBox(username: string, boxName: string): Promise<BoxData|null>;
   getUserBoxIds(username: string, boxName: string): Promise<[number, number]|null>;
-  getUserId(name: string): Promise<number|null>;
+  getUserId(name: string): Promise<number>;
 
-  getBoxesList(
-    viewerName: string,
-    boxOwnerName: string,
-    follower: boolean
-  ): Promise<BoxData[]|null>;
+  getBoxesList(viewerName: string|null, boxOwnerName: string): Promise<BoxData[]|null>;
 
   getBoxInfo(
     boxName: string,
-    viewerName: string,
-    ownerName: string,
-    follower: boolean,
+    viewerName: string|null,
+    ownerName: string
   ): Promise<BoxData|null>;
 
   insertBox(
@@ -36,9 +31,7 @@ export default interface IBoxesClientDB {
 
   checkBoxAccess(
     ownerName: string,
-    viewerName: string,
-    boxName: string,
-    follower: boolean,
-    editor?: boolean
+    viewerName: string|null,
+    boxName: string
   ): Promise<[number, number]|null>;
 }

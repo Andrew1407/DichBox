@@ -118,7 +118,7 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
       const getResUser: UserData|null = await this.userClient
         .getUserData(userData);
       const getResBox: BoxData|null = await this.boxesClient
-        .getBoxInfo(boxData.name, userData.name, userData.name, false);
+        .getBoxInfo(boxData.name, userData.name, userData.name);
       [getResBox, getResUser].forEach(
         (res: BoxData|UserData): void => this.check(res, null)
       );
@@ -290,7 +290,7 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
       this.check({ id: idResult }, { id });
 
       const infoRes: BoxData|null = await this.boxesClient
-        .getBoxInfo(boxName, name, name, false);
+        .getBoxInfo(boxName, name, name);
       const comparedKeys: string[] = Object.keys(box);
       const infoObj: BoxData|null = Object.keys(infoRes)
         .filter((key: string): boolean => comparedKeys.includes(key))
@@ -307,7 +307,7 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
       const findBoxRes: BoxData|null = await this.boxesClient
         .findUserBox(...arg);
       const [accessUser, accessBox]: [number, number] = await this.boxesClient
-        .checkBoxAccess(name, name, boxName, false);
+        .checkBoxAccess(name, name, boxName);
       this.check(findBoxRes, box);
       [
         { id: userRes, boxId: boxIdRes }, 
@@ -315,28 +315,28 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
       ].forEach((res: any): void => this.check(res, idsExp));
     }
 
-    const getListArgs: [string, string, boolean][] = [
-      [this.testUser[1].name, this.testUser[0].name, true],
-      [this.testUser[0].name, this.testUser[1].name, false],
-      [this.testUser[3].name, this.testUser[2].name, false],
-      [this.testUser[2].name, this.testUser[3].name, false]
+    const getListArgs: [string, string][] = [
+      [this.testUser[1].name, this.testUser[0].name],
+      [this.testUser[0].name, this.testUser[1].name],
+      [this.testUser[3].name, this.testUser[2].name],
+      [this.testUser[2].name, this.testUser[3].name]
     ]
     const getListExp: BoxData[] = [
       this.testBox[0], null, this.testBox[2], null
     ];
     for (const i in getListArgs) {
-      const arg: [string, string, boolean] = getListArgs[i];
+      const arg: [string, string] = getListArgs[i];
       const expVal: BoxData = getListExp[i];
       const result: BoxData[]|null = await this.boxesClient
         .getBoxesList(...arg);
-      const res = (result === null) ? result : result[0];
+      const res = (result.length) ? result[0] : null;
       this.check(res, expVal);
     }
 
-    const getInfoArgs: [string, string, string, boolean][] = [
-      [this.testBox[3].name, this.testUser[0].name, this.testUser[3].name, false],
-      [this.testBox[0].name, this.testUser[3].name, this.testUser[0].name, false],
-      [this.testBox[1].name, this.testUser[2].name, this.testUser[1].name, false]
+    const getInfoArgs: string[][] = [
+      [this.testBox[3].name, this.testUser[0].name, this.testUser[3].name],
+      [this.testBox[0].name, this.testUser[3].name, this.testUser[0].name],
+      [this.testBox[1].name, this.testUser[2].name, this.testUser[1].name]
     ];
     const invalidRes: (number|number[]|BoxData)[] = [];
     invalidRes.push(await this.boxesClient.getUserId(''));
@@ -345,12 +345,11 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
     invalidRes.push(await this.boxesClient.checkBoxAccess(
       this.testUser[3].name,
       this.testUser[0].name,
-      this.testBox[3].name,
-      false
+      this.testBox[3].name
     ));
     for (const i in getInfoArgs) {
-      const arg: [string, string, string, boolean] = getInfoArgs[i];
-      const res = await this.boxesClient.getBoxInfo(...arg);
+      const [boxName, viewer, owner]: string[] = getInfoArgs[i];
+      const res = await this.boxesClient.getBoxInfo(boxName, viewer, owner);
       invalidRes.push(res);
     }
     this.checkInvalidRes(invalidRes);

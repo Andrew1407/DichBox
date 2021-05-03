@@ -33,7 +33,7 @@ export default class BoxesRouterTest extends TestLogger {
       ],
       [
         '/boxes/user_boxes',
-        { viewerName, boxOwnerName: owner_name, follower: false },
+        { viewerName, boxOwnerName: owner_name },
         { status: statuses.OK, body: {
             boxesList: [{ owner_name, name, name_color, access_level }]
           }
@@ -52,7 +52,6 @@ export default class BoxesRouterTest extends TestLogger {
       [
         '/boxes/details',
         {
-          follower: false,
           ownerName: owner_name,
           viewerName,
           boxName: name 
@@ -66,12 +65,12 @@ export default class BoxesRouterTest extends TestLogger {
       [
         '/boxes/details',
         {
-          follower: false,
           ownerName: owner_name,
           viewerName,
           boxName: '' 
         },
-        { status: statuses.NOT_FOUND,
+        { 
+          status: statuses.NOT_FOUND,
           body: { msg: errMessages.BOXES_NOT_FOUND }
         }
       ]
@@ -208,7 +207,6 @@ export default class BoxesRouterTest extends TestLogger {
         '/boxes/files/save',
         {
           editorName: viewerName,
-          editor: true,
           files: [{ src, filePathStr: `/${filePathStr}` }]
         },
         {
@@ -220,7 +218,6 @@ export default class BoxesRouterTest extends TestLogger {
         '/boxes/files/save',
         {
           editorName: viewerName,
-          editor: true,
           files: [{ src, filePathStr }]
         }, forbiddenObj
       ],
@@ -228,23 +225,13 @@ export default class BoxesRouterTest extends TestLogger {
         '/boxes/files/save',
         {
           editorName: viewerName,
-          editor: false,
-          files: [{ src, filePathStr: `/${filePathStr}` }]
-        }, forbiddenObj
-      ],
-      [
-        '/boxes/files/save',
-        {
-          editorName: viewerName,
-          editor: true,
           files: [{ src, filePathStr: `/${filePathStr}/invalid` }]
         }, internalErrObj
       ],
       [
         '/boxes/files/get',
         {
-          boxPath, viewerName, type,
-          follower: false, name: fileName
+          boxPath, viewerName, type, fileName
         },
         {
           status: statuses.OK,
@@ -254,8 +241,7 @@ export default class BoxesRouterTest extends TestLogger {
       [
         '/boxes/files/get',
         {
-          boxPath: [...boxPath, '..'], viewerName, type,
-          follower: false, name: fileName
+          boxPath: [...boxPath, '..'], viewerName, type, fileName
         }, invalidPathObj
       ],
       [

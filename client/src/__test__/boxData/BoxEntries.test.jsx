@@ -168,7 +168,7 @@ describe('Box entries tests', () => {
       expect(searchInput).toHaveValue('');
       expect(entriesPath).toHaveLength(entriesPathStr.length);
       expect(backBtn).toHaveAttribute('type', 'button');
-      expect(backBtn).toHaveDisplayValue('view user boxes');
+      expect(backBtn).toHaveDisplayValue('view other boxes');
       
       for (const i in entriesPathStr) {
         const prefix = Number(i) ? '/ ': ''; 

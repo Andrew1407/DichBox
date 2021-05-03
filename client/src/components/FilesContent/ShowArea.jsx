@@ -76,8 +76,7 @@ const ShowArea = () => {
         src: edited,
         filePathStr: `${filePath}/${name}`
       }],
-      editorName: username,
-      editor: userData.editor,
+      editorName: username
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/save`, saveBody );
     const { last_edited } = data;
@@ -103,8 +102,7 @@ const ShowArea = () => {
     if (!editedFiles.length) return;
     const saveBody = {
       files: editedFiles,
-      editorName: username,
-      editor: userData.editor
+      editorName: username
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/save`, saveBody );
     const { edited, last_edited } = data;

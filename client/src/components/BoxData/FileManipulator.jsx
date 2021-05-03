@@ -39,10 +39,8 @@ const FileManipulator = ({ setFileManupulation, fileManipulation, addFileVisible
     const rmBody = {
       fileName: fileManipulation.name,
       type: fileManipulation.type,
-      follower: userData.follower,
       viewerName: username,
-      boxPath: [boxDetails.owner_name, ...pathName],
-      editor: userData.editor
+      boxPath: [boxDetails.owner_name, ...pathName]
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/remove`, rmBody);
     const { removed, last_edited } = data;
@@ -70,10 +68,8 @@ const FileManipulator = ({ setFileManupulation, fileManipulation, addFileVisible
     if (warning || !renameInput) return;
     const rnBody = {
       fileName: fileManipulation.name,
-      follower: userData.follower,
       viewerName: username,
       boxPath: [boxDetails.owner_name, ...pathName],
-      editor: userData.editor,
       newName: renameInput
     };
     const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/files/rename`, rnBody);

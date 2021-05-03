@@ -152,7 +152,10 @@ create function notify_viewer_rm_fn()
   as
 $$
 begin
-  if exists (select id from boxes where id = old.box_id) then
+  if
+    exists (select id from boxes where id = old.box_id)
+    and exists (select id from users where id = old.person_id)
+  then
     insert into notifications (person_id, type, param) values (old.person_id, 'viewerRm', old.box_id);
   end if;
   return old;
@@ -188,7 +191,10 @@ create function notify_editor_rm_fn()
   as
 $$
 begin
-  if exists (select id from boxes where id = old.box_id) then
+  if
+    exists (select id from boxes where id = old.box_id)
+    and exists (select id from users where id = old.person_id)
+  then
     insert into notifications (person_id, type, param) values (old.person_id, 'editorRm', old.box_id);
   end if;
   return old;

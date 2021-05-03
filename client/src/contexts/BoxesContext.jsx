@@ -9,10 +9,7 @@ export const BoxesContext = createContext();
 const BoxesContextProvider = props => {
   const history = useHistory();
   const { userData, username, pathName } = useContext(UserContext);
-  const {
-    dispatchOpenedFiles,
-    setFoundErr
-  } = useContext(MenuContext);
+  const { dispatchOpenedFiles, setFoundErr } = useContext(MenuContext);
   const [boxesList, setBoxesList] = useState([]);
   const [listOption, setListOption] = useState('all');
   const [boxInfoHidden, setBoxHiddenState] = useState(false);
@@ -25,8 +22,6 @@ const BoxesContextProvider = props => {
     const filesBody = {
       boxPath,
       viewerName: username,
-      follower: userData.follower,
-      editor: userData.editor,
       initial
     };
     try {

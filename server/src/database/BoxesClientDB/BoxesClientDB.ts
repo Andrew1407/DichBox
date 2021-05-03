@@ -5,15 +5,15 @@ import { BoxData, UserData } from '../../datatypes';
 export default class BoxesClientDB implements IBoxesClientDB {
   constructor(protected readonly daoClient: IClientDB) { }
 
-  public async getUserId(name: string): Promise<number|null> {
+  public async getUserId(name: string|null): Promise<number> {
     return await this.daoClient.getUserId(name);
   }
 
   public async getBoxesList(
-    viewerName: string,
-    boxOwnerName: string,
-    follower: boolean
-  ): Promise<BoxData[]|null> {
+    viewerName: string|null,
+    boxOwnerName: string
+  ): Promise<BoxData[]> {
+    const follower: boolean = await this.checkFollower(boxOwnerName, viewerName);
     const ownPage: boolean = viewerName === boxOwnerName;
     const viewerId: number = await this.daoClient.getUserId(viewerName);
     const boxOwnerId: number = ownPage ? viewerId :
@@ -28,8 +28,9 @@ export default class BoxesClientDB implements IBoxesClientDB {
         this.getLimitedBoxes(viewerId, boxOwnerId)
       ];
     const queries: BoxData[][] = await Promise.all(getters);
-    const boxesList: BoxData[] = [...queries[0], ...queries[1]];
-    return boxesList.length ? boxesList : null;
+    const flatLists = (acc: BoxData[], arr: BoxData[]): BoxData[] => acc.concat(arr);
+    const boxesList: BoxData[] = queries.reduce(flatLists, []);
+    return boxesList;
   }
 
   private async getLimitedBoxes(
@@ -68,6 +69,22 @@ export default class BoxesClientDB implements IBoxesClientDB {
       'order by last_edited desc'
     );
     return userBoxes;
+  }
+
+  private async checkFollower(
+    name: string,
+    subscriber: string|null
+  ): Promise<boolean> {
+    if (!subscriber) return false;
+    const nameId: number = await this.daoClient.getUserId(name);
+    if (!nameId) return false;
+    const foundResult: number[]|null = await this.daoClient.selectJoinedValues(
+      ['subscribers', 'users'],
+      ['person_id', 'id'],
+      { subscription: nameId, name: subscriber },
+      ['id']
+    );
+    return !!foundResult.length;
   }
 
   private async getVisitorBoxes(
@@ -187,10 +204,10 @@ export default class BoxesClientDB implements IBoxesClientDB {
 
   public async getBoxInfo(
     boxName: string,
-    viewerName: string,
-    ownerName: string,
-    follower: boolean,
+    viewerName: string|null,
+    ownerName: string
   ): Promise<BoxData|null> {
+    const follower: boolean = await this.checkFollower(ownerName, viewerName)
     const ownPage: boolean = viewerName === ownerName;
     const owner_id: number = await this.daoClient.getUserId(ownerName);
     const viewer_id: number = ownPage ? owner_id :
@@ -211,8 +228,9 @@ export default class BoxesClientDB implements IBoxesClientDB {
 
   private async checkEditor(
     box_id: number,
-    person_id: number
+    person_id: number|null
   ): Promise<boolean> {
+    if (!(box_id && person_id)) return false
     const foundValue: { box_id: number }[]|null = await this.daoClient.selectValues(
       'box_editors', { box_id, person_id }, ['box_id']
     );
@@ -245,9 +263,9 @@ export default class BoxesClientDB implements IBoxesClientDB {
         { ...boxData, owner_id },
         ['name', 'id', 'owner_id']
       );
-    if (limitedUsers && limitedUsers.length)
+    if (limitedUsers?.length)
       await this.insertPermissions('limited_viewers', insertedBox.id, limitedUsers);
-    if (editors && editors.length)
+    if (editors?.length)
       await this.insertPermissions('box_editors', insertedBox.id, editors);
     return insertedBox;
   }
@@ -281,10 +299,7 @@ export default class BoxesClientDB implements IBoxesClientDB {
     if (!beforeUpdateRes.length) return null;
     const [ beforeUpdate ]: BoxData[] = beforeUpdateRes;
     const foundColumns: string[] = ['last_edited', 'owner_id'];
-    if (boxData)
-      foundColumns.push(...Object.keys(boxData));
-    const accessLevelUpdated: boolean = foundColumns
-      .includes('access_level');
+    if (boxData) foundColumns.push(...Object.keys(boxData));
     if (!foundColumns.includes('access_level'))
       foundColumns.push('access_level');
     const updated: BoxData = await this.daoClient.updateValueById(
@@ -296,7 +311,7 @@ export default class BoxesClientDB implements IBoxesClientDB {
     if (editorslist) await ( editorslist.length ?
       this.updateAccessList('box_editors', beforeUpdate.id, editorslist) :
       this.daoClient.removeValue('box_editors', { box_id: beforeUpdate.id })
-    )
+    );
     const isLimited = (x: string): boolean => x === 'limited';
     const [ limitedNew, limitedOld ]: boolean[] =
       [updated.access_level, beforeUpdate.access_level].map(isLimited);
@@ -311,7 +326,7 @@ export default class BoxesClientDB implements IBoxesClientDB {
       await this.daoClient.removeValue('limited_viewers', { box_id });
     };
     if (wasLimited) {
-      await cleanList(beforeUpdate.id)
+      await cleanList(beforeUpdate.id);
     } else if (limitedlist) {
       if (setLimited && limitedlist.length)
         await this.insertPermissions('limited_viewers', beforeUpdate.id, limitedlist);
@@ -319,7 +334,7 @@ export default class BoxesClientDB implements IBoxesClientDB {
         await ( limitedlist.length ?
           this.updateAccessList('limited_viewers', beforeUpdate.id, limitedlist) :
           cleanList(beforeUpdate.id)
-        )
+        );
     }
     return { ...updated, id: beforeUpdate.id };
   }
@@ -332,10 +347,8 @@ export default class BoxesClientDB implements IBoxesClientDB {
     const currentList: { person_id: number }[]|null  = await this.daoClient.selectValues(
       table, { box_id }, ['person_id']
     );
-    if (!currentList) {
-      await this.insertPermissions(table, box_id, usernames);
-      return;
-    }
+    if (!currentList)
+      return await this.insertPermissions(table, box_id, usernames);
     const currentIds: number[] = currentList.map(x => x.person_id);
     const newIds: number[] = await this.getUsersIds(usernames);
     const queries: string[] = [
@@ -365,8 +378,7 @@ export default class BoxesClientDB implements IBoxesClientDB {
       {}, ['owner_id', 'a.id'],
       `a.name = '${boxName}' and b.name = '${username}'`
     );
-    if (!foundRes.length)
-      return null;
+    if (!foundRes.length) return null;
     const [{ owner_id, id }]: BoxData[] = foundRes;
     return [ owner_id, id ];
   }
@@ -377,12 +389,12 @@ export default class BoxesClientDB implements IBoxesClientDB {
 
   public async checkBoxAccess(
     ownerName: string,
-    viewerName: string,
-    boxName: string,
-    follower: boolean,
-    editor: boolean = false
+    viewerName: string|null,
+    boxName: string
   ): Promise<[number, number]|null> {
+    let editor: boolean = false;
     const ownPage: boolean = ownerName === viewerName;
+    const follower: boolean = await this.checkFollower(ownerName, viewerName);
     const idsRes: BoxData[] = await this.daoClient.selectJoinedValues(
       ['boxes', 'users'],
       ['owner_id', 'id'],
@@ -392,12 +404,15 @@ export default class BoxesClientDB implements IBoxesClientDB {
     if (!idsRes.length) return null;
     const ownerId: number = idsRes[0].owner_id;
     const boxId: number = idsRes[0].id;
+    if (viewerName) {
+      const viewerId: number = await this.getUserId(viewerName);
+      editor = await this.checkEditor(boxId, viewerId);
+    }
     const res: [number, number] = [ownerId, boxId];
     if (ownPage || editor) return res;
     const privacy: string = idsRes[0].access_level;
     const permitted: boolean = 
       (privacy === 'public') ||
-      (privacy === 'private' && ownPage) ||
       (privacy === 'followers' && follower);
     if (permitted) return res;
     if (privacy === 'limited') {

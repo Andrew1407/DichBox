@@ -45,13 +45,13 @@ export default class ClientDB implements IClientDB {
       return [ keys, values, valuesTemplate ];
   }
 
-  public async getUserId(name: string): Promise<number|null> {
+  public async getUserId(name: string|null): Promise<number|null> {
+    if (!name) return 0;
     const res: QueryResult = await this.poolClient.query(
       'select id from users where name = $1',
       [name]
     );
-    return res.rowCount ?
-      res.rows[0].id : null;
+    return res.rowCount ? res.rows[0].id : 0;
   }
 
   public async rawQuery(query: string, args: any[] = []): Promise<any[]> {

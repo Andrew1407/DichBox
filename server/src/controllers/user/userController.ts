@@ -47,13 +47,12 @@ const userController: UserRoutes = {
       const msg: string = errMessages.USER_NOT_FOUND;
       return makeTuple(statuses.NOT_FOUND, { msg });
     }
-    let userRes: UserData & {
-      follower?: boolean,
-      logo?: string
-    };
     user.reg_date = formatDate(String(user.reg_date));
     const logo: string|null = await userStorage.getLogoIfExists(user.id);
-    userRes = { ...user, logo, follower: false };
+    const userRes: UserData & {
+      follower?: boolean,
+      logo?: string
+    } = { ...user, logo, follower: false };
     if (!ownPage) {
       delete user.email;
       const searchId: number = await clientDB.getUserId(username);
@@ -68,8 +67,10 @@ const userController: UserRoutes = {
     const email: string = req.body.email;
     const passwd: string = req.body.passwd;
     const user: UserData = await clientDB.signInUser(email, passwd);
-    if (!user)
-      return makeTuple(statuses.NOT_FOUND, { msg: errMessages.USER_NOT_FOUND });
+    if (!user) {
+      const msg: string = errMessages.USER_NOT_FOUND;
+      return makeTuple(statuses.NOT_FOUND, { msg });
+    }
     return user.name ?
       makeTuple(statuses.OK, { name: user.name }) :
       makeTuple(statuses.BAD_REQUEST, { msg: errMessages.INVALID_PASSWORD });
@@ -96,7 +97,11 @@ const userController: UserRoutes = {
     const editedResponse: UserData & { logo?: string } = {};
     const id: number = await clientDB.getUserId(username);
     if (editedData && Object.keys(editedData).length) {
-      await clientDB.updateUser(id, editedData);
+      const updated: UserData = await clientDB.updateUser(id, editedData);
+      if (!updated) {
+        const msg: string = errMessages.USER_INVAID_REQUEST;
+        return makeTuple(statuses.BAD_REQUEST, { msg });
+      }
       for (const field in editedData)
         if (field !== 'passwd')
           editedResponse[field] = editedData[field];
@@ -130,7 +135,8 @@ const userController: UserRoutes = {
   async findUsernames(req: Request) {
     const nameTemplate: string = req.body.nameTemplate;
     const username: string = req.body.username;
-    const usernames: UserData[]|null = await clientDB.getUsernames(nameTemplate, username);
+    const usernames: UserData[]|null =
+      await clientDB.getUsernames(nameTemplate, username);
     let foundUsers: foundUser[] = [];
     if (usernames)
       foundUsers = await Promise.all(
@@ -144,8 +150,8 @@ const userController: UserRoutes = {
     const boxName: string = req.body.boxName;
     const foundLists: UserData[][] = 
       await clientDB.getLimitedUsers(username, boxName);
-    const listsMapper = async (arr: UserData[]): Promise<foundUser[]> =>(
-      await arr.length ? Promise.all(arr.map(foundUsersMapper)) : []
+    const listsMapper = (arr: UserData[]): Promise<foundUser[]> => (
+      Promise.all(arr.map(foundUsersMapper))
     );
     const [ limitedUsers, editors ]: foundUser[][] =
       await Promise.all(foundLists.map(listsMapper));
@@ -187,8 +193,9 @@ const userController: UserRoutes = {
   async searchUsers(req: Request) {
     const searchStr: string = req.body.searchStr;
     const searchFormated: string = Array.from(searchStr)
-      .filter(ch => ch !== ' ')
-      .join('');
+      .filter(ch => /\S/.test(ch))
+      .join('')
+      .toLowerCase();
     const searchedUsers: UserData[] = await clientDB.searchUsers(searchFormated);
     const searched: foundUser[] = await Promise.all(
       searchedUsers.map(foundUsersMapper)

@@ -33,8 +33,7 @@ export default class BoxesDBConnector extends BoxesClientDB implements IBoxesCli
     limitedUsers: string[]|null,
     editors: string[]|null
   ): Promise<BoxData|null> {
-    if (!(boxData && boxData.name))
-      return null;
+    if (!(boxData && boxData.name)) return null;
     const correctData: boolean = this.validator.checkDataCreated(boxData);
     if (!correctData) return null;
     const nameTaken: boolean = await this.checkTakenName(ownerName, boxData.name);

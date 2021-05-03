@@ -13,7 +13,7 @@ import '../../styles/edit-profile.css';
 
 const EditProfile = () => {
   const history = useHistory();
-  const { menuOption, setMenuOption, setLoading, setFoundErr } = useContext(MenuContext);
+  const { menuOption, setMenuOption, setLoading, setFoundErr, dispatchOpenedFiles } = useContext(MenuContext);
   const { userData, dispatchUserData, username, dispatchUsername } = useContext(UserContext);
   const { 
     useVerifiers,
@@ -62,7 +62,8 @@ const EditProfile = () => {
       fetchVerifier: async input => {
         const foundValue = await fetchUserInput('email', input);
         return foundValue === input && foundValue !== userData.email;
-      }
+      },
+      defaultState: { value: userData.email, correct: true }
     },
     name: {
       regExp: /^(?!search$)[\S]{1,40}$/,
@@ -71,7 +72,8 @@ const EditProfile = () => {
       fetchVerifier: async input => {
         const foundValue = await fetchUserInput('name', input);
         return foundValue === input && foundValue !== userData.name;
-      }
+      },
+      defaultState: { value: userData.name, correct: true }
     },
     description: {},
     description_color: {},
@@ -89,7 +91,7 @@ const EditProfile = () => {
       regExp: {
         test: input => /^[\S]{5,20}$/.test(input) && input !== dataInput.passwd
       },
-      warningRegExp: 'Password length should be 5-16 symbols (no spaces, unequal to previous one)',
+      warningRegExp: 'Password length should be 5-16 symbols (no spaces)',
     }
   };
   const { getVerifiersState, getOnChangeVerifier } = useVerifiers(signVerParams);
@@ -109,10 +111,15 @@ const EditProfile = () => {
     handleInputChangeClb,
     [editedFields, warnings, correctInput]
   );
-  
-  const ableSubmit = (editedFields.length ? 
-    getVerifiersState(editedFields) : getVerifiersState())
-    || logoEdited;
+  const checkInput = () => {
+    let editedCorrect = editedFields.length ? 
+      getVerifiersState(editedFields) : getVerifiersState();
+    if (logoEdited)
+      editedCorrect = editedFields.length ? logoEdited && editedCorrect : logoEdited;
+    return editedCorrect;
+  };
+
+  const ableSubmit = checkInput();
   const submitButton = {
     disabled: !ableSubmit,
     style: ableSubmit ?
@@ -121,8 +128,7 @@ const EditProfile = () => {
   };
   const submitEditedFieldsClb = async e => {
     e.preventDefault();
-    const isCorrect = getVerifiersState(editedFields);
-    const allowSubmit = isCorrect || logoEdited;
+    const allowSubmit = checkInput();
     if (!allowSubmit) return;
     const edited = editedFields.reduce((body, field) => {
       if (field === 'passwd') return body;
@@ -130,9 +136,10 @@ const EditProfile = () => {
         return { ...body, passwd: dataInput[field] };
       return { ...body, [field]: dataInput[field] }; 
     }, {});
+    if (edited.name === userData.name) delete edited.name;
+    if (edited.email === userData.email) delete edited.email;
     const editedBody = { username, edited };
-    if (logoEdited)
-      editedBody.logo = logoEdited;
+    if (logoEdited) editedBody.logo = logoEdited;
     setLoading(true);
     try {
       const { data } =  await axios.post(`${process.env.APP_ADDR}/users/edit`, editedBody);
@@ -147,8 +154,10 @@ const EditProfile = () => {
     } catch {
       const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
       setFoundErr(['server', msg]);
+    } finally {
+      setLoading(false);
+      dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
     }
-    setLoading(false);
   };
   const submitEditedFields = useCallback(
     submitEditedFieldsClb,

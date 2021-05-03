@@ -39,20 +39,26 @@ const VerifiersContextProvider = props => {
     const verFields = Object.keys(verParams);
     const getVerifiersState = (arr = verFields) => arr.reduce(
       (isCorrectAll, isCorrectField) =>
-        (isCorrectAll && correctInput[isCorrectField]), true
+        (isCorrectAll && !!correctInput[isCorrectField]), true
     );
     const getVerifier = field => {
       const verifierParams = verParams[field];
       if (!verifierParams) return;
       return async input => {
-        const { fetchVerifier } = verifierParams;
+        const { fetchVerifier, defaultState } = verifierParams;
         let warningStyle = {
           borderColor: 'rgb(0, 255, 76)',
           text: ''
         };
         let isCorrect = true;
         const inputRegExp = verifierParams.regExp;
-        if (inputRegExp && !inputRegExp.test(input)) {
+        if (defaultState?.value === input) {
+          warningStyle = {
+            borderColor: 'rgb(0, 217, 255)',
+            text: ''
+          };
+          isCorrect = defaultState.correct;
+        } else if (inputRegExp && !inputRegExp.test(input)) {
           warningStyle = {
             borderColor: 'crimson',
             text: verifierParams.warningRegExp

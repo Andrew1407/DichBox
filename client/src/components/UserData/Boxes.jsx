@@ -31,21 +31,20 @@ const Boxes = () => {
       if (!boxesList.length && userData.name) {
         const boxesBody = {
           viewerName: username,
-          boxOwnerName: userData.name,
-          follower: userData.follower
+          boxOwnerName: userData.name
         };
         setLoading(true);
         try {
           const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/user_boxes`, boxesBody);
           const { boxesList } = data;
-          const boxes = boxesList && boxesList.length ?
-            boxesList : [null]; 
+          const boxes = boxesList && boxesList.length ? boxesList : [null]; 
           setBoxesList(boxes);
         } catch {
           const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
           setFoundErr(['server', msg]);
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
       }
     };
 

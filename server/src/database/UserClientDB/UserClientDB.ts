@@ -159,7 +159,7 @@ export default class UserClientDB implements IUserClientDB {
 
   public async searchUsers(nameTemplate: string): Promise<UserData[]> {
     const foundRes: UserData[] = await this.daoClient.rawQuery(
-      `select id, name, name_color from users where name like \'%${nameTemplate}%\' order by followers desc;`
+      `select id, name, name_color from users where lower(name) like \'%${nameTemplate}%\' order by followers desc;`
     );
     return foundRes;
   }
@@ -207,5 +207,4 @@ export default class UserClientDB implements IUserClientDB {
     const res: UserData|null = await this.getUserData({ name }, ['passwd']);
     return !!res;
   }
-
 }
