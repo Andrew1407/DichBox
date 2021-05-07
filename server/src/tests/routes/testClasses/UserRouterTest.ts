@@ -1,7 +1,7 @@
 import TestLogger from '../../TestLogger';
 import makeRequest from '../requestHandler';
 import { UserData, BoxData } from '../../../datatypes';
-import { statuses, errMessages } from '../../../controllers/statusInfo';
+import { Statuses, ErrorMessages } from '../../../controllers/statusInfo';
 
 export default class UserRouterTest extends TestLogger {
   constructor(
@@ -20,8 +20,8 @@ export default class UserRouterTest extends TestLogger {
       const newUser: UserData = { name, email, passwd };
       const body: any = { name };
       const routesExp: any = {
-        '/users/create': { status: statuses.CREATED, body },
-        '/users/enter': { status: statuses.OK, body }
+        '/users/create': { status: Statuses.CREATED, body },
+        '/users/enter': { status: Statuses.OK, body }
       };
       for (const [route, exp] of Object.entries(routesExp)) {
         const res: any = await makeRequest(route, newUser);
@@ -32,20 +32,20 @@ export default class UserRouterTest extends TestLogger {
     const invalidArgs: [string, any, any][] = [
       ['/users/create', this.testUsers[0],
         {
-          status: statuses.BAD_REQUEST,
-          body: { msg: errMessages.USER_INVAID_REQUEST }
+          status: Statuses.BAD_REQUEST,
+          body: { msg: ErrorMessages.USER_INVAID_REQUEST }
         }
       ],
       ['/users/enter', { email: '', passwd: ''},
         {
-          status: statuses.NOT_FOUND, 
-          body: { msg: errMessages.USER_NOT_FOUND }
+          status: Statuses.NOT_FOUND, 
+          body: { msg: ErrorMessages.USER_NOT_FOUND }
         }
       ],
       ['/users/enter', { email: this.testUsers[0].email, passwd: ''},
         {
-          status: statuses.BAD_REQUEST, 
-          body: { msg: errMessages.INVALID_PASSWORD }
+          status: Statuses.BAD_REQUEST, 
+          body: { msg: ErrorMessages.INVALID_PASSWORD }
         }
       ]
     ];
@@ -63,7 +63,7 @@ export default class UserRouterTest extends TestLogger {
         '/users/edit',
         { username: name, edited, logo: null }
       );
-      const editExp: any = { status: statuses.OK, body: edited };
+      const editExp: any = { status: Statuses.OK, body: edited };
       this.check(editRes, editExp);
     }
   }
@@ -73,19 +73,19 @@ export default class UserRouterTest extends TestLogger {
     const verifyArgs: [string, any, any][] = [
       [
         '/users/passwd_verify', { username: name, passwd },
-        { status: statuses.OK, body: { checked: true } }
+        { status: Statuses.OK, body: { checked: true } }
       ],
       [
         '/users/passwd_verify', { username: name, passwd: 'wrong_pass' },
-        { status: statuses.OK, body: { checked: false } }
+        { status: Statuses.OK, body: { checked: false } }
       ],
       [
         '/users/verify', { inputField: 'name', inputValue: name },
-        { status: statuses.OK, body: { foundValue: name } }
+        { status: Statuses.OK, body: { foundValue: name } }
       ],
       [
         '/users/verify', { inputField: 'email', inputValue: '' },
-        { status: statuses.OK, body: { foundValue: null } }
+        { status: Statuses.OK, body: { foundValue: null } }
       ]
     ];
     for (const [ route, arg, exp ] of verifyArgs) {
@@ -99,7 +99,7 @@ export default class UserRouterTest extends TestLogger {
     const subscriptionName: string = this.testUsers[1].name;
     const name_color: string = this.testUsers[1].name_color;
     const subObj: any = {
-      status: statuses.OK,
+      status: Statuses.OK,
       body: { followers: 1, follower: true }
     };
     const subArg: any[] = [
@@ -127,14 +127,14 @@ export default class UserRouterTest extends TestLogger {
           subscriptionName, responseValues: true
         },
         {
-          status: statuses.NOT_FOUND,
-          body: { msg: errMessages.SUBSCRIPTIONS_NOT_FOUND }
+          status: Statuses.NOT_FOUND,
+          body: { msg: ErrorMessages.SUBSCRIPTIONS_NOT_FOUND }
         }
       ],
       [
         '/users/subs_list', { name: personName },
         { 
-          status: statuses.OK,
+          status: Statuses.OK,
           body: {
             subs: [ { name: subscriptionName, name_color, logo: null } ]
           }
@@ -143,8 +143,8 @@ export default class UserRouterTest extends TestLogger {
       [
         '/users/subs_list', { name: '' },
         {
-          status: statuses.NOT_FOUND,
-          body: { msg: errMessages.USER_NOT_FOUND }
+          status: Statuses.NOT_FOUND,
+          body: { msg: ErrorMessages.USER_NOT_FOUND }
         }
       ],
       [
@@ -155,7 +155,7 @@ export default class UserRouterTest extends TestLogger {
           subscriptionName,
           responseValues: true
         }, {
-          status: statuses.OK,
+          status: Statuses.OK,
           body: { followers: 0, follower: false }
         }
       ],
@@ -167,7 +167,7 @@ export default class UserRouterTest extends TestLogger {
           subscriptionName: personName,
           responseValues: false
         }, {
-          status: statuses.OK,
+          status: Statuses.OK,
           body: { unsubscribed: true }
         }
       ]
@@ -194,7 +194,7 @@ export default class UserRouterTest extends TestLogger {
         '/users/find',
         { pathName, username },
         {
-          status: statuses.OK,
+          status: Statuses.OK,
           body: { ...resTemplate,
             follower: false,
             ownPage: false
@@ -205,7 +205,7 @@ export default class UserRouterTest extends TestLogger {
         '/users/find',
         { pathName, username: pathName },
         {
-          status: statuses.OK,
+          status: Statuses.OK,
           body: { ...resTemplate,
             follower: false,
             ownPage: true
@@ -216,8 +216,8 @@ export default class UserRouterTest extends TestLogger {
         '/users/find',
         { pathName: '', username },
         {
-          status: statuses.NOT_FOUND,
-          body: { msg: errMessages.USER_NOT_FOUND }
+          status: Statuses.NOT_FOUND,
+          body: { msg: ErrorMessages.USER_NOT_FOUND }
         }
       ],
       [
@@ -262,7 +262,7 @@ export default class UserRouterTest extends TestLogger {
         '/users/notifications_list',
         { name },
         {
-          status: statuses.OK,
+          status: Statuses.OK,
           body: { notifications: [
               { type: 'helloMsg', icon: null }
             ]
@@ -273,7 +273,7 @@ export default class UserRouterTest extends TestLogger {
         '/users/notifications_remove',
         { username: name, ntsIds: [] },
         {
-          status: statuses.OK,
+          status: Statuses.OK,
           body: { removed: true }
         }
       ],
@@ -300,7 +300,7 @@ export default class UserRouterTest extends TestLogger {
       }
     );
     const exp: any = {
-      status: statuses.OK,
+      status: Statuses.OK,
       body: { limitedUsers: [], editors: [] }
     };
     this.check(res, exp);
@@ -312,15 +312,15 @@ export default class UserRouterTest extends TestLogger {
       { username: this.testUsers[0].name }
     ];
     const expectedRes: any = {
-      status: statuses.FORBIDDEN,
-      body: { msg: errMessages.FORBIDDEN }
+      status: Statuses.FORBIDDEN,
+      body: { msg: ErrorMessages.FORBIDDEN }
     };
     for (const arg of invalidArgs) {
       const invalidRes = await makeRequest('/users/remove', arg);
       this.check(invalidRes, expectedRes);
     }
     const expectedRem: any = {
-      status: statuses.OK,
+      status: Statuses.OK,
       body: { removed: true }
     };
     for (const user of this.testUsers) {

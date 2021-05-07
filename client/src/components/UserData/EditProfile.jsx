@@ -13,8 +13,15 @@ import '../../styles/edit-profile.css';
 
 const EditProfile = () => {
   const history = useHistory();
-  const { menuOption, setMenuOption, setLoading, setFoundErr, dispatchOpenedFiles } = useContext(MenuContext);
   const { userData, dispatchUserData, username, dispatchUsername } = useContext(UserContext);
+  const {
+    menuOption,
+    setMenuOption,
+    setLoading,
+    setFoundErr,
+    openedFiles,
+    dispatchOpenedFiles
+  } = useContext(MenuContext);
   const { 
     useVerifiers,
     fetchUserInput,
@@ -145,6 +152,12 @@ const EditProfile = () => {
       const { data } =  await axios.post(`${process.env.APP_ADDR}/users/edit`, editedBody);
       dispatchUserData({ type: 'REFRESH_DATA', data });
       if (data.name) {
+        const openedFilesOwner = openedFiles[0]?.filePath.split('/')[1];
+        if (openedFilesOwner && openedFilesOwner === userData.name) {
+          const oldPath = `/${username}`;
+          const newPath = `/${data.name}`;
+          dispatchOpenedFiles({ type: 'FILES_RENAME_PATH', oldPath, newPath });
+        }
         dispatchUsername({ type: 'SET_NAME', value: data.name});
         history.push('/' + data.name);
       }
@@ -156,7 +169,6 @@ const EditProfile = () => {
       setFoundErr(['server', msg]);
     } finally {
       setLoading(false);
-      dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
     }
   };
   const submitEditedFields = useCallback(

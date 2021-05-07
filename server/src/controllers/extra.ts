@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
 import { BoxesRoutes, middlewareFn, requestHandler, responseTuple, UserRoutes } from './routesTypes';
-import { statuses, errMessages } from './statusInfo';
+import { Statuses, ErrorMessages } from './statusInfo';
 
 const sendResponse = (res: Response, status: number, json: unknown): void => {
   res.status(status).json(json).end();
@@ -24,7 +24,7 @@ export const checkPathes = (pathes: string[][]): boolean => {
   return true;
 };
 
-export const getMiddlewares = (handlers: BoxesRoutes|UserRoutes): any => {
+export const getWrappedRoutes = (handlers: BoxesRoutes|UserRoutes): any => {
   const middlewares: unknown = {};
   for (const fnName in handlers) {
     const handler: requestHandler = handlers[fnName];
@@ -33,8 +33,8 @@ export const getMiddlewares = (handlers: BoxesRoutes|UserRoutes): any => {
         const result: responseTuple = await handler(req);
         sendResponse(res, ...result);
       } catch {
-        const msg: string = errMessages.SERVER_INTERNAL;
-        sendResponse(res, statuses.SERVER_INTERNAL, { msg });
+        const msg: string = ErrorMessages.SERVER_INTERNAL;
+        sendResponse(res, Statuses.SERVER_INTERNAL, { msg });
       }
     };
     middlewares[fnName] = middleware;

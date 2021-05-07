@@ -11,7 +11,7 @@ const FilesList = () => {
   }; 
 
   const closeFile = index => () =>
-    dispatchOpenedFiles({ type: "FILE_CLOSE", index }); 
+    dispatchOpenedFiles({ type: 'FILE_CLOSE', index }); 
 
   return (
     <div id="files-list" data-testid="files-list-test">{

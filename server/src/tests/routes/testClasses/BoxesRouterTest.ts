@@ -1,7 +1,7 @@
 import TestLogger from '../../TestLogger';
 import makeRequest from '../requestHandler';
 import { UserData, BoxData } from '../../../datatypes';
-import { statuses, errMessages } from '../../../controllers/statusInfo';
+import { Statuses, ErrorMessages } from '../../../controllers/statusInfo';
 
 export default class BoxesRouterTest extends TestLogger { 
   constructor(
@@ -29,12 +29,12 @@ export default class BoxesRouterTest extends TestLogger {
           limitedUsers: null,
           editors: null
         },
-        { status: statuses.CREATED, body: { name } }
+        { status: Statuses.CREATED, body: { name } }
       ],
       [
         '/boxes/user_boxes',
         { viewerName, boxOwnerName: owner_name },
-        { status: statuses.OK, body: {
+        { status: Statuses.OK, body: {
             boxesList: [{ owner_name, name, name_color, access_level }]
           }
         }
@@ -42,12 +42,12 @@ export default class BoxesRouterTest extends TestLogger {
       [
         '/boxes/verify',
         { username: owner_name, boxName: name },
-        { status: statuses.OK, body: { foundValue: name } }
+        { status: Statuses.OK, body: { foundValue: name } }
       ],
       [
         '/boxes/verify',
         { username: owner_name, boxName: '' },
-        { status: statuses.OK, body: { foundValue: null } }
+        { status: Statuses.OK, body: { foundValue: null } }
       ],
       [
         '/boxes/details',
@@ -56,7 +56,7 @@ export default class BoxesRouterTest extends TestLogger {
           viewerName,
           boxName: name 
         },
-        { status: statuses.OK, body: {
+        { status: Statuses.OK, body: {
             name, name_color, owner_name, owner_nc, description,
             access_level, editor: false, logo: null 
           }
@@ -70,8 +70,8 @@ export default class BoxesRouterTest extends TestLogger {
           boxName: '' 
         },
         { 
-          status: statuses.NOT_FOUND,
-          body: { msg: errMessages.BOXES_NOT_FOUND }
+          status: Statuses.NOT_FOUND,
+          body: { msg: ErrorMessages.BOXES_NOT_FOUND }
         }
       ]
     ];
@@ -104,7 +104,7 @@ export default class BoxesRouterTest extends TestLogger {
           boxName
         },
         {
-          status: statuses.OK,
+          status: Statuses.OK,
           body: {
             name, description, name_color,
             description_color, access_level
@@ -121,8 +121,8 @@ export default class BoxesRouterTest extends TestLogger {
           boxName: ''
         },
         {
-          status: statuses.BAD_REQUEST,
-          body: { msg: errMessages.BOXES_INVAID_REQUEST }
+          status: Statuses.BAD_REQUEST,
+          body: { msg: ErrorMessages.BOXES_INVAID_REQUEST }
         }
       ]
     ];
@@ -144,16 +144,16 @@ export default class BoxesRouterTest extends TestLogger {
     const filePathStr: string = [...boxPath, fileName].join('/');
 
     const forbiddenObj: any = {
-      status: statuses.FORBIDDEN,
-      body: { msg: errMessages.FORBIDDEN },
+      status: Statuses.FORBIDDEN,
+      body: { msg: ErrorMessages.FORBIDDEN },
     };
     const invalidPathObj: any = {
-      status: statuses.NOT_FOUND,
-      body: { msg: errMessages.INVALID_PATH }
+      status: Statuses.NOT_FOUND,
+      body: { msg: ErrorMessages.INVALID_PATH }
     };
     const internalErrObj: any = {
-      status: statuses.SERVER_INTERNAL,
-      body: { msg: errMessages.BOXES_INTERNAL }
+      status: Statuses.SERVER_INTERNAL,
+      body: { msg: ErrorMessages.BOXES_INTERNAL }
     };
     const templateArgs: any = {
       viewerName, fileName,
@@ -170,7 +170,7 @@ export default class BoxesRouterTest extends TestLogger {
         '/boxes/files/create',
         { ...templateArgs, boxPath, type },
         {
-          status: statuses.CREATED,
+          status: Statuses.CREATED,
           body: { created: {
               type, file: {
                 src: [ { name: fileName, type } ],
@@ -184,7 +184,7 @@ export default class BoxesRouterTest extends TestLogger {
         '/boxes/files/list',
         { boxPath, ...templateArgs, initial: false },
         {
-          status: statuses.OK,
+          status: Statuses.OK,
           body: {
             entries: { dir: {
                 src: [ { name: fileName, type } ],
@@ -199,8 +199,8 @@ export default class BoxesRouterTest extends TestLogger {
         {
           boxPath: invalidPath, ...templateArgs, initial: false },
         {
-          status: statuses.NOT_FOUND,
-          body: { msg: errMessages.DIR_NOT_FOUND },
+          status: Statuses.NOT_FOUND,
+          body: { msg: ErrorMessages.DIR_NOT_FOUND },
         }
       ],
       [
@@ -210,7 +210,7 @@ export default class BoxesRouterTest extends TestLogger {
           files: [{ src, filePathStr: `/${filePathStr}` }]
         },
         {
-          status: statuses.OK,
+          status: Statuses.OK,
           body: { edited: true },
         }
       ],
@@ -234,7 +234,7 @@ export default class BoxesRouterTest extends TestLogger {
           boxPath, viewerName, type, fileName
         },
         {
-          status: statuses.OK,
+          status: Statuses.OK,
           body: { foundData: src, found: true }
         }
       ],
@@ -247,14 +247,14 @@ export default class BoxesRouterTest extends TestLogger {
       [
         '/boxes/files/rename',
         { ...templateArgs, boxPath, newName },
-        { status: statuses.OK, body: { renamed: true} }
+        { status: Statuses.OK, body: { renamed: true} }
       ],
       [
         '/boxes/files/rename',
         { ...templateArgs, boxPath: invalidPath, newName },
         {
-          status: statuses.NOT_FOUND,
-          body: { msg: errMessages.FILES_NOT_FOUND }
+          status: Statuses.NOT_FOUND,
+          body: { msg: ErrorMessages.FILES_NOT_FOUND }
         }
       ],
       [
@@ -281,7 +281,7 @@ export default class BoxesRouterTest extends TestLogger {
           type, follower: false, 
           editor: false
         },
-        { status: statuses.OK, body: { removed: true } }
+        { status: Statuses.OK, body: { removed: true } }
       ]
     ];
     for (const [route, arg, exp] of updateArg) {
@@ -294,8 +294,8 @@ export default class BoxesRouterTest extends TestLogger {
   public async testRemoveBox(): Promise<void> {
     const username: string = this.testUsers[0].name;
     const forbiddenObj: any = {
-      status: statuses.FORBIDDEN, 
-      body: { msg: errMessages.FORBIDDEN }
+      status: Statuses.FORBIDDEN, 
+      body: { msg: ErrorMessages.FORBIDDEN }
     }
     const removeArgs: [any, any][] = [
       [
@@ -325,7 +325,7 @@ export default class BoxesRouterTest extends TestLogger {
           boxName: this.testBox.name,
           ownPage: true
         },
-        { status: statuses.OK, body: { removed: true } }
+        { status: Statuses.OK, body: { removed: true } }
       ]
     ]
     for (const [arg, exp] of removeArgs) {

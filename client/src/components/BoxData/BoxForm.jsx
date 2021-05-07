@@ -16,8 +16,14 @@ import '../../styles/box-form.css';
 const BoxForm = ({ editParametrs }) => {
   const history = useHistory();
   const params = useParams();
-  const { setMenuOption, setLoading, setFoundErr, dispatchOpenedFiles } = useContext(MenuContext);
   const { boxDetails, setBoxDetails, setEditBoxState } = useContext(BoxesContext);
+  const {
+    setMenuOption,
+    setLoading,
+    setFoundErr,
+    openedFiles,
+    dispatchOpenedFiles
+  } = useContext(MenuContext);
   const { 
     useVerifiers,
     fetchBoxInput,
@@ -89,8 +95,7 @@ const BoxForm = ({ editParametrs }) => {
     const submitBody = {
       username,
       logo: logoEdited,
-      limitedUsers: privacy === 'limited' ?
-        limitedUsers : null,
+      limitedUsers: privacy === 'limited' ? limitedUsers : null,
       editors
     };
     setLoading(true);
@@ -101,6 +106,7 @@ const BoxForm = ({ editParametrs }) => {
           boxData: { ...dataInput, access_level },
         };
         const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/create`, createBody);
+        dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
         history.push(`/${username}/${data.name}`);
       } else if (editParametrs.edit && isCorrect) {
         const edited = !inputFields.length ? null :
@@ -116,11 +122,16 @@ const BoxForm = ({ editParametrs }) => {
         };
         const { data } = await axios.post(`${process.env.APP_ADDR}/boxes/edit`, editBody);
         const boxDetailsEdited = { ...boxDetails, ...data };
-        if (logoEdited === 'removed')
-          boxDetailsEdited.logo = null;
+        if (logoEdited === 'removed') boxDetailsEdited.logo = null;
         setBoxDetails(boxDetailsEdited);
-        if (data.name)
-          history.push(`/${username}/${data.name}`);
+        const nameEdited = typeof edited?.name === 'string'
+          && params.box !== edited.name
+        if (nameEdited && openedFiles.length) {
+          const oldPath = `/${username}/${params.box}`;
+          const newPath = `/${username}/${edited.name}`;
+          dispatchOpenedFiles({ type: 'FILES_RENAME_PATH', oldPath, newPath });
+        }
+        if (data.name) history.push(`/${username}/${data.name}`);
         setEditBoxState(false);
       }
     } catch {
@@ -128,7 +139,6 @@ const BoxForm = ({ editParametrs }) => {
       setFoundErr(['server', msg]);
     } finally {
       setLoading(false);
-      dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
     }
   };
   const handleSubmit = useCallback(

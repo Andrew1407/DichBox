@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import routes from '../controllers/boxes/boxesMiddleware';
+import routes from '../controllers/boxes/boxesController';
 
 const boxesRouter: Router = Router();
 

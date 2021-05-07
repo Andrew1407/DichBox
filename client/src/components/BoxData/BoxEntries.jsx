@@ -146,7 +146,7 @@ const BoxEntries = () => {
           setFoundErr(['server', msg]);
         } else {  
           const { status, data } = e.response;
-          const errType = status === 404 ? (boxPath.length > 1 ? 'dir' : 'box') : 'server';
+          const errType = status === 404 ? 'box' : 'server';
           setFoundErr([errType, data.msg]);
         }
       } finally {
