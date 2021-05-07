@@ -62,7 +62,7 @@ const Menu = () => {
     if (foundErr) setFoundErr(null);
     if (searchStr) setSearchStr('');
     if (`/${pathName}` !== currentPath)
-      history.push('/' + pathName);
+      history.push(`/${pathName}`);
   };
   const handleHomeClick = useCallback(
     handleHomeClickClb,

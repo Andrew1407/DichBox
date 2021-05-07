@@ -34,14 +34,15 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
       const userData: UserData = this.testUser[i];
       const boxData: BoxData = this.testBox[i];
       const insertUser: UserData = await this.userClient.insertUser(userData);
-      const { id, name } = insertUser;
+      const { id, name, user_uid } = insertUser;
       userData.id = id;
+      userData.user_uid = user_uid;
       const insertBox: BoxData = await this.boxesClient.insertBox(
         userData.name,
         boxData,
         null,
         null
-      )
+      );
       boxData.owner_id = id;
       boxData.id = insertBox.id;
       boxData.owner_name = name;
@@ -56,10 +57,8 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
   }
 
   public async testUpdate(): Promise<void> {
-    const [curUserValue, updatedUserValue]: UserData[] = this.testUser
-      .slice(0, 2);
-    const [curBoxValue, updatedBoxValue]: BoxData[] = this.testBox
-      .slice(0, 2);
+    const [curUserValue, updatedUserValue]: UserData[] = this.testUser;
+    const [curBoxValue, updatedBoxValue]: BoxData[] = this.testBox;
     const newUserDescription: UserData = {
       description: updatedUserValue.description
     };
@@ -77,8 +76,11 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
     ];
     const updateBoxExp: BoxData[] = [newBoxDescription, null];
     for (const i in updateUserData) {
+      const userId: number = updateUserData[i][0];
+      const updatable: UserData = { ...updateUserData[i][1] };
+      delete updatable.user_uid;
       let updateUserRes: UserData|null = await this.userClient
-        .updateUser(...updateUserData[i]);
+        .updateUser(userId, updatable);
       let updateBoxRes: BoxData|null = await this.boxesClient
         .updateBox(...updateBoxData[i]);
       if (updateUserRes && updateBoxRes) 
@@ -99,9 +101,10 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
   public async testDelete(): Promise<void> {
     await this.testSubscribe('unsubscribe');
     for (const i in this.testUser) {
-      const userData: UserData = this.testUser[i];
+      const userData: UserData = { ...this.testUser[i] };
+      const { user_uid, name } = userData;
+      delete userData.user_uid;
       const boxData: BoxData = this.testBox[i];
-      const { id, name } = userData;
       const boxID: number = boxData.id;
       const notifications: NotificationsData[] = await this.userClient
         .getNotifications(name);
@@ -114,7 +117,7 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
       this.check(resObj, { res: true });
 
       await this.boxesClient.removeBox(boxID);
-      await this.userClient.removeUser(id);
+      await this.userClient.removeUser(user_uid);
       const getResUser: UserData|null = await this.userClient
         .getUserData(userData);
       const getResBox: BoxData|null = await this.boxesClient
@@ -163,17 +166,19 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
 
     const checkSubsExp: boolean[] = [false, true, true, true];
     for (const i in this.testUser) {
-      const user = this.testUser[i];
+      const user = { ...this.testUser[i] };
+      delete user.user_uid;
       this.check(searchRes[i], user);
     
       const { name, email, passwd } = user;
-      const signInExp: Record<'name'|'passwd'|'notifications', string> = { 
+      const signInExp: any = { 
         name,
         passwd,
-        notifications: "0"
+        notifications: "1"
       };
       const signInRes: UserData|null = await this.userClient
         .signInUser(email, passwd);
+      delete signInRes.user_uid;
       this.check(signInRes, signInExp);
 
       const notification: NotificationsData[] = await this.userClient

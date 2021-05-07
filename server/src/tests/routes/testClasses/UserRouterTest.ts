@@ -25,6 +25,7 @@ export default class UserRouterTest extends TestLogger {
       };
       for (const [route, exp] of Object.entries(routesExp)) {
         const res: any = await makeRequest(route, newUser);
+        user.user_uid = res.body.user_uid;
         this.check(res, exp);
       }
     }
@@ -324,8 +325,8 @@ export default class UserRouterTest extends TestLogger {
       body: { removed: true }
     };
     for (const user of this.testUsers) {
-      const { name } = user;
-      const permitted: any = { username: name, confirmation: 'permitted' };
+      const { name, user_uid } = user;
+      const permitted: any = { uuid: user_uid, username: name, confirmation: 'permitted' };
       const result: any = await makeRequest('/users/remove', permitted);
       this.check(result, expectedRem);
     }
@@ -354,8 +355,10 @@ export default class UserRouterTest extends TestLogger {
     const expectedStr: string = JSON.stringify(expected);
     const errMsg: string = `FAILED. Incorrect result - expected:\n"${expectedStr}",\ngot:\n"${resultStr}"`;
     const statusEqual: boolean = result.status === expected.status;
+    const filteredRes = { ...result.body };
+    delete filteredRes.user_uid;
     const bodyExpStr: string = JSON.stringify(expected.body);
-    const bodyResStr: string = JSON.stringify(result.body);
+    const bodyResStr: string = JSON.stringify(filteredRes);
     const bodyEqual: boolean = bodyExpStr === bodyResStr;
     return (statusEqual && bodyEqual) ? 
       null : new Error(errMsg);

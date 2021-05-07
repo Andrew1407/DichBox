@@ -2,8 +2,8 @@ import { UserData, NotificationsData } from '../../datatypes';
 
 export default interface IUserClientDB {
   insertUser(userData: UserData): Promise<UserData|null>;
-  updateUser(id: number,UserData: UserData): Promise<UserData|null>;
-  removeUser(id: number): Promise<void>;
+  updateUser(id: number, UserData: UserData): Promise<UserData|null>;
+  removeUser(user_uid: string): Promise<void>;
   signInUser(email: string, passwd: string): Promise<UserData|null>;
 
   getUserData(values: UserData, returning?: string[]): Promise<UserData|null>;
@@ -23,6 +23,7 @@ export default interface IUserClientDB {
   ): Promise<number|null>;
     
   getUsernames(usersTemplate: string, username: string): Promise<UserData[]|null>;
+  getUsernameByUuid(user_uid: string): Promise<string|null>;
   getLimitedUsers(username: string, boxName: string): Promise<UserData[][]>;
   searchUsers(nameTemplate: string): Promise<UserData[]>;
   

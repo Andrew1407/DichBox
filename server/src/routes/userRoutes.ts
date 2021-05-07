@@ -4,6 +4,7 @@ import routes from '../controllers/user/userController';
 const usersRouter: Router = Router();
 
 usersRouter
+  .post('/identify', routes.findUsername)
   .post('/create', routes.signUpUser)
   .post('/find', routes.findUser)
   .post('/enter', routes.signInUser)

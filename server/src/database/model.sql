@@ -7,14 +7,26 @@ create database dich_box;
 -- users' data
 create table users (
   id serial primary key,
-  name varchar(40) not null,
+  name varchar(40) not null unique,
   name_color varchar(8) default '#00d9ff',
-  email varchar(50) not null,
+  email varchar(50) not null unique,
   passwd varchar(65) not null,
   followers int default 0,
   reg_date timestamp default now(),
   description varchar(100) default '',
   description_color varchar(8) default '#00d9ff'
+);
+
+-- module for uuid usage
+create extension if not exists "uuid-ossp";
+
+-- users random generated identifiers
+create table uuids (
+  person_id int not null 
+    references users (id) 
+    on delete cascade
+    on update cascade,
+  user_uid uuid default uuid_generate_v4()
 );
 
 -- subscribers
@@ -81,6 +93,40 @@ create table box_editors (
     on delete cascade
     on update cascade
 );
+
+-- remove user by uuid
+create function rm_uuid_with_user_fn()
+  returns trigger
+  language plpgsql
+  as
+$$
+begin
+  delete from users where id = old.person_id;
+  return old;
+end;
+$$;
+
+create trigger rm_uuid_with_user
+  after delete on uuids
+  for each row
+  execute procedure rm_uuid_with_user_fn();
+
+-- create uuid
+create function add_user_uuid_fn()
+  returns trigger
+  language plpgsql
+  as
+$$
+begin
+  insert into uuids (person_id) values (new.id);
+  return new;
+end;
+$$;
+
+create trigger add_user_uuid
+  after insert on users
+  for each row
+  execute procedure add_user_uuid_fn();
 
 -- remove user as subscription (trigger)
 create function rm_user_subs_fn()

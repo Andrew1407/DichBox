@@ -30,8 +30,13 @@ export default class UserClientDB implements IUserClientDB {
   }
 
   public async insertUser(userData: UserData): Promise<UserData> {
-    return await this.daoClient
+    const inserted: UserData = await this.daoClient
       .insertValue('users', userData, ['name', 'id']);
+    const [{ user_uid }]: UserData[] = await this.daoClient.selectValues(
+      'uuids', { person_id: inserted.id }, ['user_uid']
+    );
+    inserted.user_uid = user_uid;
+    return inserted;
   }
 
   public async updateUser(
@@ -57,12 +62,13 @@ export default class UserClientDB implements IUserClientDB {
     const userRes: UserData[]|null = await this.daoClient
       .selectValues('users', values, returning);
     if (!userRes) return null;
-    const notifications: number = await this.getNotificationsAmount(userRes[0].id);
+    const notifications: number =
+      await this.getNotificationsAmount(userRes[0].id);
     return { ...userRes[0], notifications };
   }
 
-  public async removeUser(id: number): Promise<void> {
-    await this.daoClient.removeValue('users', { id });
+  public async removeUser(user_uid: string): Promise<void> {
+    await this.daoClient.removeValue('uuids', { user_uid });
   }
 
   // subscribers
@@ -136,7 +142,17 @@ export default class UserClientDB implements IUserClientDB {
       `select id, name, name_color from users where name like \'%${usersTemplate}%\' and name != $1 limit 10;`,
       [username]
     );
-    return res.length ? res: null;
+    return res.length ? res : null;
+  }
+
+  public async getUsernameByUuid(user_uid: string): Promise<string|null> {
+    const nameRes: UserData[] = await this.daoClient.selectJoinedValues(
+      ['uuids', 'users'],
+      ['person_id', 'id'],
+      { user_uid },
+      ['name']
+    );
+    return nameRes[0]?.name || null;
   }
 
   public async getLimitedUsers(
@@ -197,7 +213,15 @@ export default class UserClientDB implements IUserClientDB {
   }
 
   public async signInUser(email: string, _: string = ''): Promise<UserData|null> {
-    return await this.getUserData({ email }, ['name', 'passwd']);
+    const found: UserData|null =
+      await this.getUserData({ email }, ['name', 'passwd', 'id']);
+    if (!found) return null;
+    const uuidRes: UserData[]|null = await this.daoClient
+      .selectValues('uuids', { person_id: found.id }, ['user_uid']);
+    if (!uuidRes?.length) return null;
+    found.user_uid = uuidRes[0].user_uid;
+    delete found.id;
+    return found;
   }
 
   public async checkPasswd(

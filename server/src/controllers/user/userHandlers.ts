@@ -26,6 +26,17 @@ const clientDB: IUserClientDB = userFactory.getConnector() as IUserClientDB;
 const userStorage: IUserStorageManager = userFactory.getStorageManager() as IUserStorageManager;
 
 const userHandlers: UserRoutes = {
+  async findUsername(req: Request) {
+    const uuid: string|null = req.body.uuid || null;
+    const msg: string = ErrorMessages.USER_NOT_FOUND;
+    if (!uuid)
+      return makeTuple(Statuses.NOT_FOUND, { msg });
+    const name: string|null = await clientDB.getUsernameByUuid(uuid);
+    return name ?
+      makeTuple(Statuses.OK, { name }) :
+      makeTuple(Statuses.NOT_FOUND, { msg });
+  },
+
   async signUpUser(req: Request) {
     const clientData: UserData = req.body;
     const inserted: UserData|null = await clientDB.insertUser(clientData);
@@ -72,7 +83,7 @@ const userHandlers: UserRoutes = {
       return makeTuple(Statuses.NOT_FOUND, { msg });
     }
     return user.name ?
-      makeTuple(Statuses.OK, { name: user.name }) :
+      makeTuple(Statuses.OK, { name: user.name, user_uid: user.user_uid }) :
       makeTuple(Statuses.BAD_REQUEST, { msg: ErrorMessages.INVALID_PASSWORD });
   },
 
@@ -118,16 +129,17 @@ const userHandlers: UserRoutes = {
   },
 
   async removeUser(req: Request) {
-    const name: string = req.body.username;
+    const uuid: string = req.body.uuid;
     const rmAccess: string = req.body.confirmation;
+    const msg: string = ErrorMessages.FORBIDDEN;
+    const name: string|null = await clientDB.getUsernameByUuid(uuid);
+    if (!name) return makeTuple(Statuses.FORBIDDEN, { msg });
     const id: number = await clientDB.getUserId(name);
-    if (rmAccess !== 'permitted' || !id) {
-      const msg: string = ErrorMessages.FORBIDDEN;
+    if (rmAccess !== 'permitted' || !id)
       return makeTuple(Statuses.FORBIDDEN, { msg });
-    }
     await Promise.all([
       userStorage.removeUser(id),
-      clientDB.removeUser(id)
+      clientDB.removeUser(uuid)
     ]);
     return makeTuple(Statuses.OK, { removed: true });
   },

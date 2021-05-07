@@ -95,10 +95,8 @@ const EditProfile = () => {
       }
     },
     newPasswd: {
-      regExp: {
-        test: input => /^[\S]{5,20}$/.test(input) && input !== dataInput.passwd
-      },
-      warningRegExp: 'Password length should be 5-16 symbols (no spaces)',
+      regExp: /^[\S]{5,20}$/,
+      warningRegExp: 'Password length should be 5-16 symbols (no spaces)'
     }
   };
   const { getVerifiersState, getOnChangeVerifier } = useVerifiers(signVerParams);

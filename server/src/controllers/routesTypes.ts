@@ -22,6 +22,7 @@ export interface BoxesRoutes {
 };
 
 export interface UserRoutes {
+  findUsername: middlewareFn|requestHandler,
   findUser: middlewareFn|requestHandler,
   signUpUser: middlewareFn|requestHandler,
   signInUser: middlewareFn|requestHandler,

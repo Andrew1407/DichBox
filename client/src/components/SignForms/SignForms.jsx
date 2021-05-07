@@ -80,6 +80,8 @@ const SingForms = () => {
       const { data } = await axios.post(`${process.env.APP_ADDR}/users/create`, dataInput);
       cleanWarnings();
       dispatchDataInput({ type: 'CLEAN_DATA' });
+      const uuidLocal = Array.from(data.user_uid).reverse().join('');
+      localStorage.setItem('secretSomething', uuidLocal);
       dispatchUsername({ type: 'SET_NAME', value: data.name });
     } catch (e) {
       const { status, data } = e.response;
@@ -104,9 +106,11 @@ const SingForms = () => {
     };
     try {
       const { data } = await axios.post(`${process.env.APP_ADDR}/users/enter`, dataInput );
-      if (data.name) {
+      if (data.name && data.user_uid) {
         cleanWarnings();
         dispatchDataInput({ type: 'CLEAN_DATA' });
+        const uuidLocal = Array.from(data.user_uid).reverse().join('');
+        localStorage.setItem('secretSomething', uuidLocal);  
         dispatchUsername({ type: 'SET_NAME', value: data.name });
       } else {
         setPasswdInvalid();

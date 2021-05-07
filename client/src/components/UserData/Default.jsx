@@ -32,13 +32,16 @@ const Default = () => {
     setModalOptions(null);
     dispatchUserData({ type: 'CLEAN_DATA' });
     setPathName('');
+    localStorage.removeItem('secretSomething');
     if (openedFiles.length)
       dispatchOpenedFiles({ type: 'FILES_CLOSE_ALL' });
     history.push('/');
   };
 
   const removeOkClb = async () => {
-    const rmBody = { username, confirmation: 'permitted' }
+    const uuidLocal = localStorage.getItem('secretSomething');
+    const uuid = Array.from(uuidLocal).reverse().join('');
+    const rmBody = { uuid, confirmation: 'permitted' }
     const { data } = await axios.post(`${process.env.APP_ADDR}/users/remove`, rmBody);
     if (data.removed) signOutOkClb();
   };

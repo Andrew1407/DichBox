@@ -48,6 +48,7 @@ export default class ConnectorDBTest extends TestLogger implements ITesterDB {
           .insertUser(owner);
         if (userRes) {
           owner.id = userRes.id;
+          owner.user_uid = userRes.user_uid
           box.owner_id = userRes.id;
         }
         this.check(userRes, userExp);
@@ -91,10 +92,11 @@ export default class ConnectorDBTest extends TestLogger implements ITesterDB {
       const signInExp: Record<'name'|'passwd'|'notifications', string> = { 
         name,
         passwd,
-        notifications: "0"
+        notifications: "1"
       };
       const signInRes: UserData|null = await this.userConnector
         .signInUser(email, passwd);
+      delete signInRes.user_uid;
       const checkPasswd: boolean = await this.userConnector
         .checkPasswd(name, passwd);
       this.check(signInRes, signInExp);
@@ -183,7 +185,7 @@ export default class ConnectorDBTest extends TestLogger implements ITesterDB {
 
   public async testDelete(): Promise<void> {
     for (const user of this.testUser)
-      await this.userConnector.removeUser(user.id);
+      await this.userConnector.removeUser(user.user_uid);
   }
 
   public async run(): Promise<void> {

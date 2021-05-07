@@ -4,6 +4,7 @@ export type access_level = 'public'|'private'|'limited'|'invetee'|'followers';
 
 export interface UserData {
   id?: number,
+  user_uid?: string,
   name?: string,
   email?: string,
   passwd?: string,
