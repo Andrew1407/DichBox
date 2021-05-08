@@ -19,25 +19,24 @@ export default class Server {
     const PORT: number = Number(process.env.PORT) || 7041;
     const HOST: string = process.env.HOST || 'localhost';
     const listenArgs: any[] = [PORT, HOST];
-    if (initTests)
-      listenArgs.push(runTests);
+    if (initTests) listenArgs.push(runTests);
     this.server.listen(...listenArgs);
   }
 
   public handleShutdown(clb?: () => void): void {
     const onExitClb = (): void => {
+      let exitCode: 0|1 = 0;
       this.server.close((err?: Error) => {
-        if (err) console.error(err);
-        ClientDB
-          .getInstance()
-          .closePool();
-        if (clb) clb();
-        process.exit(0);
+        if (err) { 
+          console.error(err);
+          exitCode = 1;
+        };
+        ClientDB.getInstance().closePool();
+        clb?.call(null);
+        process.exit(exitCode);
       });
 
-      setInterval((): void => {
-        process.exit(0);
-      }, 1000).unref();
+      setInterval((): void => process.exit(exitCode), 1000).unref();
     };
     
     process.on('SIGINT', onExitClb);

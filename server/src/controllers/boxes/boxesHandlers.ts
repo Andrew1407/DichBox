@@ -64,7 +64,7 @@ const boxesHandlers: BoxesRoutes = {
     const username: string = req.body.username;
     const boxName: string = req.body.boxName;
     const foundBox: BoxData|null = await clientDB.findUserBox(username, boxName);
-    const foundValue: string|null = foundBox ? foundBox.name : null;
+    const foundValue: string|null = foundBox?.name || null;
     return makeTuple(Statuses.OK, { foundValue });
   },
 
@@ -109,8 +109,7 @@ const boxesHandlers: BoxesRoutes = {
     delete updated.owner_id;
     formatDateAll(updated);
     const jsonRes: BoxData & { logo?: string } = 
-      !logo || logo === 'removed' ?
-        updated : { ...updated, logo };
+      !logo || logo === 'removed' ? updated : { ...updated, logo };
     return makeTuple(Statuses.OK, jsonRes);
   },
 

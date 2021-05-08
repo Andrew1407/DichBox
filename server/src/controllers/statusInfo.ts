@@ -1,14 +1,14 @@
 export const enum Statuses {
   OK = 200,
-  SERVER_INTERNAL = 500,
-  NOT_FOUND = 404,
   CREATED = 201,
   BAD_REQUEST = 400,
-  FORBIDDEN = 403
+  FORBIDDEN = 403,
+  NOT_FOUND = 404,
+  SERVER_INTERNAL = 500
 };
 
 export const enum ErrorMessages {
-  USER_INVAID_REQUEST = 'We just can\'t sign you up!',
+  USER_INVAID_REQUEST = 'This data is toxic. Not good for you...',
   USER_NOT_FOUND = 'The searched digital twin wasn\'t found in the DichBox system...',
   FORBIDDEN = 'Forbidden for you!!!',
   SUBSCRIPTIONS_NOT_FOUND = 'Nothing was found for you...',

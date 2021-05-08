@@ -97,8 +97,7 @@ export default class UserClientDB implements IUserClientDB {
         (x: string): Promise<number> => this.daoClient.getUserId(x)
       )
     );
-    if (!(person_id && subscription))
-      return null;
+    if (!(person_id && subscription)) return null;
     const getQueries = (): Promise<unknown>[] => {
       const args: ['subscribers', SubscribersData] = [
         'subscribers',
@@ -213,9 +212,10 @@ export default class UserClientDB implements IUserClientDB {
   }
 
   public async signInUser(email: string, _: string = ''): Promise<UserData|null> {
-    const found: UserData|null =
-      await this.getUserData({ email }, ['name', 'passwd', 'id']);
-    if (!found) return null;
+    const foundRes: UserData[]|null = await this.daoClient
+      .selectValues('users', { email }, ['name', 'passwd', 'id']);
+    if (!foundRes?.length) return null;
+    const [ found ]: UserData[] = foundRes;
     const uuidRes: UserData[]|null = await this.daoClient
       .selectValues('uuids', { person_id: found.id }, ['user_uid']);
     if (!uuidRes?.length) return null;

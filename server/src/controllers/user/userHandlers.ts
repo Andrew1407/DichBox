@@ -29,8 +29,7 @@ const userHandlers: UserRoutes = {
   async findUsername(req: Request) {
     const uuid: string|null = req.body.uuid || null;
     const msg: string = ErrorMessages.USER_NOT_FOUND;
-    if (!uuid)
-      return makeTuple(Statuses.NOT_FOUND, { msg });
+    if (!uuid) return makeTuple(Statuses.NOT_FOUND, { msg });
     const name: string|null = await clientDB.getUsernameByUuid(uuid);
     return name ?
       makeTuple(Statuses.OK, { name }) :
@@ -77,14 +76,11 @@ const userHandlers: UserRoutes = {
   async signInUser(req: Request) {
     const email: string = req.body.email;
     const passwd: string = req.body.passwd;
-    const user: UserData = await clientDB.signInUser(email, passwd);
-    if (!user) {
-      const msg: string = ErrorMessages.USER_NOT_FOUND;
-      return makeTuple(Statuses.NOT_FOUND, { msg });
-    }
-    return user.name ?
-      makeTuple(Statuses.OK, { name: user.name, user_uid: user.user_uid }) :
-      makeTuple(Statuses.BAD_REQUEST, { msg: ErrorMessages.INVALID_PASSWORD });
+    const user: UserData|null = await clientDB.signInUser(email, passwd);
+    return user ?
+      user.name ? makeTuple(Statuses.OK, user) :
+      makeTuple(Statuses.BAD_REQUEST, { msg: ErrorMessages.INVALID_PASSWORD }) :
+      makeTuple(Statuses.NOT_FOUND, { msg: ErrorMessages.USER_NOT_FOUND });
   },
 
   async verifyUserInput(req: Request) {
@@ -113,9 +109,9 @@ const userHandlers: UserRoutes = {
         const msg: string = ErrorMessages.USER_INVAID_REQUEST;
         return makeTuple(Statuses.BAD_REQUEST, { msg });
       }
-      for (const field in editedData)
-        if (field !== 'passwd')
-          editedResponse[field] = editedData[field];
+      Object.assign(editedResponse, editedData);
+      if ('passwd' in editedResponse)
+        delete editedResponse.passwd;
     }
     if (editedLogo) 
       if (editedLogo === 'removed') {
@@ -177,6 +173,10 @@ const userHandlers: UserRoutes = {
       subscriptionName: string,
       responseValues: boolean
     } = req.body;
+    if (personName === subscriptionName) {
+      const msg: string = ErrorMessages.USER_INVAID_REQUEST;
+      return makeTuple(Statuses.BAD_REQUEST, { msg });
+    }
     const followers: number|null = 
       await clientDB.subscribe(personName, subscriptionName, action);
     if (followers === null) {
