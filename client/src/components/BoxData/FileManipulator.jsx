@@ -14,12 +14,12 @@ const FileManipulator = ({ setFileManupulation, fileManipulation, addFileVisible
   const getFullPathStr = f =>
     `${f.type} "${f.name} (${pathName.join('/')}/${f.name})"`;
   const getWarningClb = input => {
-    const inputValid = /^[^\s/]{1,40}$/;
+    const inputValid = /^[^#%\?\s/]{1,40}$/;
     const nameExists = pathEntries
       .filter(x => x && x.name === input)
       .length;
     if (!inputValid.test(input))
-      return 'Invalid input (name can\'t include slashes and spaces)';
+      return 'Invalid input (name can\'t include spaces, "?", "/", "#", "%", length should be 1-40 symbols)';
     if (nameExists)
       return `An entry with the same name already exists in "/${pathName.join('/')}"`;
     return '';

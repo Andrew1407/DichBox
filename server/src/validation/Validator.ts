@@ -10,7 +10,7 @@ export default abstract class Validator {
 
   constructor() {
     this.patterns = {
-      name: /^[^\s/]{1,40}$/,
+      name: /^[^#%\?\s/]{1,40}$/,
       passwd: /^[\S]{5,20}$/,
       email: /^([a-z_\d\.-]+)@([a-z\d]+)\.([a-z]{2,8})(\.[a-z]{2,8})*$/,
       color: /^#[a-z\d]{6}$/
@@ -19,14 +19,14 @@ export default abstract class Validator {
 
   protected checkFields(
     data: UserData|BoxData,
-    specificFields: any
+    specificFields: Object
   ): boolean {
     const fieldsCheck: any = {
       ...specificFields,
-      name: (x: string): boolean => this.patterns.name.test(x),
-      name_color: (x: string): boolean => this.patterns.color.test(x),
-      description: (x: string): boolean => typeof x === 'string' && x.length <= 100,
-      description_color: (x: string): boolean => this.patterns.color.test(x),
+      name: (x: string): boolean => this.isString(x) && this.patterns.name.test(x),
+      name_color: (x: string): boolean => this.isString(x) && this.patterns.color.test(x),
+      description: (x: string): boolean => this.isString(x) && x.length <= 100,
+      description_color: (x: string): boolean => this.isString(x) && this.patterns.color.test(x),
     };
     const reducer = (res: boolean, key: string): boolean => (
       key in fieldsCheck ?
@@ -36,6 +36,10 @@ export default abstract class Validator {
       .reduce(reducer, true);
     return dataCorrect;
   };
+
+  protected isString(value: any): boolean {
+    return typeof value === 'string';
+  }
 
   abstract checkDataCreated(data: UserData|BoxData): boolean;
   abstract checkDataEdited(data: UserData|BoxData): boolean;

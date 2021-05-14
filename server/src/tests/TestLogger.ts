@@ -13,14 +13,11 @@ export default abstract class TestLogger {
       .filter((e: Error|null): boolean => !!e);
     const failed: number = errors.length;
     const passed: number = total - failed;
-    const passedSign: string = total === passed ? ' ✔️ ' : ' ❌';
+    const passedSign: string = total === passed ? ' ✔️ ' : ' ❌ ';
     const logStr: string = ` - ${testName}. Total: ${total}, passed: ${passed}, failed: ${failed} [${passedSign}].`;
     console.log(logStr);
     if (failed) {
-      errors.forEach(
-        (e: Error): void => console.error(e)
-      );
-      
+      errors.forEach((e: Error): void => console.error(e));
       ClientDB.getInstance().closePool();
       process.exit(1);
     }

@@ -1,4 +1,4 @@
-import { existsSync as fsExistsSync, promises as fsp, Stats as fsStats }  from 'fs';
+import { promises as fs, Stats as fsStats }  from 'fs';
 import * as path from 'path';
 import IBoxesStorageManager from './IBoxesStorageManager';
 import { PathEntries, DirEntries, FileEntries, entryType } from '../../datatypes';
@@ -40,10 +40,10 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
   }
 
   private async getDirEntries(dirPath: string): Promise<DirEntries[]> {
-    const dirList: string[] = await fsp.readdir(dirPath);
+    const dirList: string[] = await fs.readdir(dirPath);
     const dirMapper = async (name: string): Promise<DirEntries> => {
       const fullPath: string = path.join(dirPath, name);
-      const nameStats: fsStats = await fsp.lstat(fullPath);
+      const nameStats: fsStats = await fs.lstat(fullPath);
       if (nameStats.isFile()) {
         const isImage: boolean = /\.(png|jpeg|jpg|webp|tiff|raw|gif|bmp)$/.test(name);
         const type: entryType = isImage ? 'image' : 'file';
@@ -68,9 +68,9 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const idsStr: string[] = this.idsToString(ids);
     const boxPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
-    const exists: boolean = fsExistsSync(boxPath);
+    const exists: boolean = await this.exists(boxPath);
     if (!exists) return null;
-    const pathStats: fsStats = await fsp.lstat(boxPath);
+    const pathStats: fsStats = await fs.lstat(boxPath);
     if (pathStats.isDirectory()) {
       const src: DirEntries[] = await this.getDirEntries(boxPath);
       const name: string = extraPath.length > 1 ?
@@ -79,7 +79,7 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     }
     if (pathStats.isFile()) {
       if (initial) return null;
-      const src: string = await fsp.readFile(boxPath, 'utf-8');
+      const src: string = await fs.readFile(boxPath, 'utf-8');
       const dirPath: string[] = boxPath.split('/');
       const name: string = dirPath.pop();
       const file: FileEntries = { src, name };
@@ -99,15 +99,15 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const idsStr: string[] = this.idsToString(ids);
     const boxPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
-    const exists: boolean = fsExistsSync(boxPath);
+    const exists: boolean = await this.exists(boxPath);
     if (!exists) return null;
     const filePath: string = path.join(boxPath, name);
     if (type === 'dir')
-      await fsp.mkdir(filePath)
+      await fs.mkdir(filePath)
     else if (type === 'file')
-      await fsp.writeFile(filePath, '');
+      await fs.writeFile(filePath, '');
     else if (type === 'image')
-      await fsp.writeFile(filePath, entries);
+      await fs.writeFile(filePath, entries);
     const src: DirEntries[] = await this.getDirEntries(boxPath);
     const typeKey: entryType = type === 'dir' ? 'dir' : 'file';
     return { type, [typeKey]: { src, name } };
@@ -122,12 +122,12 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const idsStr: string[] = this.idsToString(ids);
     const filePath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath, name);
-    const exists: boolean = fsExistsSync(filePath);
+    const exists: boolean = await this.exists(filePath);
     if (!exists) return false;
     if (type === 'dir')
       await this.removeDir('boxes', ...idsStr, ...extraPath, name);
     else
-      await fsp.unlink(filePath);
+      await fs.unlink(filePath);
     return true;
   }
 
@@ -143,9 +143,9 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const [ oldPath, newPath ]: string[] = [ name, newName ].map(
       (p: string): string => path.join(dirPath, p)
     );
-    const exists: boolean = fsExistsSync(oldPath);
+    const exists: boolean = await this.exists(oldPath);
     if (!exists) return false;
-    await fsp.rename(oldPath, newPath);
+    await fs.rename(oldPath, newPath);
     return true;
   }
 
@@ -159,10 +159,10 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const idsStr: string[] = this.idsToString(ids);;
     const boxPath: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...extraPath);
-    const exists: boolean = fsExistsSync(boxPath);
+    const exists: boolean = await this.exists(boxPath);
     if (!exists) return null;
     const filePath: string = path.join(boxPath, name);
-    const src: string = await fsp.readFile(filePath, 'utf-8');
+    const src: string = await fs.readFile(filePath, 'utf-8');
     return src;
   }
 
@@ -174,9 +174,9 @@ export default class BoxesStorageManager extends StorageManager implements IBoxe
     const idsStr: string[] = ids.map((x: number): string => x.toString());
     const filePathStr: string = path
       .join(this.storagePath, 'boxes', ...idsStr, ...filePath);
-    const exists: boolean = fsExistsSync(filePathStr);
+    const exists: boolean = await this.exists(filePathStr);
     if (!exists) return false;
-    await fsp.writeFile(filePathStr, src);
+    await fs.writeFile(filePathStr, src);
     return true;
   }
 }

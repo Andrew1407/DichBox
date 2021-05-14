@@ -1,6 +1,6 @@
 {
   "name": "dichbox_server",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "DichBox API",
   "main": "webpack.config.js",
   "scripts": {

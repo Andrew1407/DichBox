@@ -35,8 +35,14 @@ const Notifications = () => {
         const ntsBody = { name: userData.name };
         const { data } =  await axios.post(`${process.env.APP_ADDR}/users/notifications_list`, ntsBody);
         const { notifications } = data;
-        if (notifications)
+        if (notifications) {
           setUsersList(notifications);
+          if (userData.notifications !== notifications.length)
+            dispatchUserData({
+              type: 'REFRESH_DATA',
+              data: { notifications: notifications.length }
+            });      
+        }
       } catch {
         const msg = 'It\'s a secret, but something terrible happened on the DichBox server...';
         setFoundErr(['server', msg]);

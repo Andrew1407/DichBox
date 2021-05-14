@@ -174,7 +174,7 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
       const signInExp: any = { 
         name,
         passwd,
-        notifications: "1"
+        notifications: '1'
       };
       const signInRes: UserData|null = await this.userClient
         .signInUser(email, passwd);
@@ -269,17 +269,12 @@ export default class ClientDBTest extends TestLogger implements ITesterDB {
       name: this.testUser[1].name
     };
     const invalidRes: (number|UserData|UserData[])[] = [];
-    invalidRes.push(await this.userClient
-      .getUsersData(invalidUser));
-    invalidRes.push(await this.userClient
-      .getUserData(invalidUser));
-    invalidRes.push(await this.userClient
-      .signInUser('', ''));
-    invalidRes.push(await this.userClient
-      .getUserId(''));
-    invalidRes.push(await this.userClient
-      .getUsernames(firstUser.name, firstUser.name));
-    invalidRes.push(await this.userClient.searchUsers(null)[0] || null);
+    invalidRes.push(await this.userClient.getUsersData(invalidUser));
+    invalidRes.push(await this.userClient.getUserData(invalidUser));
+    invalidRes.push(await this.userClient.signInUser('', ''));
+    invalidRes.push(await this.userClient.getUserId(''));
+    invalidRes.push(await this.userClient.getUsernames(firstUser.name, firstUser.name));
+    invalidRes.push(await this.userClient.searchUsers('%')[0] || null);
     this.checkInvalidRes(invalidRes);
   }
 

@@ -51,8 +51,8 @@ const SingForms = () => {
   const signUpVerParams = {
     ...signInVerParams,
     name: {
-      regExp: /^[^\s/]{1,40}$/,
-      warningRegExp: 'Username should be unique, 5-40 symbols length (no spaces)',
+      regExp: /^[^#%\?\s/]{1,40}$/,
+      warningRegExp: 'Username should be unique, 5-40 symbols length (no spaces, "?", "/", "#", "%")',
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
         const fetchData = fetchUserInput;

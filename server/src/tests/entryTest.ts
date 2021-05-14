@@ -18,7 +18,7 @@ const runTests = async (): Promise<void> => {
     await test.run();
   }
   
-  console.log('\nAll tests are passed. The server is ready to use.\n')
+  console.log('\nAll tests are passed. The server is ready to use.\n');
 }; 
 
 const commandArgs: string[] = process.argv;
@@ -27,9 +27,7 @@ const testsLog: boolean = commandArgs.includes(testArgs);
 
 if (testsLog) {
   const onExit = (): void => {
-    ClientDB
-      .getInstance()
-      .closePool();
+    ClientDB.getInstance().closePool();
     process.exit(0);
   };
   runTests().then(onExit);

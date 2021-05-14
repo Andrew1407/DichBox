@@ -29,6 +29,16 @@ export default class UserClientDB implements IUserClientDB {
     );
   }
 
+  private formatSearchTemplate(template: string): string {
+    const specialSymbols: string[] = ['%', '_'];
+    const replacer = (value: string, symbol: string): string => {
+      const symbolCheck: RegExp = new RegExp(symbol, 'g');
+      const escaped: string = '\\' + symbol;
+      return value.replace(symbolCheck, escaped);
+    };
+    return specialSymbols.reduce(replacer, template);
+  }
+
   public async insertUser(userData: UserData): Promise<UserData> {
     const inserted: UserData = await this.daoClient
       .insertValue('users', userData, ['name', 'id']);
@@ -137,8 +147,9 @@ export default class UserClientDB implements IUserClientDB {
     usersTemplate: string,
     username: string
   ): Promise<UserData[]|null> {
+    const search: string = this.formatSearchTemplate(usersTemplate);
     const res: UserData[] = await this.daoClient.rawQuery(
-      `select id, name, name_color from users where name like \'%${usersTemplate}%\' and name != $1 limit 10;`,
+      `select id, name, name_color from users where name ilike \'%${search}%\' and name != $1 limit 10;`,
       [username]
     );
     return res.length ? res : null;
@@ -173,8 +184,9 @@ export default class UserClientDB implements IUserClientDB {
   }
 
   public async searchUsers(nameTemplate: string): Promise<UserData[]> {
+    const search: string = this.formatSearchTemplate(nameTemplate);
     const foundRes: UserData[] = await this.daoClient.rawQuery(
-      `select id, name, name_color from users where lower(name) like \'%${nameTemplate}%\' order by followers desc;`
+      `select id, name, name_color from users where name ilike \'%${search}%\' order by followers desc limit 26;`
     );
     return foundRes;
   }
@@ -224,10 +236,7 @@ export default class UserClientDB implements IUserClientDB {
     return found;
   }
 
-  public async checkPasswd(
-    name: string,
-    _: string
-  ): Promise<boolean> {
+  public async checkPasswd(name: string, _: string): Promise<boolean> {
     const res: UserData|null = await this.getUserData({ name }, ['passwd']);
     return !!res;
   }

@@ -1,4 +1,4 @@
-import { existsSync as fsExistsSync, promises as fsp }  from 'fs';
+import * as fs  from 'fs/promises';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 import IStorageManager from './IStorageManager';
@@ -32,10 +32,10 @@ export default class StorageManager implements IStorageManager {
     const logoPath: string =  extraId ?
       this.generateLogoPath(id, [extraId.toString()]) :
       this.generateLogoPath(id);
-    const logoExists = fsExistsSync(logoPath);
+    const logoExists: boolean = await this.exists(logoPath);
     if (!logoExists)
       return null;
-    const userLogo: string = await fsp.readFile(logoPath, 'base64');
+    const userLogo: string = await fs.readFile(logoPath, 'base64');
     return this.appendBase64Header(userLogo);
   }
 
@@ -48,7 +48,7 @@ export default class StorageManager implements IStorageManager {
       this.generateLogoPath(id, [extraId.toString()]) :
       this.generateLogoPath(id);
     const base64Data = logo.replace(/^data:image\/png;base64,/, '');
-    await fsp.writeFile(logoPath, base64Data, 'base64');
+    await fs.writeFile(logoPath, base64Data, 'base64');
     return logo;
   }
 
@@ -59,20 +59,26 @@ export default class StorageManager implements IStorageManager {
     const logoPath: string =  extraId ?
       this.generateLogoPath(id, [extraId.toString()]) :
       this.generateLogoPath(id);
-    const logoExists = fsExistsSync(logoPath);
+    const logoExists: boolean = await this.exists(logoPath);
     if (logoExists)
-     await fsp.unlink(logoPath);
+     await fs.unlink(logoPath);
   }
 
   protected async createDir(...pathes: string[]): Promise<void> {
     const dirPath: string = path.join(this.storagePath, ...pathes);
-    await fsp.mkdir(dirPath, { recursive: true });
+    await fs.mkdir(dirPath, { recursive: true });
   }
 
   protected async removeDir(...pathes: string[]): Promise<void> {
     const dirPath: string = path.join(this.storagePath, ...pathes);
-    const exists: boolean = fsExistsSync(dirPath);
+    const exists: boolean = await this.exists(dirPath);
     if (exists)
-      await fsp.rmdir(dirPath, { recursive: true });
+      await fs.rmdir(dirPath, { recursive: true });
+  }
+
+  protected async exists(filePath: string): Promise<boolean> {
+    return await fs.access(filePath)
+      .then((): boolean => true)
+      .catch((): boolean => false);
   }
 }

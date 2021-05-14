@@ -10,7 +10,7 @@ exports[`Footer tests matches snapshot 1`] = `
   >
     <small>
       <b>
-        version: 1.0.0
+        version: 1.0.1
       </b>
     </small>
   </p>

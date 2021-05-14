@@ -143,6 +143,11 @@ const userHandlers: UserRoutes = {
   async findUsernames(req: Request) {
     const nameTemplate: string = req.body.nameTemplate;
     const username: string = req.body.username;
+    const isString = (str: any): boolean => typeof str === 'string';
+    if (!(isString(nameTemplate) && isString(username))) {
+      const msg: string = ErrorMessages.USER_INVAID_REQUEST;
+      return makeTuple(Statuses.OK, { msg })
+    }
     const usernames: UserData[]|null =
       await clientDB.getUsernames(nameTemplate, username);
     let foundUsers: foundUser[] = [];
@@ -204,6 +209,10 @@ const userHandlers: UserRoutes = {
 
   async searchUsers(req: Request) {
     const searchStr: string = req.body.searchStr;
+    if (typeof searchStr !== 'string') {
+      const msg: string = ErrorMessages.USER_INVAID_REQUEST;
+      return makeTuple(Statuses.BAD_REQUEST, { msg });
+    }
     const searchFormated: string = Array.from(searchStr)
       .filter(ch => /\S/.test(ch))
       .join('')

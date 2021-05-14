@@ -15,12 +15,14 @@ export default class Server {
     this.server = http.createServer(app);
   }
 
-  public start(initTests: boolean): void {
+  public start(initTests: boolean, clb?: () => void): void {
     const PORT: number = Number(process.env.PORT) || 7041;
     const HOST: string = process.env.HOST || 'localhost';
-    const listenArgs: any[] = [PORT, HOST];
-    if (initTests) listenArgs.push(runTests);
-    this.server.listen(...listenArgs);
+    const listenerClb = (): void => {
+      if (initTests) runTests();
+      clb?.call(null);
+    };
+    this.server.listen(PORT, HOST, listenerClb);
   }
 
   public handleShutdown(clb?: () => void): void {

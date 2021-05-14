@@ -13,7 +13,7 @@ export default class BoxValidator extends Validator {
     const specificFileds: {
       access_level: (x: string) => boolean
     } = {
-      access_level: x => /^(public|private|followers|limited)$/.test(x)
+      access_level: x => this.isString(x) && /^(public|private|followers|limited)$/.test(x)
     };
     return super.checkFields(data, specificFileds);
   }

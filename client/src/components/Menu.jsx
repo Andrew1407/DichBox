@@ -60,7 +60,7 @@ const Menu = () => {
     setPathEntries([]);
     setUsersList(null);
     if (foundErr) setFoundErr(null);
-    if (searchStr) setSearchStr('');
+    if (searchStr) setSearchStr(null);
     if (`/${pathName}` !== currentPath)
       history.push(`/${pathName}`);
   };

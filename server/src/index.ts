@@ -25,13 +25,13 @@ if (cluster.isMaster) {
 } else {
   const workerId: number = cluster.worker.id;
   const runTests: boolean = workerId === TEST_WORKER;
-  const onClusterExit = (): void => {
-    console.log(`The server was shut down on the process ${workerId}.`);
-  };
+  const logWorker = (message: string): void => console.log(`${message} ${workerId}.`);
+  const onServerStart = (): void => logWorker('The server started on the process');
+  const onClusterExit = (): void => logWorker('The server was shut down on the process');
   
   const app: express.Application = express();
   const server: Server = new Server(app);
   
-  server.start(runTests);
+  server.start(runTests, onServerStart);
   server.handleShutdown(onClusterExit);
 }

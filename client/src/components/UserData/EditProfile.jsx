@@ -73,8 +73,8 @@ const EditProfile = () => {
       defaultState: { value: userData.email, correct: true }
     },
     name: {
-      regExp: /^(?!search$)[\S]{1,40}$/,
-      warningRegExp: 'Username length should be 1-40 symbols (unique, no spaces)',
+      regExp: /^[^#%\?\s/]{1,40}$/,
+      warningRegExp: 'Username length should be 1-40 symbols (unique, no spaces, "?", "/", "#", "%")',
       warningFetch: 'This username is already taken',
       fetchVerifier: async input => {
         const foundValue = await fetchUserInput('name', input);
