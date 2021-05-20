@@ -18,14 +18,31 @@ export default class ClientDB implements IClientDB {
   
   private constructor() { }
 
-  public async openPool(): Promise<void> {
-    if (!this.poolClient)
+  private async connect(errClb: () => (Promise<void>|void)): Promise<void> {
+    if (this.poolClient) return;
+    try {
       this.poolClient = await new Pool({
         host: process.env.DB_HOST,
         user: process.env.DB_USERNAME,
         password: process.env.DB_PASSWD,
         database: process.env.DB_NAME
       }).connect();
+    } catch {
+      errClb();
+    }
+  }
+
+  public async openPool(): Promise<void> {
+    const reconnect = async (): Promise<void> => {
+      const onFailed = (): void =>  {
+        const poolErr: Error = new Error('Pool connection failed (twice)');
+        console.error(poolErr);
+        process.exit(1);
+      };
+      const secondTry = (): Promise<void> => this.connect(onFailed);
+      setTimeout(secondTry, 500);
+    };
+    await this.connect(reconnect);
   }
 
   public closePool(): void {

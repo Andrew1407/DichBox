@@ -1,6 +1,18 @@
 import { Response, Request } from 'express';
+import * as dotenv from 'dotenv';
+import ILogger from '../logger/ILogger';
+import Logger from '../logger/Logger';
 import { BoxesRoutes, middlewareFn, requestHandler, responseTuple, UserRoutes } from './routesTypes';
 import { Statuses, ErrorMessages } from './statusInfo';
+import LogInfo from '../logger/LogInfo';
+
+dotenv.config();
+
+type errorContainer = { msg: string };
+
+const logDir: string = process.env.LOG_DIR || 'logs';
+const printable: boolean = process.env.VERBOSE?.toLowerCase() === 'true';
+const logger: ILogger = new Logger(logDir, printable);
 
 const sendResponse = (res: Response, status: number, json: unknown): void => {
   res.status(status).json(json).end();
@@ -25,19 +37,41 @@ export const checkPathes = (pathes: string[][]): boolean => {
 };
 
 export const getWrappedRoutes = (handlers: BoxesRoutes|UserRoutes): any => {
-  const middlewares: unknown = {};
+  const wrappedRoutes: unknown = {};
   for (const fnName in handlers) {
     const handler: requestHandler = handlers[fnName];
     const middleware: middlewareFn = async (req: Request, res: Response) => {
+      let logData: LogInfo;
       try {
         const result: responseTuple = await handler(req);
+        const status: number = result[0] as number;
+        logData = {
+          date: new Date().toLocaleString(),
+          method: req.method,
+          route: req.url,
+          status: result[0]
+        };
+        if (!(status === Statuses.OK || status === Statuses.CREATED)) {
+          const { msg }: errorContainer = result[1] as errorContainer;
+          logData.errorMessage = msg;
+        }
         sendResponse(res, ...result);
-      } catch {
+      } catch(e) {
         const msg: string = ErrorMessages.SERVER_INTERNAL;
+        logData = {
+          date: new Date().toLocaleString(),
+          method: req.method,
+          route: req.url,
+          status: Statuses.SERVER_INTERNAL,
+          errorMessage: msg,
+          errorMessageInternal: e.message
+        };
         sendResponse(res, Statuses.SERVER_INTERNAL, { msg });
+      } finally {
+        logger.log(logData);
       }
     };
-    middlewares[fnName] = middleware;
+    wrappedRoutes[fnName] = middleware;
   }
-  return middlewares;
+  return wrappedRoutes;
 };

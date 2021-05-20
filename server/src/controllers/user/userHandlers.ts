@@ -15,15 +15,15 @@ type foundUser = {
   logo: string|null
 };
 
+const userFactory: IControllerFactory = new UserControllerFactory();
+const clientDB: IUserClientDB = userFactory.getConnector() as IUserClientDB;
+const userStorage: IUserStorageManager = userFactory.getStorageManager() as IUserStorageManager;
+
 const foundUsersMapper = async (user: UserData): Promise<foundUser> => ({
   name: user.name, 
   name_color: user.name_color,
   logo: await userStorage.getLogoIfExists(user.id)
 });
-
-const userFactory: IControllerFactory = new UserControllerFactory();
-const clientDB: IUserClientDB = userFactory.getConnector() as IUserClientDB;
-const userStorage: IUserStorageManager = userFactory.getStorageManager() as IUserStorageManager;
 
 const userHandlers: UserRoutes = {
   async findUsername(req: Request) {
