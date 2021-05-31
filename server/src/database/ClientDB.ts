@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import { Pool, PoolClient, QueryResult } from 'pg';
 import IClientDB from './IClientDB';
 import { dataElement } from '../datatypes';
+import Colors from '../logger/colors';
 
 dotenv.config();
 
@@ -36,7 +37,7 @@ export default class ClientDB implements IClientDB {
     const reconnect = async (): Promise<void> => {
       const onFailed = (): void =>  {
         const poolErr: Error = new Error('Pool connection failed (twice)');
-        console.error(poolErr);
+        console.error(Colors.BG_BLACK, Colors.FG_RED, poolErr, Colors.RESET);
         process.exit(1);
       };
       const secondTry = (): Promise<void> => this.connect(onFailed);
@@ -46,8 +47,7 @@ export default class ClientDB implements IClientDB {
   }
 
   public closePool(): void {
-    if (this.poolClient)
-      this.poolClient.release();
+    this.poolClient?.release();
   }
 
   private formatData(data: any): 

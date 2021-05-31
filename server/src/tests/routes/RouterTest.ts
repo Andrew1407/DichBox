@@ -3,6 +3,7 @@ import UserRouterTest from './testClasses/UserRouterTest';
 import BoxesRouterTest from './testClasses/BoxesRouterTest';
 import { testUser, testBox } from '../testData/routes';
 import { BoxData, UserData } from '../../datatypes';
+import Colors from '../../logger/colors';
 
 export default class RouterTest implements ITester {
   private userRouter: UserRouterTest;
@@ -33,7 +34,7 @@ export default class RouterTest implements ITester {
   }
 
   public async run(): Promise<void> {
-    console.log('Routes tests:');
+    console.log(Colors.BG_BLACK, Colors.FG_BLUE, 'Routes tests:', Colors.RESET);
     await Promise.all([
       this.userRouter.run(),
       this.boxesRouter.run()

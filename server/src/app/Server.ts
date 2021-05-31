@@ -17,10 +17,10 @@ export default class Server {
     this.server = http.createServer(app);
   }
 
-  public start(initTests: boolean, clb?: () => void): void {
+  public start(initTests: boolean, clb?: () => void|Promise<void>): void {
     const { port: PORT, host: HOST }: Server = this;
-    const listenerClb = (): void => {
-      if (initTests) runTests();
+    const listenerClb = async (): Promise<void> => {
+      if (initTests) await runTests();
       clb?.call(null);
     };
     this.server.listen(PORT, HOST, listenerClb);

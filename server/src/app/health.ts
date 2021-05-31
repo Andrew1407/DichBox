@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import * as path from 'path';
 import * as dotenv from 'dotenv';
-import ILogger from './logger/ILogger';
-import Logger from './logger/Logger';
+import { Statuses } from '../controllers/statusInfo';
+import ILogger from '../logger/ILogger';
+import Logger from '../logger/Logger';
 
 dotenv.config();
 
@@ -10,16 +10,15 @@ const logDir: string = process.env.LOG_DIR || 'logs';
 const printable: boolean = process.env.VERBOSE?.toLowerCase() === 'true';
 const logger: ILogger = new Logger(logDir, printable);
 
-export const viewPath: string = path.join(__dirname, '..', 'dist', 'view');
-
-export const viewHandler = (req: Request, res: Response): void => {
-  const root: string = viewPath;
-  const viewEntry: string = 'index.html';
+const healthCheck = (req: Request, res: Response): void => {
+  res.json(null).status(Statuses.OK);
   logger.log({
     date: new Date().toLocaleString(),
     method: req.method,
     route: req.url,
     status: res.statusCode
   });
-  res.sendFile(viewEntry, { root });
+  res.end();
 };
+
+export default healthCheck;

@@ -22,11 +22,12 @@ type responseType = {
 };
 
 type responsePromise = (val: responseType) => void;
+type rejectPromise = (err: Error) => void;
 type clientRequestClb = (clientRes: http.IncomingMessage) => Promise<void>;
 type queryType = (route: string, body?: unknown|null) => Promise<responseType>;
 
 const makeRequest: queryType = (route, body = null) => new Promise(
-  (res: responsePromise): void => {
+  (res: responsePromise, rej: rejectPromise): void => {
     const bodyStringified: string = JSON.stringify(body);
     const headers: headersType = {
       'Content-Type': 'application/json',
@@ -50,7 +51,9 @@ const makeRequest: queryType = (route, body = null) => new Promise(
       res(responseBody);
     };
     const clientRequest: http.ClientRequest = http.request(options, requestClb);
-    clientRequest.end(bodyStringified);
+    clientRequest
+      .on('error', rej)
+      .end(bodyStringified);
   }
 );
 

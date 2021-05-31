@@ -4,6 +4,7 @@ import ITesterDB from './ITesterDB';
 import BaseConnectorTest from './testClasses/BaseConnectorTest';
 import ClientDBTest from './testClasses/ClientDBTest';
 import ConnectorDBTest from './testClasses/ConnectorDBTest';
+import Colors from '../../logger/colors';
 
 export default class DatabaseTest implements ITester {
   private readonly baseTest: ITesterDB;
@@ -36,7 +37,7 @@ export default class DatabaseTest implements ITester {
   }
 
   public async run(): Promise<void> {
-    console.log('Database tests:');
+    console.log(Colors.BG_BLACK, Colors.FG_BLUE, 'Database tests:', Colors.RESET);
     await Promise.all([
       this.baseTest.run(),
       this.clientTest.run(),

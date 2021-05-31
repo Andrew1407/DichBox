@@ -32,7 +32,7 @@ if (cluster.isMaster) {
 } else {
   const workerId: number = cluster.worker.id;
   const runTests: boolean = workerId === TEST_WORKER;
-  const font: string = Colors.MAGENTA;
+  const font: string = Colors.FG_MAGENTA;
   const reset: string = Colors.RESET;
   const logWorker = (message: string): void => console.log(`${font}${message} ${workerId}.${reset}`);
   const onServerStart = (): void => logWorker('The server started on the process');

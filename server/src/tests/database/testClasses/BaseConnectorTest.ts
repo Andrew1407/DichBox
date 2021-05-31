@@ -172,10 +172,10 @@ export default class BaseConnectorTest extends TestLogger implements ITesterDB {
     if (!result && !expected) return null;
     if (!result || !expected) return new Error(errMsg);
     for (const key in result) {
-        const expVal = expected[key];
-        const resVal = result[key];
-        if (resVal !== expVal) return new Error(errMsg);
-      }
+      const expVal = expected[key];
+      const resVal = result[key];
+      if (resVal !== expVal) return new Error(errMsg);
+    }
     return null;
   }
 

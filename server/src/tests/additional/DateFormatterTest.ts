@@ -1,4 +1,4 @@
-import TestLogger from "../TestLogger";
+import TestLogger from '../TestLogger';
 import ITester from '../ITester';
 import { formatDate, formatDateTime } from '../../controllers/dateFormatters';
 

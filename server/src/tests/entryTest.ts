@@ -3,7 +3,7 @@ import AdditionalTest from './additional/AdditionalTest';
 import DatabaseTest from './database/DatabaseTest';
 import FileSystemTest from './fileSystem/FileSystemTest';
 import RouterTest from './routes/RouterTest';
-import ClientDB from '../database/ClientDB';
+import Colors from '../logger/colors';
 
 const runTests = async (): Promise<void> => {
   const tests: ITester[] = [
@@ -18,19 +18,8 @@ const runTests = async (): Promise<void> => {
     await test.run();
   }
   
-  console.log('\nAll tests are passed. The server is ready to use.\n');
+  const passedMsg: string = '\nAll tests are passed. The server is ready to use.\n';
+  console.log(Colors.BG_BLACK, Colors.FG_BLUE, passedMsg, Colors.RESET);
 }; 
-
-const commandArgs: string[] = process.argv;
-const testArgs: string = '--run-tests';
-const testsLog: boolean = commandArgs.includes(testArgs);
-
-if (testsLog) {
-  const onExit = (): void => {
-    ClientDB.getInstance().closePool();
-    process.exit(0);
-  };
-  runTests().then(onExit);
-}
 
 export default runTests;
