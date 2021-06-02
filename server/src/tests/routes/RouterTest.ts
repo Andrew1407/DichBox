@@ -6,8 +6,8 @@ import { BoxData, UserData } from '../../datatypes';
 import Colors from '../../logger/colors';
 
 export default class RouterTest implements ITester {
-  private userRouter: UserRouterTest;
-  private boxesRouter: BoxesRouterTest;
+  private readonly userRouter: UserRouterTest;
+  private readonly boxesRouter: BoxesRouterTest;
 
   constructor() {
     const users: UserData[] = testUser.map(

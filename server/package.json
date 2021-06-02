@@ -1,13 +1,12 @@
 {
   "name": "dichbox_server",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "DichBox API",
   "main": "webpack.config.js",
   "scripts": {
     "start": "nodemon -x ts-node src/index.ts",
     "build": "webpack",
     "mkstorage": "mkdir -p ../../DichStorage/{boxes,logos/{boxes,users}}",
-    "initdb": "psql -f src/database/model.sql",
     "test": "ts-node src/tests/testRunner.ts"
   },
   "repository": {

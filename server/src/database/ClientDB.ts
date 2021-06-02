@@ -23,10 +23,10 @@ export default class ClientDB implements IClientDB {
     if (this.poolClient) return;
     try {
       this.poolClient = await new Pool({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USERNAME,
-        password: process.env.DB_PASSWD,
-        database: process.env.DB_NAME
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USERNAME || 'postgres',
+        password: process.env.DB_PASSWD || '',
+        database: process.env.DB_NAME || 'postgres'
       }).connect();
     } catch {
       errClb();

@@ -1,0 +1,21 @@
+version: "3"
+services:
+  test:
+    build:
+      context: .
+      dockerfile: "Dockerfile.test"
+    depends_on:
+      - "postgres"
+    ports:
+      - "${PORT}:${PORT}"
+  
+  postgres:
+    image: postgres:13
+    ports:
+      - "5438:5432"
+    environment:
+      POSTGRES_USER: "${DB_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWD}"
+      POSTGRES_DB: "${DB_NAME}"
+    volumes:
+      - "./server/src/database/model.sql:/docker-entrypoint-initdb.d/model.sql"

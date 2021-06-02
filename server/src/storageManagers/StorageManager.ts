@@ -10,7 +10,7 @@ export default class StorageManager implements IStorageManager {
   protected readonly storagePath: string;
 
   constructor(logosType: string) {
-    this.storagePath = process.env.STORAGE_PATH || '../../DichStorage';
+    this.storagePath = process.env.STORAGE_PATH || '../DichStorage';
     this.logosPath  = path.join(this.storagePath, 'logos', logosType);
   }
 
