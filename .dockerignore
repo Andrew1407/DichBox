@@ -3,6 +3,7 @@ DichStorage/
 
 # ignore .git and .cache folders
 .git
+.github
 .cache
 
 # project dependencies

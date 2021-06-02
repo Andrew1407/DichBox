@@ -1,0 +1,9 @@
+name: dichbox-app-compose-test
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: containers test
+        run: docker-compose -f docker-compose.test.yaml --env-file ./server/.env.example up --exit-code-from test
