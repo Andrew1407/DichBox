@@ -19,3 +19,6 @@ server/test-logs/
 
 # built artefact
 server/dist/
+
+# versions description
+**/changes-list.md
