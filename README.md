@@ -6,13 +6,13 @@ Storage web-service for editing boxes (storages) and their entries.
   + [container](#container)
   + [server](https://github.com/Andrew1407/DichBox/tree/main/server)
   + [browser client](https://github.com/Andrew1407/DichBox/tree/main/client)
-  + [mobile client](https://github.com/Andrew1407/DichBoxMobile-)
+  + [mobile client](https://github.com/Andrew1407/DichBoxMobile)
 
 ---
 
 ## Container
 
-#### Setup
+### Setup
 
 To run DichBox using docker-compose create environment file with fields:
   + **PORT** - app server port
@@ -33,3 +33,11 @@ Run docker-compose with specified environment file:
 
 For example (using variable for the server):
 > docker-compose --env-file ./server/.env.example up
+
+### Versions
+
+**1.0.0** (server v2.0.0, browser client v1.0.1):
+  + database and app services;
+  + container test;
+  + github workflows;
+  + documentation;

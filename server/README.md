@@ -14,6 +14,16 @@ Create **.env** file ([example](https://github.com/Andrew1407/DichBox/blob/main/
 Create *DichStorage* directory using path mentioned in *.env* file (STORAGE_PATH) or create default one:
 > npm run mkstorage
 
+To create database use script [**model.sql**](https://github.com/Andrew1407/DichBox/blob/main/server/src/database/model.sql). Also specify database host, name and user with password in *.env* file.
+
+To run the script use *psql* command:
+> psql -U [username] -d [dbname] -f src/database/model.sql
+
+Or use psql environment:
+> \i src/database/model.sql
+
+---
+
 Run tests:
 > npm test
 
