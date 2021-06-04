@@ -1,6 +1,8 @@
 # DichBox
 
-![DichBox icon](https://raw.githubusercontent.com/Andrew1407/DichBox/main/client/src/styles/imgs/full-logo.png)
+<p align="center">
+  <a target="blank"><img src="https://raw.githubusercontent.com/Andrew1407/DichBox/main/client/src/styles/imgs/full-logo.png" width="140" alt="DichBox Logo" /></a>
+</p>
 
 Storage web-service for editing boxes (storages) and their entries.
 
