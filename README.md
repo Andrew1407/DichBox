@@ -1,5 +1,7 @@
 # DichBox
 
+![DichBox icon](https://raw.githubusercontent.com/Andrew1407/DichBox/main/client/src/styles/imgs/full-logo.png)
+
 Storage web-service for editing boxes (storages) and their entries.
 
 **Components**:
@@ -21,17 +23,17 @@ To run DichBox using docker-compose create environment file with fields:
   + **DB_NAME** - database name
 
 Run test container (and database one) with specified environment file:
-> docker-compose -f docker-compose.test.yaml --env-file [environment file path] up --exit-code-from test
+> docker-compose -f docker-compose.test.yaml --env-file [environment file path] up --exit-code-from test; docker container rm dichbox_test_1
 
-For example (using variable for the server):
-> docker-compose -f docker-compose.test.yaml --env-file ./server/.env.example up --exit-code-from test
+For example (using .env file from the server):
+> docker-compose -f docker-compose.test.yaml --env-file ./server/.env.example up --exit-code-from test; docker container rm dichbox_test_1
 
 ---
 
 Run docker-compose with specified environment file:
 > docker-compose --env-file [environment file path] up
 
-For example (using variable for the server):
+For example (using .env file from the server):
 > docker-compose --env-file ./server/.env.example up
 
 ### Versions
