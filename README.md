@@ -25,10 +25,10 @@ To run DichBox using docker-compose create environment file with fields:
   + **DB_NAME** - database name
 
 Run test container (and database one) with specified environment file:
-> docker-compose -f docker-compose.test.yaml --env-file [environment file path] up --exit-code-from test; docker container rm dichbox_test_1
+> docker-compose -f docker-compose.test.yaml --env-file [environment file path] up --exit-code-from test; docker container rm dichbox_test_1 && docker rmi dichbox_test:latest
 
 For example (using .env file from the server):
-> docker-compose -f docker-compose.test.yaml --env-file ./server/.env.example up --exit-code-from test; docker container rm dichbox_test_1
+> docker-compose -f docker-compose.test.yaml --env-file ./server/.env.example up --exit-code-from test; docker container rm dichbox_test_1 && docker rmi dichbox_test:latest
 
 ---
 

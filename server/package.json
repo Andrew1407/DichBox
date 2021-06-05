@@ -6,14 +6,14 @@
   "scripts": {
     "start": "nodemon -x ts-node src/index.ts",
     "build": "webpack",
-    "mkstorage": "mkdir -p ../../DichStorage/{boxes,logos/{boxes,users}}",
+    "mkstorage": "bash -c 'mkdir -p ../DichStorage/{boxes,logos/{boxes,users}}'",
     "test": "ts-node src/tests/testRunner.ts"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Andrew1407/DichBox.git"
   },
-  "author": "Andrew1407, dgomilko",
+  "authors": "Andrew1407, dgomilko",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Andrew1407/DichBox/issues"
